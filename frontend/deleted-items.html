@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deleted Items - NSU IT Classroom Records</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="techCanvas"></canvas>
+    
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <span>NSU IT</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="dashboard.html" class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="devices.html" class="nav-item">
+                    <i class="fas fa-desktop"></i>
+                    <span>Devices</span>
+                </a>
+                <a href="rooms.html" class="nav-item">
+                    <i class="fas fa-door-open"></i>
+                    <span>Rooms</span>
+                </a>
+                <a href="installations.html" class="nav-item">
+                    <i class="fas fa-plug"></i>
+                    <span>Installations</span>
+                </a>
+                <a href="gate-passes.html" class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Gate Passes</span>
+                </a>
+                <a href="blog.html" class="nav-item">
+                    <i class="fas fa-newspaper"></i>
+                    <span>Blog & News</span>
+                </a>
+                <a href="import-data.html" class="nav-item">
+                    <i class="fas fa-file-import"></i>
+                    <span>Import Data</span>
+                </a>
+                <a href="deleted-items.html" class="nav-item active">
+                    <i class="fas fa-trash-restore"></i>
+                    <span>Deleted Items</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="user-role" id="userRole">...</div>
+                    </div>
+                </div>
+                <button class="btn-logout" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1><i class="fas fa-trash-restore"></i> Deleted Items</h1>
+                    <p class="page-subtitle">Restore or permanently delete items</p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab(event, 'devices')">
+                    <i class="fas fa-desktop"></i> Deleted Devices
+                </button>
+                <button class="tab-btn" onclick="switchTab(event, 'rooms')">
+                    <i class="fas fa-door-open"></i> Deleted Rooms
+                </button>
+            </div>
+
+            <!-- Deleted Devices Tab -->
+            <div id="devicesTab" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-desktop"></i> Deleted Devices</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Type</th>
+                                        <th>Brand</th>
+                                        <th>Model</th>
+                                        <th>Serial Number</th>
+                                        <th>Deleted By</th>
+                                        <th>Deleted At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deletedDevicesTableBody">
+                                    <tr>
+                                        <td colspan="8" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deleted Rooms Tab -->
+            <div id="roomsTab" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-door-open"></i> Deleted Rooms</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Room Number</th>
+                                        <th>Room Name</th>
+                                        <th>Building</th>
+                                        <th>Floor</th>
+                                        <th>Capacity</th>
+                                        <th>Deleted At</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="deletedRoomsTableBody">
+                                    <tr>
+                                        <td colspan="7" class="text-center">Loading...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Confirm Restore Modal -->
+    <div id="restoreModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-trash-restore"></i> Restore Item</h3>
+                <button class="btn-close" onclick="closeRestoreModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to restore this <span id="restoreType"></span>?</p>
+                <p class="text-muted"><strong id="restoreItemName"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRestoreModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="confirmRestore()">
+                    <i class="fas fa-trash-restore"></i> Restore
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Permanent Delete Modal -->
+    <div id="permanentDeleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Permanent Delete</h3>
+                <button class="btn-close" onclick="closePermanentDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="text-danger"><strong>Warning:</strong> This action cannot be undone!</p>
+                <p>Are you sure you want to permanently delete this <span id="deleteType"></span>?</p>
+                <p class="text-muted"><strong id="deleteItemName"></strong></p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closePermanentDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmPermanentDelete()">
+                    <i class="fas fa-trash"></i> Delete Permanently
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js?v=2"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/deleted-items.js"></script>
+    <script>
+        // Debug: Check if CONFIG is loaded
+        console.log('CONFIG loaded:', typeof CONFIG !== 'undefined');
+        if (typeof CONFIG !== 'undefined') {
+            console.log('CONFIG.ENDPOINTS:', CONFIG.ENDPOINTS);
+            console.log('DELETED_ITEMS endpoint:', CONFIG.ENDPOINTS.DELETED_ITEMS);
+        }
+        
+        // Particle animation
+        const canvas = document.getElementById('techCanvas');
+        canvas.style.willChange = 'contents';
+        const ctx = canvas.getContext('2d', { alpha: true, desynchronized: true });
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 3 + 1;
+                this.speedX = Math.random() * 0.5 - 0.25;
+                this.speedY = Math.random() * 0.5 - 0.25;
+                this.color = Math.random() > 0.5 ? 'rgba(26, 135, 190, 0.8)' : 'rgba(42, 40, 90, 0.8)';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width || this.x < 0) this.speedX *= -1;
+                if (this.y > canvas.height || this.y < 0) this.speedY *= -1;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        const particles = [];
+        for (let i = 0; i < 40; i++) {
+            particles.push(new Particle());
+        }
+
+        function connectParticles() {
+            for (let i = 0; i < particles.length; i++) {
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    if (distance < 150) {
+                        ctx.strokeStyle = `rgba(26, 135, 190, ${0.2 * (1 - distance / 150)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        let lastTime = 0;
+        const fps = 30; // Limit to 30 FPS for better performance
+        const interval = 1000 / fps;
+        
+        function animate(currentTime) {
+            requestAnimationFrame(animate);
+            
+            const deltaTime = currentTime - lastTime;
+            if (deltaTime < interval) return;
+            
+            lastTime = currentTime - (deltaTime % interval);
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            connectParticles();
+        }
+        animate(0);
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>

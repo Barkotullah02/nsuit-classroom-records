@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Gate Pass - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html" class="active"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <div>
+                    <button class="btn btn-secondary" onclick="window.location.href='gate-passes.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Gate Passes
+                    </button>
+                    <h1><i class="fas fa-plus-circle"></i> Create Gate Pass</h1>
+                    <p class="text-muted">Generate gate pass for device movement</p>
+                </div>
+            </div>
+
+            <!-- Create Gate Pass Form -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Gate Pass Information</h3>
+                </div>
+                <div style="padding: 30px;">
+                    <form id="gatePassForm">
+                        <div class="form-group">
+                            <label for="deviceSelect">Select Device *</label>
+                            <select id="deviceSelect" class="form-control" required>
+                                <option value="">Choose a device...</option>
+                            </select>
+                            <small class="form-text">Select any device from your inventory</small>
+                        </div>
+
+                        <div style="margin: 15px 0;">
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="addDeviceToList()" style="background: #28a745;">
+                                <i class="fas fa-plus"></i> Add This Device to Gate Pass
+                            </button>
+                        </div>
+
+                        <div id="selectedDevicesList" style="margin: 20px 0;">
+                            <h4 style="color: var(--primary-color); margin-bottom: 15px;">
+                                <i class="fas fa-list"></i> Devices in This Gate Pass (<span id="deviceCount">0</span>)
+                            </h4>
+                            <div id="devicesListContainer" style="background: #f8f9fa; padding: 15px; border-radius: 8px; min-height: 100px;">
+                                <p style="text-align: center; color: #666; margin: 20px 0;">No devices added yet. Select a device and click "Add This Device to Gate Pass".</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gatePassNumber">Gate Pass Number *</label>
+                            <input type="text" id="gatePassNumber" class="form-control" readonly required style="background-color: #f8f9fa; font-weight: bold; color: #007bff;">
+                            <small class="form-text">Auto-generated 6-digit unique number</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="gatePassDate">Gate Pass Date *</label>
+                            <input type="date" id="gatePassDate" class="form-control" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="consigneeName">Name & Address of Consignee *</label>
+                            <textarea id="consigneeName" class="form-control" rows="2" placeholder="Enter name and address of consignee" required></textarea>
+                            <small class="form-text">Person or department receiving the device</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="destination">Destination *</label>
+                            <input type="text" id="destination" class="form-control" placeholder="Enter destination location" required>
+                            <small class="form-text">Where is the device being moved to?</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="carrierName">Carrier/Handler Name *</label>
+                            <input type="text" id="carrierName" class="form-control" placeholder="Name of person carrying the device" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="carrierAppointment">Carrier Appointment *</label>
+                            <input type="text" id="carrierAppointment" class="form-control" placeholder="Job title/position" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="carrierDepartment">Carrier Department *</label>
+                            <input type="text" id="carrierDepartment" class="form-control" placeholder="Department name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="carrierTelephone">Carrier Telephone *</label>
+                            <input type="tel" id="carrierTelephone" class="form-control" placeholder="Contact number" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="securityName">Security Officer Name</label>
+                            <input type="text" id="securityName" class="form-control" placeholder="Name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="securityAppointment">Security Officer Appointment</label>
+                            <input type="text" id="securityAppointment" class="form-control" placeholder="Position">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="securityDepartment">Security Officer Department</label>
+                            <input type="text" id="securityDepartment" class="form-control" placeholder="Department" value="Duty Security Officer">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="securityTelephone">Security Officer Telephone</label>
+                            <input type="tel" id="securityTelephone" class="form-control" placeholder="Contact number">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="receiverName">Receiver Name</label>
+                            <input type="text" id="receiverName" class="form-control" placeholder="Name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="receiverAppointment">Receiver Appointment</label>
+                            <input type="text" id="receiverAppointment" class="form-control" placeholder="Position">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="receiverDepartment">Receiver Department</label>
+                            <input type="text" id="receiverDepartment" class="form-control" placeholder="Department">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="receiverTelephone">Receiver Telephone</label>
+                            <input type="tel" id="receiverTelephone" class="form-control" placeholder="Contact number">
+                        </div>
+                        </div>
+
+                        <div class="modal-footer" style="padding: 0; border: none; margin-top: 30px;">
+                            <button type="button" class="btn btn-secondary" onclick="window.location.href='gate-passes.html'">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-check"></i> Create Gate Pass
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        // Generate 6-digit number immediately when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            const gatePassField = document.getElementById('gatePassNumber');
+            if (gatePassField) {
+                const random6Digit = Math.floor(100000 + Math.random() * 900000);
+                gatePassField.value = random6Digit;
+                console.log('Gate Pass Number:', random6Digit);
+            }
+        });
+    </script>
+    <script src="js/create-gate-pass.js"></script>
+</body>
+</html>

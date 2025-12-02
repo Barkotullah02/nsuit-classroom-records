@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gate Passes - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html" class="active"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1><i class="fas fa-file-alt"></i> Gate Passes</h1>
+                <button class="btn btn-primary" onclick="window.location.href='create-gate-pass.html'">
+                    <i class="fas fa-plus"></i> Create Gate Pass
+                </button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="totalGatePasses">0</h3>
+                        <p>Total Gate Passes</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <i class="fas fa-calendar-day"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="thisMonthGatePasses">0</h3>
+                        <p>This Month</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <i class="fas fa-calendar-week"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="thisWeekGatePasses">0</h3>
+                        <p>This Week</p>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <i class="fas fa-calendar"></i>
+                    </div>
+                    <div class="stat-details">
+                        <h3 id="todayGatePasses">0</h3>
+                        <p>Today</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filters -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Filters</h3>
+                    <button class="btn btn-secondary btn-sm" id="clearFiltersBtn">Clear Filters</button>
+                </div>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filterDateFrom">From Date</label>
+                        <input type="date" id="filterDateFrom" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterDateTo">To Date</label>
+                        <input type="date" id="filterDateTo" class="form-control">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterSearch">Search</label>
+                        <input type="text" id="filterSearch" class="form-control" placeholder="Gate Pass #, Device ID, Room...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gate Passes Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Gate Pass Records</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Gate Pass #</th>
+                                <th>Date</th>
+                                <th>Device ID</th>
+                                <th>Type</th>
+                                <th>Room</th>
+                                <th>Installer</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="gatePassesTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/gate-passes.js"></script>
+</body>
+</html>

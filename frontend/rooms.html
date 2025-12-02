@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html" class="active"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Room Management</h1>
+                <button class="btn btn-primary" onclick="showAddRoomModal()">
+                    <i class="fas fa-plus"></i> Add Room
+                </button>
+            </div>
+
+            <!-- Rooms Grid -->
+            <div class="stats-grid" id="roomsGrid">
+                <div class="text-center" style="grid-column: 1/-1;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Room Modal -->
+    <div id="roomModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="roomModalTitle"><i class="fas fa-door-open"></i> Add Room</h3>
+                <button class="btn-close" onclick="closeRoomModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="roomForm">
+                    <input type="hidden" id="roomId">
+                    <div class="form-group">
+                        <label for="roomNumber">Room Number *</label>
+                        <input type="text" id="roomNumber" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="roomName">Room Name *</label>
+                        <input type="text" id="roomName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="building">Building</label>
+                        <input type="text" id="building">
+                    </div>
+                    <div class="form-group">
+                        <label for="floor">Floor</label>
+                        <input type="text" id="floor">
+                    </div>
+                    <div class="form-group">
+                        <label for="capacity">Capacity</label>
+                        <input type="number" id="capacity" min="1">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeRoomModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveRoom()">
+                    <i class="fas fa-save"></i> Save
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Delete Room</h3>
+                <button class="btn-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this room?</p>
+                <p class="text-muted"><strong id="deleteRoomName"></strong></p>
+                <p class="text-warning"><i class="fas fa-info-circle"></i> Room will be moved to deleted items and can be restored later.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        let currentRoomId = null;
+        let currentDeleteRoomId = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadRooms();
+        });
+
+        async function loadRooms() {
+            const result = await Utils.apiRequest(CONFIG.ENDPOINTS.ROOMS, {
+                method: 'GET'
+            });
+
+            if (result.success) {
+                displayRooms(result.data);
+            }
+        }
+
+        function displayRooms(rooms) {
+            const grid = document.getElementById('roomsGrid');
+            
+            if (!rooms || rooms.length === 0) {
+                grid.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">No rooms found</p>';
+                return;
+            }
+
+            let html = '';
+            rooms.forEach(room => {
+                html += `
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+                            <div>
+                                <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">
+                                    ${room.room_number}
+                                </h3>
+                                <p style="color: var(--text-secondary);">${room.room_name}</p>
+                            </div>
+                            <div class="stat-icon primary">
+                                <i class="fas fa-door-open"></i>
+                            </div>
+                        </div>
+                        <div style="border-top: 1px solid var(--border-color); padding-top: 16px; margin-bottom: 16px;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 14px;">
+                                <div>
+                                    <span style="color: var(--text-secondary);">Building:</span>
+                                    <strong>${room.building || 'N/A'}</strong>
+                                </div>
+                                <div>
+                                    <span style="color: var(--text-secondary);">Floor:</span>
+                                    <strong>${room.floor || 'N/A'}</strong>
+                                </div>
+                                <div>
+                                    <span style="color: var(--text-secondary);">Capacity:</span>
+                                    <strong>${room.capacity || 'N/A'}</strong>
+                                </div>
+                                <div>
+                                    <span style="color: var(--text-secondary);">Devices:</span>
+                                    <strong>${room.device_count || 0}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-sm btn-primary" onclick="showEditRoomModal(${room.room_id}, '${escapeHtml(room.room_number)}', '${escapeHtml(room.room_name)}', '${escapeHtml(room.building || '')}', '${escapeHtml(room.floor || '')}', ${room.capacity || 'null'})" style="flex: 1;">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="showDeleteModal(${room.room_id}, '${escapeHtml(room.room_number)} - ${escapeHtml(room.room_name)}')" style="flex: 1;">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function showAddRoomModal() {
+            currentRoomId = null;
+            document.getElementById('roomModalTitle').innerHTML = '<i class="fas fa-door-open"></i> Add Room';
+            document.getElementById('roomForm').reset();
+            document.getElementById('roomId').value = '';
+            document.getElementById('roomModal').classList.add('active');
+        }
+
+        function showEditRoomModal(id, number, name, building, floor, capacity) {
+            currentRoomId = id;
+            document.getElementById('roomModalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit Room';
+            document.getElementById('roomId').value = id;
+            document.getElementById('roomNumber').value = number;
+            document.getElementById('roomName').value = name;
+            document.getElementById('building').value = building;
+            document.getElementById('floor').value = floor;
+            document.getElementById('capacity').value = capacity || '';
+            document.getElementById('roomModal').classList.add('active');
+        }
+
+        function closeRoomModal() {
+            document.getElementById('roomModal').classList.remove('active');
+            currentRoomId = null;
+        }
+
+        async function saveRoom() {
+            const roomData = {
+                room_number: document.getElementById('roomNumber').value,
+                room_name: document.getElementById('roomName').value,
+                building: document.getElementById('building').value || null,
+                floor: document.getElementById('floor').value || null,
+                capacity: document.getElementById('capacity').value || null
+            };
+
+            if (currentRoomId) {
+                roomData.room_id = currentRoomId;
+            }
+
+            const method = currentRoomId ? 'PUT' : 'POST';
+            const result = await Utils.apiRequest(CONFIG.ENDPOINTS.ROOMS, {
+                method: method,
+                body: JSON.stringify(roomData)
+            });
+
+            if (result.success) {
+                Utils.showNotification(currentRoomId ? 'Room updated successfully' : 'Room created successfully', 'success');
+                closeRoomModal();
+                await loadRooms();
+            } else {
+                Utils.showNotification(result.message || 'Failed to save room', 'error');
+            }
+        }
+
+        function showDeleteModal(id, name) {
+            currentDeleteRoomId = id;
+            document.getElementById('deleteRoomName').textContent = name;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            currentDeleteRoomId = null;
+        }
+
+        async function confirmDelete() {
+            if (!currentDeleteRoomId) {
+                console.error('No room ID selected for deletion');
+                showNotification('No room selected', 'error');
+                return;
+            }
+
+            console.log('Deleting room with ID:', currentDeleteRoomId);
+
+            try {
+                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.ROOMS, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ room_id: currentDeleteRoomId })
+                });
+
+                console.log('Delete result:', result);
+
+                if (result.success) {
+                    showNotification('Room deleted successfully', 'success');
+                    closeDeleteModal();
+                    await loadRooms();
+                } else {
+                    showNotification(result.message || 'Failed to delete room', 'error');
+                }
+            } catch (error) {
+                console.error('Error deleting room:', error);
+                showNotification('Error deleting room: ' + error.message, 'error');
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification notification-${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? '#4caf50' : type === 'error' ? '#f44336' : '#2196f3'};
+                color: white;
+                padding: 15px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-in';
+                setTimeout(() => notification.remove(), 300);
+            }, 5000);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close modals when clicking outside
+        window.addEventListener('click', function(event) {
+            if (event.target.id === 'roomModal') {
+                closeRoomModal();
+            }
+            if (event.target.id === 'deleteModal') {
+                closeDeleteModal();
+            }
+        });
+    </script>
+</body>
+</html>

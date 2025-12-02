@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Devices - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html" class="active"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1>Device Management</h1>
+                <button class="btn btn-primary" id="addDeviceBtn">
+                    <i class="fas fa-plus"></i> Add Device
+                </button>
+            </div>
+
+            <!-- Filters -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Filters</h3>
+                    <button class="btn btn-secondary btn-sm" id="clearFiltersBtn">Clear Filters</button>
+                </div>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filterDeviceId">Device ID</label>
+                        <input type="text" id="filterDeviceId" placeholder="Search by device ID">
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterType">Device Type</label>
+                        <select id="filterType">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterBrand">Brand</label>
+                        <select id="filterBrand">
+                            <option value="">All Brands</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterRoom">Current Room</label>
+                        <select id="filterRoom">
+                            <option value="">All Rooms</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Devices Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Devices List</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Type</th>
+                                <th>Brand</th>
+                                <th>Model</th>
+                                <th>Current Room</th>
+                                <th>Total Lifetime</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="devicesTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Device Modal -->
+    <div id="deviceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add Device</h2>
+                <button class="close-btn" id="closeModalBtn">&times;</button>
+            </div>
+            <form id="deviceForm">
+                <input type="hidden" id="deviceId">
+                
+                <div class="form-group">
+                    <label for="deviceUniqueId">Device Unique ID *</label>
+                    <input type="text" id="deviceUniqueId" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="typeId">Device Type *</label>
+                    <div style="display: flex; gap: 8px;">
+                        <select id="typeId" class="form-control" required style="flex: 1;">
+                            <option value="">Select Type</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary" id="addTypeBtn" style="display: none;" title="Add new device type">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="brandId">Brand *</label>
+                    <div style="display: flex; gap: 8px;">
+                        <select id="brandId" class="form-control" required style="flex: 1;">
+                            <option value="">Select Brand</option>
+                        </select>
+                        <button type="button" class="btn btn-secondary" id="addBrandBtn" style="display: none;" title="Add new brand">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <input type="text" id="model" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="serialNumber">Serial Number</label>
+                    <input type="text" id="serialNumber" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="purchaseDate">Purchase Date</label>
+                    <input type="date" id="purchaseDate" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="warrantyPeriod">Warranty Period (months)</label>
+                    <input type="number" id="warrantyPeriod" class="form-control" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="notes">Notes</label>
+                    <textarea id="notes" class="form-control" rows="3"></textarea>
+                </div>
+
+                <div class="form-group" id="isActiveGroup" style="display: none;">
+                    <label>
+                        <input type="checkbox" id="isActive" checked> Device is Active
+                    </label>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Device</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Device History Modal -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Device History</h2>
+                <button class="close-btn" id="closeHistoryModalBtn">&times;</button>
+            </div>
+            <div id="historyContent">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Brand Modal -->
+    <div id="addBrandModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-copyright"></i> Add New Brand</h2>
+                <button class="close-btn" id="closeAddBrandModalBtn">&times;</button>
+            </div>
+            <form id="addBrandForm">
+                <div class="form-group">
+                    <label for="newBrandName">Brand Name *</label>
+                    <input type="text" id="newBrandName" class="form-control" placeholder="e.g., Dell, HP, Logitech" required>
+                    <small class="text-muted">Enter the manufacturer or brand name</small>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelAddBrandBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Brand
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Device Type Modal -->
+    <div id="addDeviceTypeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-laptop"></i> Add New Device Type</h2>
+                <button class="close-btn" id="closeAddDeviceTypeModalBtn">&times;</button>
+            </div>
+            <form id="addDeviceTypeForm">
+                <div class="form-group">
+                    <label for="newTypeName">Device Type Name *</label>
+                    <input type="text" id="newTypeName" class="form-control" placeholder="e.g., Projector, Monitor" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="newTypeDescription">Description</label>
+                    <textarea id="newTypeDescription" class="form-control" rows="3" placeholder="Optional description of this device type"></textarea>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelAddDeviceTypeBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Device Type
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/devices.js"></script>
+</body>
+</html>

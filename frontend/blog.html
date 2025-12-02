@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog & News - NSU IT Classroom Records</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .blog-container { display: grid; grid-template-columns: 1fr 350px; gap: 30px; padding: 20px; }
+        .blog-main { min-width: 0; }
+        .blog-sidebar { position: sticky; top: 20px; height: fit-content; }
+        .search-filter-bar { display: flex; gap: 15px; margin-bottom: 30px; flex-wrap: wrap; }
+        .search-box { flex: 1; min-width: 300px; position: relative; }
+        .search-box input { width: 100%; padding: 12px 40px 12px 15px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 14px; }
+        .search-box .fa-search { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+        .category-filter { display: flex; gap: 10px; flex-wrap: wrap; }
+        .category-btn { padding: 8px 16px; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 20px; cursor: pointer; transition: all 0.3s; font-size: 13px; }
+        .category-btn:hover, .category-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .post-card { background: var(--card-bg); border-radius: 12px; overflow: hidden; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); transition: all 0.3s; cursor: pointer; }
+        .post-card:hover { transform: translateY(-4px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+        .post-featured { height: 200px; overflow: hidden; background: linear-gradient(135deg, var(--primary-color), var(--primary-light)); position: relative; }
+        .post-featured img { width: 100%; height: 100%; object-fit: cover; }
+        .post-category-badge { position: absolute; top: 15px; left: 15px; padding: 4px 12px; background: rgba(255,255,255,0.95); border-radius: 12px; font-size: 11px; font-weight: 600; color: var(--primary-color); }
+        .post-pinned-badge { position: absolute; top: 15px; right: 15px; padding: 4px 12px; background: #f59e0b; border-radius: 12px; font-size: 11px; font-weight: 600; color: white; }
+        .post-content { padding: 20px; }
+        .post-title { font-size: 20px; font-weight: 600; margin-bottom: 10px; color: var(--text-primary); line-height: 1.4; }
+        .post-excerpt { color: var(--text-secondary); font-size: 14px; line-height: 1.6; margin-bottom: 15px; }
+        .post-meta { display: flex; align-items: center; gap: 20px; font-size: 13px; color: var(--text-secondary); }
+        .post-meta-item { display: flex; align-items: center; gap: 5px; }
+        .sidebar-section { background: var(--card-bg); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .sidebar-title { font-size: 18px; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+        .popular-post { padding: 12px 0; border-bottom: 1px solid var(--border-color); cursor: pointer; transition: all 0.2s; }
+        .popular-post:last-child { border-bottom: none; }
+        .popular-post:hover { background: rgba(var(--primary-rgb), 0.05); margin: 0 -12px; padding: 12px; border-radius: 8px; }
+        .popular-post-title { font-size: 14px; font-weight: 500; margin-bottom: 5px; line-height: 1.4; }
+        .popular-post-meta { font-size: 12px; color: var(--text-secondary); }
+        .pagination { display: flex; justify-content: center; gap: 10px; margin-top: 30px; }
+        .page-btn { padding: 8px 16px; border: 1px solid var(--border-color); background: var(--card-bg); border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .page-btn:hover, .page-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .no-posts { text-align: center; padding: 60px 20px; color: var(--text-secondary); }
+        @media (max-width: 1024px) { .blog-container { grid-template-columns: 1fr; } .blog-sidebar { position: static; } }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Device Manager</h2>
+            </div>
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="blog.html" class="active"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1><i class="fas fa-newspaper"></i> Blog & News</h1>
+                    <p style="margin-top: 5px; color: var(--text-secondary);">Latest updates, announcements, and articles</p>
+                </div>
+                <button class="btn btn-primary" id="createPostBtn" style="display: none;">
+                    <i class="fas fa-plus"></i> Create Post
+                </button>
+            </div>
+
+            <div class="blog-container">
+                <div class="blog-main">
+                    <div class="search-filter-bar">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Search posts...">
+                            <i class="fas fa-search"></i>
+                        </div>
+                    </div>
+
+                    <div class="category-filter" id="categoryFilter">
+                        <button class="category-btn active" data-category="">All</button>
+                    </div>
+
+                    <div id="postsContainer" style="margin-top: 30px;">
+                        <div style="text-align: center; padding: 40px;">
+                            <div class="spinner"></div>
+                        </div>
+                    </div>
+
+                    <div id="pagination" class="pagination"></div>
+                </div>
+
+                <div class="blog-sidebar">
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title"><i class="fas fa-fire"></i> Popular Posts</h3>
+                        <div id="popularPosts">
+                            <div style="text-align: center; padding: 20px;">
+                                <div class="spinner" style="width: 30px; height: 30px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-section">
+                        <h3 class="sidebar-title"><i class="fas fa-tags"></i> Categories</h3>
+                        <div id="categoriesStats"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js?v=4"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/blog.js?v=5"></script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Data - Classroom Device Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html" class="active"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <h1><i class="fas fa-file-import"></i> Import Data from CSV</h1>
+                <p>Upload CSV files to bulk import devices, rooms, or other data</p>
+            </div>
+
+            <div id="alert-container"></div>
+
+            <!-- Import Instructions -->
+            <div class="card" style="margin-bottom: 30px;">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-info-circle"></i> Instructions</h3>
+                </div>
+                <div style="padding: 20px;">
+                    <h4>CSV Format Requirements:</h4>
+                    <ul style="line-height: 2;">
+                        <li><strong>Devices CSV:</strong> Must have columns: <code>device_unique_id, type_name, brand_name, model, serial_number, purchase_date, warranty_period, notes</code></li>
+                        <li><strong>Rooms CSV:</strong> Must have columns: <code>room_number, room_name, building, floor, capacity</code></li>
+                        <li><strong>Installation History CSV:</strong> Must have columns: <code>device_unique_id, room_number, installation_date, installation_time, installer_name, installer_id, withdrawal_date, withdrawal_time, withdrawer_name, withdrawer_id, data_entry_by, status, notes</code></li>
+                        <li><strong>First row must be header row</strong> with column names</li>
+                        <li>Date format should be: YYYY-MM-DD (e.g., 2025-01-15)</li>
+                        <li>Time format should be: HH:MM:SS (e.g., 14:30:00) - Leave empty if not applicable</li>
+                        <li>For Installation History: <code>status</code> should be 'active' or 'withdrawn'. Leave withdrawal fields empty for active installations</li>
+                        <li>File must be in CSV format (.csv extension)</li>
+                    </ul>
+                    
+                    <h4 style="margin-top: 20px;">Download Sample Templates:</h4>
+                    <button class="btn btn-secondary" onclick="downloadDeviceTemplate()">
+                        <i class="fas fa-download"></i> Download Devices Template
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadRoomTemplate()">
+                        <i class="fas fa-download"></i> Download Rooms Template
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadInstallationTemplate()">
+                        <i class="fas fa-download"></i> Download Installation History Template
+                    </button>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><i class="fas fa-upload"></i> Upload CSV File</h3>
+                </div>
+                <div style="padding: 30px;">
+                    <form id="importForm">
+                        <div class="form-group">
+                            <label for="importType">Import Type *</label>
+                            <select id="importType" class="form-control" required>
+                                <option value="">Select what you want to import...</option>
+                                <option value="devices">Devices (Basic Info)</option>
+                                <option value="rooms">Rooms</option>
+                                <option value="installations">Installation History</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="csvFile">CSV File *</label>
+                            <input type="file" id="csvFile" class="form-control" accept=".csv" required>
+                            <small class="form-text">Select a CSV file to upload</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="skipDuplicates" checked>
+                                Skip duplicate entries (recommended)
+                            </label>
+                        </div>
+
+                        <div style="display: flex; gap: 10px; margin-top: 20px;">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> Upload and Import
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+                                <i class="fas fa-redo"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+
+                    <!-- Progress -->
+                    <div id="importProgress" style="display: none; margin-top: 30px;">
+                        <h4>Import Progress</h4>
+                        <div style="background: #f0f0f0; padding: 20px; border-radius: 8px;">
+                            <div id="progressText">Processing...</div>
+                            <div style="margin-top: 10px; background: #ddd; height: 30px; border-radius: 5px; overflow: hidden;">
+                                <div id="progressBar" style="background: #28a745; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Results -->
+                    <div id="importResults" style="display: none; margin-top: 30px;">
+                        <h4>Import Results</h4>
+                        <div id="resultsContent" style="background: #f8f9fa; padding: 20px; border-radius: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/import-data.js"></script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device History - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            .sidebar,
+            .btn,
+            button {
+                display: none !important;
+            }
+
+            .container {
+                display: block;
+            }
+
+            .main-content {
+                margin: 0;
+                padding: 20px;
+            }
+
+            .page-header {
+                margin-bottom: 20px;
+            }
+
+            .card {
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            @page {
+                size: A4 landscape;
+                margin: 1cm;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Classroom</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="dashboard.html">
+                    <i class="fas fa-dashboard"></i> Dashboard
+                </a>
+                <a href="devices.html" class="active">
+                    <i class="fas fa-laptop"></i> Devices
+                </a>
+                <a href="installations.html">
+                    <i class="fas fa-exchange-alt"></i> Installations
+                </a>
+                <a href="rooms.html">
+                    <i class="fas fa-door-open"></i> Rooms
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <div>
+                        <div id="userName" class="user-name">Loading...</div>
+                        <div id="userRole" class="user-role"></div>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="Utils.logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <button class="btn btn-secondary" onclick="window.location.href='devices.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Devices
+                    </button>
+                    <h1 id="pageTitle"><i class="fas fa-history"></i> Device History</h1>
+                    <p id="deviceInfo">Loading device information...</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print History
+                </button>
+            </div>
+
+            <!-- Device Details Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Device Information</h3>
+                </div>
+                <div id="deviceDetails" style="padding: 20px;">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+
+            <!-- Installation History -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Installation History</h3>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Room</th>
+                                <th>Building</th>
+                                <th>Installed Date</th>
+                                <th>Withdrawn Date</th>
+                                <th>Days in Room</th>
+                                <th>Status</th>
+                                <th>Installed By</th>
+                                <th>Withdrawn By</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center">
+                                    <div class="spinner"></div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Summary Statistics -->
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Usage Statistics</h3>
+                </div>
+                <div style="padding: 20px;">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalInstallations">0</div>
+                            <div class="stat-label">Total Installations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalDays">0</div>
+                            <div class="stat-label">Total Days Used</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="roomsUsed">0</div>
+                            <div class="stat-label">Rooms Used</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="avgDaysPerRoom">0</div>
+                            <div class="stat-label">Avg Days per Room</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/device-history.js"></script>
+</body>
+</html>
