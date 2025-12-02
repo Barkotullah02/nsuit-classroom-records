@@ -137,7 +137,8 @@
                         <button type="button" class="editor-btn" onclick="formatText('postExcerpt', 'italic')" title="Italic"><i class="fas fa-italic"></i></button>
                         <button type="button" class="editor-btn" onclick="formatText('postExcerpt', 'underline')" title="Underline"><i class="fas fa-underline"></i></button>
                     </div>
-                    <textarea id="postExcerpt" class="editor-textarea" rows="3"></textarea>
+                    <textarea id="postExcerpt" class="editor-textarea" rows="3" placeholder="Enter a brief summary of your post..."></textarea>
+                    <small style="color: var(--text-secondary); font-size: 12px;">Tip: Select text and click buttons to format</small>
                 </div>
 
                 <div class="form-group">
@@ -154,7 +155,7 @@
                         <button type="button" class="editor-btn" onclick="formatText('postContent', 'link')" title="Insert Link"><i class="fas fa-link"></i></button>
                         <button type="button" class="editor-btn" onclick="formatText('postContent', 'quote')" title="Quote"><i class="fas fa-quote-right"></i></button>
                     </div>
-                    <textarea id="postContent" class="editor-textarea" required></textarea>
+                    <textarea id="postContent" class="editor-textarea" required placeholder="Write your post content here...&#10;&#10;Select text and use the formatting toolbar above to:&#10;• Make text bold, italic, or underlined&#10;• Create headings (H1, H2, H3)&#10;• Add bullet or numbered lists&#10;• Insert links&#10;• Add quotes"></textarea>
                 </div>
 
                 <div class="form-group image-upload-container">
@@ -184,6 +185,6 @@
 
     <script src="js/config.js?v=4"></script>
     <script src="js/utils.js"></script>
-    <script src="js/blog-admin.js?v=5"></script>
+    <script src="js/blog-admin.js?v=6"></script>
 </body>
 </html>

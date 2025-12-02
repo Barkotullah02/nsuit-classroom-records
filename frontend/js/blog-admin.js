@@ -128,6 +128,7 @@ function openCreateModal() {
     document.getElementById('submitBtnText').textContent = 'Create Post';
     document.getElementById('postForm').reset();
     document.getElementById('postId').value = '';
+    removeImage(); // Clear any image preview
     document.getElementById('postModal').classList.add('active');
 }
 
@@ -147,8 +148,21 @@ async function editPost(postId) {
             document.getElementById('postStatus').value = post.status;
             document.getElementById('postExcerpt').value = post.excerpt || '';
             document.getElementById('postContent').value = post.content;
-            document.getElementById('postImage').value = post.featured_image || '';
             document.getElementById('postPinned').checked = post.is_pinned == 1;
+            
+            // Handle existing featured image
+            if (post.featured_image) {
+                const preview = document.getElementById('imagePreview');
+                const removeBtn = document.querySelector('.remove-image');
+                const imageData = document.getElementById('postImageData');
+                
+                preview.src = post.featured_image;
+                preview.classList.add('show');
+                removeBtn.classList.add('show');
+                imageData.value = post.featured_image;
+            } else {
+                removeImage();
+            }
             
             document.getElementById('postModal').classList.add('active');
         }
@@ -162,13 +176,15 @@ async function handleFormSubmit(e) {
     e.preventDefault();
     
     const postId = document.getElementById('postId').value;
+    const imageData = document.getElementById('postImageData').value; // Get base64 image data
+    
     const formData = {
         title: document.getElementById('postTitle').value.trim(),
         category_id: document.getElementById('postCategory').value,
         status: document.getElementById('postStatus').value,
         excerpt: document.getElementById('postExcerpt').value.trim(),
         content: document.getElementById('postContent').value.trim(),
-        featured_image: document.getElementById('postImage').value.trim() || null,
+        featured_image: imageData || null, // Use base64 data
         is_pinned: document.getElementById('postPinned').checked ? 1 : 0
     };
 
@@ -189,14 +205,20 @@ async function handleFormSubmit(e) {
             response = await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, 'POST', formData);
         }
 
-        if (response.success) {
+        console.log('API Response:', response);
+
+        if (response && response.success) {
             showNotification(postId ? 'Post updated successfully' : 'Post created successfully', 'success');
             closePostModal();
             await loadAllPosts();
+        } else {
+            showNotification(response?.message || 'Failed to save post', 'error');
         }
     } catch (error) {
         console.error('Failed to save post:', error);
-        showNotification(error.message || 'Failed to save post', 'error');
+        showNotification(error.message || 'Failed to save post. Please try again.', 'error');
+    }
+}
     }
 }
 
@@ -221,6 +243,7 @@ async function deletePost(postId) {
 function closePostModal() {
     document.getElementById('postModal').classList.remove('active');
     document.getElementById('postForm').reset();
+    removeImage(); // Clear image preview
     editingPostId = null;
 }
 
@@ -231,6 +254,115 @@ document.addEventListener('click', (e) => {
         closePostModal();
     }
 });
+
+// Text formatting functions - WYSIWYG style (like MS Word)
+function formatText(textareaId, format) {
+    const textarea = document.getElementById(textareaId);
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    
+    if (!selectedText && format !== 'link') {
+        alert('Please select text to format');
+        return;
+    }
+    
+    let replacement = '';
+    let cursorOffset = 0;
+    
+    switch(format) {
+        case 'bold':
+            replacement = `<strong>${selectedText}</strong>`;
+            cursorOffset = 8; // length of <strong>
+            break;
+        case 'italic':
+            replacement = `<em>${selectedText}</em>`;
+            cursorOffset = 4; // length of <em>
+            break;
+        case 'underline':
+            replacement = `<u>${selectedText}</u>`;
+            cursorOffset = 3; // length of <u>
+            break;
+        case 'h1':
+            replacement = `<h1>${selectedText}</h1>`;
+            cursorOffset = 4;
+            break;
+        case 'h2':
+            replacement = `<h2>${selectedText}</h2>`;
+            cursorOffset = 4;
+            break;
+        case 'h3':
+            replacement = `<h3>${selectedText}</h3>`;
+            cursorOffset = 4;
+            break;
+        case 'ul':
+            const ulLines = selectedText.split('\n').filter(l => l.trim());
+            replacement = '<ul>\n' + ulLines.map(line => `  <li>${line.trim()}</li>`).join('\n') + '\n</ul>';
+            cursorOffset = 5;
+            break;
+        case 'ol':
+            const olLines = selectedText.split('\n').filter(l => l.trim());
+            replacement = '<ol>\n' + olLines.map(line => `  <li>${line.trim()}</li>`).join('\n') + '\n</ol>';
+            cursorOffset = 5;
+            break;
+        case 'link':
+            const url = prompt('Enter URL:', 'https://');
+            if (url) {
+                replacement = `<a href="${url}" target="_blank">${selectedText || url}</a>`;
+                cursorOffset = 9 + url.length;
+            } else {
+                return;
+            }
+            break;
+        case 'quote':
+            replacement = `<blockquote>${selectedText}</blockquote>`;
+            cursorOffset = 12;
+            break;
+        default:
+            return;
+    }
+    
+    // Replace selected text
+    const newValue = textarea.value.substring(0, start) + replacement + textarea.value.substring(end);
+    textarea.value = newValue;
+    
+    // Set cursor position after the opening tag
+    textarea.focus();
+    textarea.setSelectionRange(start + cursorOffset, start + cursorOffset + selectedText.length);
+}
+
+// Image preview and handling
+function previewImage(input) {
+    const preview = document.getElementById('imagePreview');
+    const removeBtn = document.querySelector('.remove-image');
+    const imageData = document.getElementById('postImageData');
+    
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.add('show');
+            removeBtn.classList.add('show');
+            imageData.value = e.target.result; // Store base64 data
+        };
+        
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+function removeImage() {
+    const input = document.getElementById('postImage');
+    const preview = document.getElementById('imagePreview');
+    const removeBtn = document.querySelector('.remove-image');
+    const imageData = document.getElementById('postImageData');
+    
+    input.value = '';
+    preview.src = '';
+    preview.classList.remove('show');
+    removeBtn.classList.remove('show');
+    imageData.value = '';
+}
 
 function showNotification(message, type = 'info') {
     const notification = document.createElement('div');

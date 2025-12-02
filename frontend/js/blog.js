@@ -273,7 +273,7 @@ async function loadPost(postId) {
                     </div>
                 </div>
                 ${post.featured_image ? `<div class="post-featured-main"><img src="${post.featured_image}" alt="${post.title}"></div>` : ''}
-                <div class="post-body">${post.content.replace(/\n/g, '<br>')}</div>
+                <div class="post-body">${renderMarkdown(post.content)}</div>
             `;
 
             // Show admin actions if user is admin
@@ -479,6 +479,50 @@ async function deletePost(postId) {
         console.error('Failed to delete post:', error);
         showNotification('Failed to delete post', 'error');
     }
+}
+
+// Simple HTML/markdown renderer
+function renderMarkdown(text) {
+    if (!text) return '';
+    
+    // If text already contains HTML tags, return as is (it's already formatted)
+    if (/<[a-z][\s\S]*>/i.test(text)) {
+        return text;
+    }
+    
+    // Otherwise, convert markdown to HTML for backward compatibility
+    // Escape HTML first for markdown content
+    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    
+    // Headers
+    text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+    
+    // Bold
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // Italic
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    
+    // Underline
+    text = text.replace(/__(.+?)__/g, '<u>$1</u>');
+    
+    // Links
+    text = text.replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Quotes
+    text = text.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+    
+    // Lists
+    text = text.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+    text = text.replace(/^- (.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>');
+    
+    // Line breaks
+    text = text.replace(/\n/g, '<br>');
+    
+    return text;
 }
 
 function showNotification(message, type = 'info') {
