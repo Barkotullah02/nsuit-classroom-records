@@ -4,13 +4,18 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Only run login page logic if we're on the login page
+    const loginForm = document.getElementById('loginForm');
+    if (!loginForm) {
+        // Not on login page, skip
+        return;
+    }
+
     // Redirect if already logged in
     if (Utils.isLoggedIn()) {
         window.location.href = 'dashboard.html';
         return;
     }
-
-    const loginForm = document.getElementById('loginForm');
     
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();

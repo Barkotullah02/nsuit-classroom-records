@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Classroom Support - NSU Classroom Records</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            text-align: center;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--primary-color);
+        }
+
+        .stat-card h3 {
+            margin: 0.5rem 0;
+            font-size: 2rem;
+            color: var(--text-color);
+        }
+
+        .stat-card p {
+            margin: 0;
+            color: #666;
+        }
+        
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+        }
+        
+        .modal-large {
+            max-width: 800px;
+            width: 90%;
+        }
+        
+        .team-member-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            transition: all 0.2s;
+        }
+        
+        .team-member-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+        }
+        
+        .priority-high {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        
+        .priority-medium {
+            color: #ffc107;
+            font-weight: bold;
+        }
+        
+        .priority-low {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .status-in-progress {
+            background-color: #cce5ff;
+            color: #004085;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #teamMembersSection h2 {
+            margin: 2rem 0 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-school"></i> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="classroom-support.html" class="active"><i class="fas fa-headset"></i> Classroom Support</a></li>
+                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1><i class="fas fa-headset"></i> Classroom Support</h1>
+                <p>Track and manage classroom technical support activities</p>
+                <button class="btn btn-primary" onclick="showNewSupportModal()">
+                    <i class="fas fa-plus"></i> New Support Record
+                </button>
+            </div>
+
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-ticket-alt"></i></div>
+                    <h3 id="totalSupports">0</h3>
+                    <p>Total Supports</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                    <h3 id="pendingSupports">0</h3>
+                    <p>Pending</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                    <h3 id="completedSupports">0</h3>
+                    <p>Completed</p>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <h3 id="activeMembers">0</h3>
+                    <p>Active Team Members</p>
+                </div>
+            </div>
+
+            <!-- Team Members Section (Admin Only) -->
+            <div id="teamMembersSection" style="display: none;">
+                <h2><i class="fas fa-users"></i> Team Members</h2>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Add/Edit Team Member</h3>
+                    </div>
+                    <form id="teamMemberForm">
+                        <input type="hidden" id="teamMemberId">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Name *</label>
+                                <input type="text" id="teamMemberName" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <input type="email" id="teamMemberEmail">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <input type="tel" id="teamMemberPhone">
+                            </div>
+                            <div class="form-group">
+                                <label>Department</label>
+                                <input type="text" id="teamMemberDepartment">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="teamMemberActive" checked> Active
+                            </label>
+                        </div>
+                        <div class="button-group">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Member
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetTeamMemberForm()">
+                                <i class="fas fa-times"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Team Members List</h3>
+                    </div>
+                    <div id="teamMembersList"></div>
+                </div>
+            </div>
+
+            <!-- Support Records -->
+            <h2><i class="fas fa-list"></i> Support Records</h2>
+
+            <!-- Filters -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Filters</h3>
+                </div>
+                <div class="filter-grid">
+                    <div class="form-group">
+                        <label>Team Member</label>
+                        <select id="filterMember">
+                            <option value="">All Members</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date From</label>
+                        <input type="date" id="filterDateFrom">
+                    </div>
+                    <div class="form-group">
+                        <label>Date To</label>
+                        <input type="date" id="filterDateTo">
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="filterStatus">
+                            <option value="">All Statuses</option>
+                            <option value="PENDING">Pending</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Issue Type</label>
+                        <select id="filterIssueType">
+                            <option value="">All Types</option>
+                            <option value="TECHNICAL">Technical</option>
+                            <option value="SETUP">Setup</option>
+                            <option value="TRAINING">Training</option>
+                            <option value="MAINTENANCE">Maintenance</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>&nbsp;</label>
+                        <button class="btn btn-primary" onclick="loadSupportRecords()">
+                            <i class="fas fa-filter"></i> Apply
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Support Records Table -->
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Team Member</th>
+                                <th>Location</th>
+                                <th>Description</th>
+                                <th>Issue Type</th>
+                                <th>Priority</th>
+                                <th>Status</th>
+                                <th>Duration</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="supportRecordsTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Support Record Modal -->
+    <div id="supportModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="supportModalTitle">
+                    <i class="fas fa-plus"></i> New Support Record
+                </h2>
+                <button class="close-btn" onclick="closeSupportModal()">&times;</button>
+            </div>
+            <form id="supportRecordForm">
+                <input type="hidden" id="supportId">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Team Member *</label>
+                        <select id="supportMemberId" required>
+                            <option value="">Select Team Member</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Date *</label>
+                        <input type="date" id="supportDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Time *</label>
+                        <input type="time" id="supportTime" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Location (Classroom) *</label>
+                        <input type="text" id="supportLocation" placeholder="e.g., NAC 501" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Room (Optional)</label>
+                        <select id="supportRoomId">
+                            <option value="">Select Room</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Support Description *</label>
+                    <textarea id="supportDescription" rows="3" required></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Issue Type</label>
+                        <select id="supportIssueType">
+                            <option value="TECHNICAL">Technical</option>
+                            <option value="SETUP">Setup</option>
+                            <option value="TRAINING">Training</option>
+                            <option value="MAINTENANCE">Maintenance</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Priority</label>
+                        <select id="supportPriority">
+                            <option value="LOW">Low</option>
+                            <option value="MEDIUM" selected>Medium</option>
+                            <option value="HIGH">High</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="supportStatus">
+                            <option value="PENDING">Pending</option>
+                            <option value="IN_PROGRESS">In Progress</option>
+                            <option value="COMPLETED">Completed</option>
+                            <option value="CANCELLED">Cancelled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input type="number" id="supportDuration" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label>Faculty Name</label>
+                        <input type="text" id="supportFacultyName">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Devices Involved</label>
+                    <input type="text" id="supportDevices" placeholder="e.g., Projector, Microphone">
+                </div>
+                <div class="form-group">
+                    <label>Additional Notes</label>
+                    <textarea id="supportNotes" rows="2"></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeSupportModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/classroom-support.js"></script>
+</body>
+</html>

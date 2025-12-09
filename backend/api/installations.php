@@ -40,6 +40,11 @@ switch ($method) {
                 $params[':status'] = $_GET['status'];
             }
 
+            if (isset($_GET['installation_type'])) {
+                $where .= " AND di.installation_type = :installation_type";
+                $params[':installation_type'] = $_GET['installation_type'];
+            }
+
             $query = "SELECT 
                         di.installation_id,
                         di.device_id,
@@ -47,15 +52,24 @@ switch ($method) {
                         dt.type_name,
                         db.brand_name,
                         d.model,
+                        d.serial_number,
+                        d.device_status,
+                        d.current_issue,
+                        d.storage_location as device_storage_location,
                         di.room_id,
                         r.room_number,
                         r.room_name,
+                        r.building,
                         di.installed_date,
                         di.withdrawn_date,
                         DATEDIFF(IFNULL(di.withdrawn_date, CURDATE()), di.installed_date) as days_in_room,
                         di.status,
+                        di.installation_type,
                         di.installation_notes,
                         di.withdrawal_notes,
+                        di.team_members,
+                        di.issue_at_withdrawal,
+                        di.storage_location as withdrawal_storage_location,
                         di.gate_pass_number,
                         di.gate_pass_date,
                         COALESCE(di.installer_name, u_installed.full_name) as installed_by_name,
@@ -122,10 +136,10 @@ switch ($method) {
 
             $query = "INSERT INTO device_installations 
                      (device_id, room_id, installed_date, installed_by, installer_name, installer_id, 
-                      installation_notes, gate_pass_number, gate_pass_date, data_entry_by, status) 
+                      installation_notes, team_members, installation_type, gate_pass_number, gate_pass_date, data_entry_by, status) 
                      VALUES 
                      (:device_id, :room_id, :installed_date, :installed_by, :installer_name, :installer_id,
-                      :installation_notes, :gate_pass_number, :gate_pass_date, :data_entry_by, 'active')";
+                      :installation_notes, :team_members, :installation_type, :gate_pass_number, :gate_pass_date, :data_entry_by, 'active')";
 
             $stmt = $db->prepare($query);
             $stmt->bindParam(':device_id', $data['device_id']);
@@ -135,6 +149,8 @@ switch ($method) {
             $stmt->bindParam(':installer_name', $data['installer_name']);
             $stmt->bindParam(':installer_id', $data['installer_id']);
             $stmt->bindParam(':installation_notes', $data['installation_notes']);
+            $stmt->bindParam(':team_members', $data['team_members']);
+            $stmt->bindParam(':installation_type', $data['installation_type']);
             $stmt->bindParam(':gate_pass_number', $data['gate_pass_number']);
             $stmt->bindParam(':gate_pass_date', $data['gate_pass_date']);
             $stmt->bindParam(':data_entry_by', $user['user_id']);
@@ -185,6 +201,8 @@ switch ($method) {
                      withdrawer_name = :withdrawer_name,
                      withdrawer_id = :withdrawer_id,
                      withdrawal_notes = :withdrawal_notes,
+                     issue_at_withdrawal = :issue_at_withdrawal,
+                     storage_location = :storage_location,
                      data_entry_by = :data_entry_by,
                      status = 'withdrawn'
                      WHERE installation_id = :installation_id";
@@ -196,6 +214,8 @@ switch ($method) {
             $stmt->bindParam(':withdrawer_name', $data['withdrawer_name']);
             $stmt->bindParam(':withdrawer_id', $data['withdrawer_id']);
             $stmt->bindParam(':withdrawal_notes', $data['withdrawal_notes']);
+            $stmt->bindParam(':issue_at_withdrawal', $data['issue_at_withdrawal']);
+            $stmt->bindParam(':storage_location', $data['storage_location']);
             $stmt->bindParam(':data_entry_by', $user['user_id']);
 
             if ($stmt->execute()) {

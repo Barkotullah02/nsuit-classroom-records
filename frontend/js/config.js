@@ -20,7 +20,9 @@ const CONFIG = {
         BLOG_POSTS: '/blog-posts.php',
         BLOG_COMMENTS: '/blog-comments.php',
         BLOG_REACTIONS: '/blog-reactions.php',
-        BLOG_CATEGORIES: '/blog-categories.php'
+        BLOG_CATEGORIES: '/blog-categories.php',
+        SUPPORT_TEAM: '/support-team.php',
+        CLASSROOM_SUPPORT: '/classroom-support.php'
     },
 
     // User roles

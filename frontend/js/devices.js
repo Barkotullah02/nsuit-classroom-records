@@ -54,6 +54,7 @@ function initializeEventListeners() {
         Utils.debounce(() => loadDevices(), 500));
     document.getElementById('filterType').addEventListener('change', () => loadDevices());
     document.getElementById('filterBrand').addEventListener('change', () => loadDevices());
+    document.getElementById('filterStatus').addEventListener('change', () => loadDevices());
     document.getElementById('filterRoom').addEventListener('change', () => loadDevices());
     
     document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
@@ -98,11 +99,13 @@ async function loadDevices() {
     const typeId = document.getElementById('filterType').value;
     const brandId = document.getElementById('filterBrand').value;
     const roomId = document.getElementById('filterRoom').value;
+    const status = document.getElementById('filterStatus')?.value;
 
     if (deviceId) params.append('device_unique_id', deviceId);
     if (typeId) params.append('type_id', typeId);
     if (brandId) params.append('brand_id', brandId);
     if (roomId) params.append('room_id', roomId);
+    if (status) params.append('device_status', status);
 
     const queryString = params.toString();
     const url = CONFIG.ENDPOINTS.DEVICES + (queryString ? '?' + queryString : '');
@@ -126,33 +129,61 @@ function displayDevices(devicesList) {
     const tbody = document.getElementById('devicesTableBody');
     
     if (!devicesList || devicesList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No devices found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center">No devices found</td></tr>';
         return;
     }
 
     let html = '';
     devicesList.forEach(device => {
-        const statusBadge = device.is_active 
-            ? '<span class="badge badge-success">Active</span>' 
-            : '<span class="badge badge-danger">Inactive</span>';
+        // Device status badge with Excel-like colors
+        let statusClass = '';
+        let statusText = device.device_status || 'N/A';
+        switch(device.device_status) {
+            case 'NEW':
+                statusClass = 'badge-success';
+                break;
+            case 'REPAIR':
+                statusClass = 'badge-danger';
+                break;
+            case 'USED':
+                statusClass = 'badge-warning';
+                break;
+            case 'WITHDRAWN':
+                statusClass = 'badge-secondary';
+                break;
+            default:
+                statusClass = 'badge-info';
+        }
+        const statusBadge = `<span class="badge ${statusClass}">${statusText}</span>`;
 
         const currentRoom = device.current_room_number 
-            ? `${device.current_room_number} - ${device.current_room_name}` 
+            ? `${device.current_building || ''} ${device.current_room_number}`.trim()
             : '<span class="text-muted">Not installed</span>';
 
         const lifetime = device.total_lifetime_days !== null
             ? Utils.formatDays(device.total_lifetime_days)
             : '<span class="text-muted">N/A</span>';
 
+        const serialNo = device.serial_number || '<span class="text-muted">N/A</span>';
+        const issue = device.current_issue || '<span class="text-muted">-</span>';
+        const storage = device.storage_location || '<span class="text-muted">-</span>';
+
+        // Apply row highlighting for repair status (Excel-like)
+        const rowClass = device.device_status === 'REPAIR' ? 'status-repair' : 
+                        device.device_status === 'WITHDRAWN' ? 'status-withdrawn' : '';
+
         html += `
-            <tr>
+            <tr class="${rowClass}">
                 <td><strong>${device.device_unique_id}</strong></td>
                 <td>${device.type_name}</td>
                 <td>${device.brand_name}</td>
                 <td>${device.model || 'N/A'}</td>
-                <td>${currentRoom}</td>
-                <td>${lifetime}</td>
+                <td>${serialNo}</td>
                 <td>${statusBadge}</td>
+                <td>${currentRoom}</td>
+                <td>${issue}</td>
+                <td>${storage}</td>
+                <td>${lifetime}</td>
                 <td>
                     <button class="btn btn-sm btn-info" onclick="createGatePassForDevice(${device.device_id}, '${device.device_unique_id}')" title="Create Gate Pass">
                         <i class="fas fa-file-alt"></i> Gate Pass
@@ -209,6 +240,8 @@ function populateRoomFilter() {
 function populateFormDropdowns() {
     const typeSelect = document.getElementById('typeId');
     const brandSelect = document.getElementById('brandId');
+    const issueSelect = document.getElementById('currentIssue');
+    const storageSelect = document.getElementById('storageLocation');
 
     metadata.types.forEach(type => {
         typeSelect.innerHTML += `<option value="${type.type_id}">${type.type_name}</option>`;
@@ -217,6 +250,20 @@ function populateFormDropdowns() {
     metadata.brands.forEach(brand => {
         brandSelect.innerHTML += `<option value="${brand.brand_id}">${brand.brand_name}</option>`;
     });
+
+    // Populate issues dropdown
+    if (metadata.issues && issueSelect) {
+        metadata.issues.forEach(issue => {
+            issueSelect.innerHTML += `<option value="${issue.issue_name}">${issue.issue_name}</option>`;
+        });
+    }
+
+    // Populate storage locations dropdown
+    if (metadata.storage_locations && storageSelect) {
+        metadata.storage_locations.forEach(location => {
+            storageSelect.innerHTML += `<option value="${location.location_name}">${location.location_name}</option>`;
+        });
+    }
 }
 
 /**
@@ -226,6 +273,7 @@ function clearFilters() {
     document.getElementById('filterDeviceId').value = '';
     document.getElementById('filterType').value = '';
     document.getElementById('filterBrand').value = '';
+    document.getElementById('filterStatus').value = '';
     document.getElementById('filterRoom').value = '';
     loadDevices();
 }
@@ -249,6 +297,9 @@ function openDeviceModal(device = null) {
         document.getElementById('brandId').value = device.brand_id;
         document.getElementById('model').value = device.model || '';
         document.getElementById('serialNumber').value = device.serial_number || '';
+        document.getElementById('deviceStatus').value = device.device_status || 'NEW';
+        document.getElementById('currentIssue').value = device.current_issue || '';
+        document.getElementById('storageLocation').value = device.storage_location || '';
         document.getElementById('purchaseDate').value = device.purchase_date || '';
         document.getElementById('warrantyPeriod').value = device.warranty_period || '';
         document.getElementById('notes').value = device.notes || '';
@@ -256,6 +307,7 @@ function openDeviceModal(device = null) {
         isActiveGroup.style.display = 'block';
     } else {
         title.textContent = 'Add Device';
+        document.getElementById('deviceStatus').value = 'NEW';
         isActiveGroup.style.display = 'none';
     }
 
@@ -284,6 +336,9 @@ async function handleDeviceSubmit(e) {
         brand_id: document.getElementById('brandId').value,
         model: document.getElementById('model').value.trim(),
         serial_number: document.getElementById('serialNumber').value.trim(),
+        device_status: document.getElementById('deviceStatus').value,
+        current_issue: document.getElementById('currentIssue').value || null,
+        storage_location: document.getElementById('storageLocation').value || null,
         purchase_date: document.getElementById('purchaseDate').value || null,
         warranty_period: document.getElementById('warrantyPeriod').value || null,
         notes: document.getElementById('notes').value.trim()

@@ -22,6 +22,7 @@
                     <li><a href="installations.html" class="active"><i class="fas fa-plug"></i> Installations</a></li>
                     <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
                     <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="classroom-support.html"><i class="fas fa-headset"></i> Classroom Support</a></li>
                     <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
                     <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
                     <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
@@ -72,6 +73,15 @@
                             <option value="withdrawn">Withdrawn</option>
                         </select>
                     </div>
+                    <div class="filter-group">
+                        <label for="filterInstallationType">Installation Type</label>
+                        <select id="filterInstallationType">
+                            <option value="">All Types</option>
+                            <option value="NEW_INSTALLATION">New Installation</option>
+                            <option value="REPAIRED">Repaired</option>
+                            <option value="OLD_REINSTALL">Old Reinstall</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -84,19 +94,22 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Device ID</th>
+                                <th>Device ID (NSU ID)</th>
                                 <th>Type</th>
                                 <th>Brand/Model</th>
                                 <th>Room</th>
                                 <th>Installed Date</th>
+                                <th>Installation Type</th>
+                                <th>Team</th>
                                 <th>Days in Room</th>
                                 <th>Status</th>
+                                <th>Issue</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="installationsTableBody">
                             <tr>
-                                <td colspan="8" class="text-center">
+                                <td colspan="11" class="text-center">
                                     <div class="spinner"></div>
                                 </td>
                             </tr>
@@ -140,6 +153,16 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="installationType">Installation Type *</label>
+                    <select id="installationType" class="form-control" required>
+                        <option value="NEW_INSTALLATION">New Installation</option>
+                        <option value="REPAIRED">Repaired Device</option>
+                        <option value="OLD_REINSTALL">Old Device Reinstall</option>
+                    </select>
+                    <small class="form-text">Select whether this is a new installation, repaired device, or old device being reinstalled</small>
+                </div>
+
+                <div class="form-group">
                     <label for="installerName">Installer Name</label>
                     <input type="text" id="installerName" class="form-control" placeholder="Name of person who installed">
                     <small class="form-text">Leave blank to use your name</small>
@@ -148,6 +171,12 @@
                 <div class="form-group">
                     <label for="installerId">Installer ID</label>
                     <input type="text" id="installerId" class="form-control" placeholder="Employee/Staff ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="teamMembers">Team Members (Excel TEAM field)</label>
+                    <input type="text" id="teamMembers" class="form-control" placeholder="e.g., Arafat/Sabbir/Kayfan">
+                    <small class="form-text">Separate multiple names with / (slash)</small>
                 </div>
 
                 <div class="form-group">
@@ -199,6 +228,22 @@
                 <div class="form-group">
                     <label for="withdrawerId">Withdrawer ID</label>
                     <input type="text" id="withdrawerId" class="form-control" placeholder="Employee/Staff ID">
+                </div>
+
+                <div class="form-group">
+                    <label for="issueAtWithdrawal">Issue Found (Excel Issue field)</label>
+                    <select id="issueAtWithdrawal" class="form-control">
+                        <option value="">No Issue</option>
+                    </select>
+                    <small class="form-text">Select the issue found during withdrawal</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="withdrawalStorage">Storage Location (Excel Store field)</label>
+                    <select id="withdrawalStorage" class="form-control">
+                        <option value="">Not Stored</option>
+                    </select>
+                    <small class="form-text">Where the device will be stored</small>
                 </div>
 
                 <div class="form-group">

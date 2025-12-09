@@ -144,6 +144,24 @@
         </div>
     </div>
 
+    <!-- Room Devices Modal -->
+    <div id="devicesModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-desktop"></i> Devices in <span id="devicesRoomName"></span></h3>
+                <button class="btn-close" onclick="closeDevicesModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="devicesListContainer">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDevicesModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
     <script>
@@ -208,6 +226,9 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-sm btn-success" onclick="viewRoomDevices(${room.room_id}, '${escapeHtml(room.room_number)} - ${escapeHtml(room.room_name)}')" style="flex: 1;">
+                                <i class="fas fa-desktop"></i> View Devices
+                            </button>
                             <button class="btn btn-sm btn-primary" onclick="showEditRoomModal(${room.room_id}, '${escapeHtml(room.room_number)}', '${escapeHtml(room.room_name)}', '${escapeHtml(room.building || '')}', '${escapeHtml(room.floor || '')}', ${room.capacity || 'null'})" style="flex: 1;">
                                 <i class="fas fa-edit"></i> Edit
                             </button>
@@ -355,6 +376,64 @@
             return div.innerHTML;
         }
 
+        async function viewRoomDevices(roomId, roomName) {
+            document.getElementById('devicesRoomName').textContent = roomName;
+            document.getElementById('devicesModal').classList.add('active');
+            document.getElementById('devicesListContainer').innerHTML = '<div class="spinner"></div>';
+
+            try {
+                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.INSTALLATIONS + '?room_id=' + roomId, {
+                    method: 'GET'
+                });
+
+                if (result.success && result.data) {
+                    displayDevicesList(result.data);
+                } else {
+                    document.getElementById('devicesListContainer').innerHTML = '<p class="text-center">No devices found in this room</p>';
+                }
+            } catch (error) {
+                console.error('Error loading devices:', error);
+                document.getElementById('devicesListContainer').innerHTML = '<p class="text-center text-danger">Error loading devices</p>';
+            }
+        }
+
+        function displayDevicesList(installations) {
+            const container = document.getElementById('devicesListContainer');
+            
+            if (!installations || installations.length === 0) {
+                container.innerHTML = '<p class="text-center">No devices installed in this room</p>';
+                return;
+            }
+
+            let html = '<div class="table-container"><table class="data-table"><thead><tr>';
+            html += '<th>Device Type</th>';
+            html += '<th>Serial Number</th>';
+            html += '<th>Status</th>';
+            html += '<th>Installation Date</th>';
+            html += '<th>Installed By</th>';
+            html += '</tr></thead><tbody>';
+
+            installations.forEach(inst => {
+                const statusClass = inst.status === 'active' ? 'success' : inst.status === 'withdrawn' ? 'danger' : 'warning';
+                const statusIcon = inst.status === 'active' ? 'check-circle' : inst.status === 'withdrawn' ? 'times-circle' : 'clock';
+                
+                html += '<tr>';
+                html += `<td>${inst.device_type || 'N/A'}</td>`;
+                html += `<td><code>${inst.serial_number || 'N/A'}</code></td>`;
+                html += `<td><span class="badge badge-${statusClass}"><i class="fas fa-${statusIcon}"></i> ${inst.status || 'N/A'}</span></td>`;
+                html += `<td>${inst.installation_date ? new Date(inst.installation_date).toLocaleDateString() : 'N/A'}</td>`;
+                html += `<td>${inst.installed_by_name || 'N/A'}</td>`;
+                html += '</tr>';
+            });
+
+            html += '</tbody></table></div>';
+            container.innerHTML = html;
+        }
+
+        function closeDevicesModal() {
+            document.getElementById('devicesModal').classList.remove('active');
+        }
+
         // Close modals when clicking outside
         window.addEventListener('click', function(event) {
             if (event.target.id === 'roomModal') {
@@ -362,6 +441,9 @@
             }
             if (event.target.id === 'deleteModal') {
                 closeDeleteModal();
+            }
+            if (event.target.id === 'devicesModal') {
+                closeDevicesModal();
             }
         });
     </script>

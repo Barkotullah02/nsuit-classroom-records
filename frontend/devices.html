@@ -22,6 +22,7 @@
                     <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
                     <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
                     <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="classroom-support.html"><i class="fas fa-headset"></i> Classroom Support</a></li>
                     <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
                     <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
                     <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
@@ -59,7 +60,7 @@
                 </div>
                 <div class="filters">
                     <div class="filter-group">
-                        <label for="filterDeviceId">Device ID</label>
+                        <label for="filterDeviceId">Device ID (NSU ID)</label>
                         <input type="text" id="filterDeviceId" placeholder="Search by device ID">
                     </div>
                     <div class="filter-group">
@@ -72,6 +73,16 @@
                         <label for="filterBrand">Brand</label>
                         <select id="filterBrand">
                             <option value="">All Brands</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterStatus">Status</label>
+                        <select id="filterStatus">
+                            <option value="">All Statuses</option>
+                            <option value="NEW">New</option>
+                            <option value="REPAIR">Repair</option>
+                            <option value="USED">Used</option>
+                            <option value="WITHDRAWN">Withdrawn</option>
                         </select>
                     </div>
                     <div class="filter-group">
@@ -92,19 +103,22 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>Device ID</th>
+                                <th>Device ID (NSU ID)</th>
                                 <th>Type</th>
                                 <th>Brand</th>
                                 <th>Model</th>
-                                <th>Current Room</th>
-                                <th>Total Lifetime</th>
+                                <th>Serial No.</th>
                                 <th>Status</th>
+                                <th>Current Room</th>
+                                <th>Issue</th>
+                                <th>Storage</th>
+                                <th>Total Lifetime</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="devicesTableBody">
                             <tr>
-                                <td colspan="8" class="text-center">
+                                <td colspan="11" class="text-center">
                                     <div class="spinner"></div>
                                 </td>
                             </tr>
@@ -160,8 +174,36 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="serialNumber">Serial Number</label>
-                    <input type="text" id="serialNumber" class="form-control">
+                    <label for="serialNumber">Serial Number (Manufacture SL)</label>
+                    <input type="text" id="serialNumber" class="form-control" placeholder="e.g., VWJ2241B01148">
+                    <small class="text-muted">Manufacturer Serial Number</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="deviceStatus">Device Status</label>
+                    <select id="deviceStatus" class="form-control">
+                        <option value="NEW">New</option>
+                        <option value="REPAIR">Repair</option>
+                        <option value="USED">Used</option>
+                        <option value="WITHDRAWN">Withdrawn</option>
+                    </select>
+                    <small class="text-muted">Current status of the device</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="currentIssue">Current Issue (Optional)</label>
+                    <select id="currentIssue" class="form-control">
+                        <option value="">No Issue</option>
+                    </select>
+                    <small class="text-muted">Any current problem with the device</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="storageLocation">Storage Location (Optional)</label>
+                    <select id="storageLocation" class="form-control">
+                        <option value="">Not Stored</option>
+                    </select>
+                    <small class="text-muted">Where the device is stored if withdrawn</small>
                 </div>
 
                 <div class="form-group">

@@ -219,8 +219,6 @@ async function handleFormSubmit(e) {
         showNotification(error.message || 'Failed to save post. Please try again.', 'error');
     }
 }
-    }
-}
 
 async function deletePost(postId) {
     if (!confirm('Are you sure you want to delete this post? This will also delete all comments and reactions. This action cannot be undone.')) {

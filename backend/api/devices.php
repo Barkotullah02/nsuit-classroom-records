@@ -62,6 +62,9 @@ switch ($method) {
                         db.brand_name,
                         d.model,
                         d.serial_number,
+                        d.device_status,
+                        d.current_issue,
+                        d.storage_location,
                         d.purchase_date,
                         d.warranty_period,
                         d.notes,
@@ -70,6 +73,7 @@ switch ($method) {
                         r.room_id as current_room_id,
                         r.room_number as current_room_number,
                         r.room_name as current_room_name,
+                        r.building as current_building,
                         di.installed_date as current_installation_date,
                         DATEDIFF(CURDATE(), di.installed_date) as days_in_current_room,
                         (SELECT MIN(inst.installed_date) 
@@ -135,9 +139,9 @@ switch ($method) {
             }
 
             $query = "INSERT INTO devices 
-                     (device_unique_id, type_id, brand_id, model, serial_number, purchase_date, warranty_period, notes) 
+                     (device_unique_id, type_id, brand_id, model, serial_number, device_status, current_issue, storage_location, purchase_date, warranty_period, notes) 
                      VALUES 
-                     (:device_unique_id, :type_id, :brand_id, :model, :serial_number, :purchase_date, :warranty_period, :notes)";
+                     (:device_unique_id, :type_id, :brand_id, :model, :serial_number, :device_status, :current_issue, :storage_location, :purchase_date, :warranty_period, :notes)";
 
             $stmt = $db->prepare($query);
             $stmt->bindParam(':device_unique_id', $data['device_unique_id']);
@@ -145,6 +149,9 @@ switch ($method) {
             $stmt->bindParam(':brand_id', $data['brand_id']);
             $stmt->bindParam(':model', $data['model']);
             $stmt->bindParam(':serial_number', $data['serial_number']);
+            $stmt->bindParam(':device_status', $data['device_status']);
+            $stmt->bindParam(':current_issue', $data['current_issue']);
+            $stmt->bindParam(':storage_location', $data['storage_location']);
             $stmt->bindParam(':purchase_date', $data['purchase_date']);
             $stmt->bindParam(':warranty_period', $data['warranty_period']);
             $stmt->bindParam(':notes', $data['notes']);
@@ -192,6 +199,9 @@ switch ($method) {
                      brand_id = :brand_id,
                      model = :model,
                      serial_number = :serial_number,
+                     device_status = :device_status,
+                     current_issue = :current_issue,
+                     storage_location = :storage_location,
                      purchase_date = :purchase_date,
                      warranty_period = :warranty_period,
                      notes = :notes,
@@ -205,6 +215,9 @@ switch ($method) {
             $stmt->bindParam(':brand_id', $data['brand_id']);
             $stmt->bindParam(':model', $data['model']);
             $stmt->bindParam(':serial_number', $data['serial_number']);
+            $stmt->bindParam(':device_status', $data['device_status']);
+            $stmt->bindParam(':current_issue', $data['current_issue']);
+            $stmt->bindParam(':storage_location', $data['storage_location']);
             $stmt->bindParam(':purchase_date', $data['purchase_date']);
             $stmt->bindParam(':warranty_period', $data['warranty_period']);
             $stmt->bindParam(':notes', $data['notes']);

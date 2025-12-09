@@ -893,6 +893,33 @@ tbody tr:hover {
     color: white;
 }
 
+.badge-secondary {
+    background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    color: white;
+}
+
+.badge-info {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+}
+
+/* Excel-like Row Highlighting for Device Status */
+tr.status-repair {
+    background-color: rgba(239, 68, 68, 0.15) !important;
+}
+
+tr.status-repair:hover {
+    background-color: rgba(239, 68, 68, 0.25) !important;
+}
+
+tr.status-withdrawn {
+    background-color: rgba(107, 114, 128, 0.15) !important;
+}
+
+tr.status-withdrawn:hover {
+    background-color: rgba(107, 114, 128, 0.25) !important;
+}
+
 /* Filters */
 .filters {
     display: flex;

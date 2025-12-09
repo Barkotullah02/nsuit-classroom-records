@@ -6,8 +6,10 @@
 let rooms = [];
 let devices = [];
 let installations = [];
+let metadata = { issues: [], storage_locations: [] };
 
 document.addEventListener('DOMContentLoaded', async () => {
+    await loadMetadata();
     await loadRooms();
     await loadDevices();
     await loadInstallations();
@@ -44,12 +46,49 @@ function initializeEventListeners() {
     // Filter listeners
     document.getElementById('filterRoom').addEventListener('change', () => loadInstallations());
     document.getElementById('filterStatus').addEventListener('change', () => loadInstallations());
+    document.getElementById('filterInstallationType').addEventListener('change', () => loadInstallations());
     document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
 
     // Set default date to today
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('installedDate').value = today;
     document.getElementById('withdrawnDate').value = today;
+}
+
+/**
+ * Load metadata (issues and storage locations)
+ */
+async function loadMetadata() {
+    const result = await Utils.apiRequest(CONFIG.ENDPOINTS.METADATA, {
+        method: 'GET'
+    });
+
+    if (result.success) {
+        metadata = result.data;
+        populateIssueAndStorageDropdowns();
+    }
+}
+
+/**
+ * Populate issue and storage dropdowns
+ */
+function populateIssueAndStorageDropdowns() {
+    const issueSelect = document.getElementById('issueAtWithdrawal');
+    const storageSelect = document.getElementById('withdrawalStorage');
+
+    // Populate issues
+    if (metadata.issues) {
+        metadata.issues.forEach(issue => {
+            issueSelect.innerHTML += `<option value="${issue.issue_name}">${issue.issue_name}</option>`;
+        });
+    }
+
+    // Populate storage locations
+    if (metadata.storage_locations) {
+        metadata.storage_locations.forEach(location => {
+            storageSelect.innerHTML += `<option value="${location.location_name}">${location.location_name}</option>`;
+        });
+    }
 }
 
 /**
@@ -89,9 +128,11 @@ async function loadInstallations() {
     
     const roomId = document.getElementById('filterRoom').value;
     const status = document.getElementById('filterStatus').value;
+    const installationType = document.getElementById('filterInstallationType')?.value;
 
     if (roomId) params.append('room_id', roomId);
     if (status) params.append('status', status);
+    if (installationType) params.append('installation_type', installationType);
 
     const queryString = params.toString();
     const url = CONFIG.ENDPOINTS.INSTALLATIONS + (queryString ? '?' + queryString : '');
@@ -115,7 +156,7 @@ function displayInstallations(installationsList) {
     const tbody = document.getElementById('installationsTableBody');
     
     if (!installationsList || installationsList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No installation records found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="text-center">No installation records found</td></tr>';
         return;
     }
 
@@ -125,15 +166,37 @@ function displayInstallations(installationsList) {
             ? '<span class="badge badge-success">Active</span>' 
             : '<span class="badge badge-warning">Withdrawn</span>';
 
+        const team = inst.team_members || '<span class="text-muted">-</span>';
+        const issue = inst.issue_at_withdrawal || (inst.status === 'withdrawn' ? '<span class="text-muted">No issue</span>' : '<span class="text-muted">-</span>');
+        
+        // Installation type badge
+        let installTypeBadge = '';
+        switch(inst.installation_type) {
+            case 'NEW_INSTALLATION':
+                installTypeBadge = '<span class="badge badge-success">New</span>';
+                break;
+            case 'REPAIRED':
+                installTypeBadge = '<span class="badge badge-info">Repaired</span>';
+                break;
+            case 'OLD_REINSTALL':
+                installTypeBadge = '<span class="badge badge-secondary">Old Reinstall</span>';
+                break;
+            default:
+                installTypeBadge = '<span class="badge badge-primary">N/A</span>';
+        }
+
         html += `
             <tr>
                 <td><strong>${inst.device_unique_id}</strong></td>
                 <td>${inst.type_name}</td>
                 <td>${inst.brand_name} ${inst.model || ''}</td>
-                <td>${inst.room_number} - ${inst.room_name}</td>
+                <td>${inst.building || ''} ${inst.room_number}</td>
                 <td>${Utils.formatDate(inst.installed_date)}</td>
+                <td>${installTypeBadge}</td>
+                <td>${team}</td>
                 <td>${inst.days_in_room} days</td>
                 <td>${statusBadge}</td>
+                <td>${issue}</td>
                 <td>
                     ${inst.gate_pass_number ? `
                         <button class="btn btn-sm btn-info" onclick="viewGatePass(${inst.installation_id})" title="View Gate Pass">
@@ -203,6 +266,7 @@ function populateDeviceDropdown() {
 function clearFilters() {
     document.getElementById('filterRoom').value = '';
     document.getElementById('filterStatus').value = '';
+    document.getElementById('filterInstallationType').value = '';
     loadInstallations();
 }
 
@@ -236,9 +300,11 @@ async function handleInstallSubmit(e) {
         device_id: document.getElementById('deviceSelect').value,
         room_id: document.getElementById('roomSelect').value,
         installed_date: document.getElementById('installedDate').value,
+        installation_type: document.getElementById('installationType').value,
         installation_notes: document.getElementById('installationNotes').value.trim(),
         installer_name: document.getElementById('installerName').value.trim() || null,
         installer_id: document.getElementById('installerId').value.trim() || null,
+        team_members: document.getElementById('teamMembers').value.trim() || null,
         gate_pass_number: document.getElementById('gatePassNumber').value.trim() || null,
         gate_pass_date: document.getElementById('gatePassDate').value || null
     };
@@ -300,7 +366,9 @@ async function handleWithdrawSubmit(e) {
         withdrawn_date: document.getElementById('withdrawnDate').value,
         withdrawal_notes: document.getElementById('withdrawalNotes').value.trim(),
         withdrawer_name: document.getElementById('withdrawerName').value.trim() || null,
-        withdrawer_id: document.getElementById('withdrawerId').value.trim() || null
+        withdrawer_id: document.getElementById('withdrawerId').value.trim() || null,
+        issue_at_withdrawal: document.getElementById('issueAtWithdrawal').value || null,
+        storage_location: document.getElementById('withdrawalStorage').value || null
     };
 
     const result = await Utils.apiRequest(CONFIG.ENDPOINTS.INSTALLATIONS, {

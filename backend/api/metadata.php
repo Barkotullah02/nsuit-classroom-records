@@ -31,9 +31,40 @@ if ($method === 'GET') {
         $brands_stmt->execute();
         $brands = $brands_stmt->fetchAll(PDO::FETCH_ASSOC);
 
+        // Get device issues
+        $issues_query = "SELECT issue_id, issue_name, issue_category FROM device_issues WHERE is_active = TRUE ORDER BY issue_name";
+        $issues_stmt = $db->prepare($issues_query);
+        $issues_stmt->execute();
+        $issues = $issues_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Get storage locations
+        $locations_query = "SELECT location_id, location_name, description FROM storage_locations WHERE is_active = TRUE ORDER BY location_name";
+        $locations_stmt = $db->prepare($locations_query);
+        $locations_stmt->execute();
+        $storage_locations = $locations_stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Get device statuses (from ENUM)
+        $device_statuses = [
+            ['value' => 'NEW', 'label' => 'New'],
+            ['value' => 'REPAIR', 'label' => 'Repair'],
+            ['value' => 'USED', 'label' => 'Used'],
+            ['value' => 'WITHDRAWN', 'label' => 'Withdrawn']
+        ];
+
+        // Get installation types
+        $installation_types = [
+            ['value' => 'NEW_INSTALLATION', 'label' => 'New Installation'],
+            ['value' => 'REPAIRED', 'label' => 'Repaired Device'],
+            ['value' => 'OLD_REINSTALL', 'label' => 'Old Device Reinstall']
+        ];
+
         Response::success([
             'types' => $types,
-            'brands' => $brands
+            'brands' => $brands,
+            'issues' => $issues,
+            'storage_locations' => $storage_locations,
+            'device_statuses' => $device_statuses,
+            'installation_types' => $installation_types
         ], 'Metadata retrieved successfully');
     } catch (Exception $e) {
         Response::error('Failed to retrieve metadata: ' . $e->getMessage());
