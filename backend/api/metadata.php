@@ -31,25 +31,8 @@ if ($method === 'GET') {
         $brands_stmt->execute();
         $brands = $brands_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-        // Get device issues
-        $issues_query = "SELECT issue_id, issue_name, issue_category FROM device_issues WHERE is_active = TRUE ORDER BY issue_name";
-        $issues_stmt = $db->prepare($issues_query);
-        $issues_stmt->execute();
-        $issues = $issues_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Get storage locations
-        $locations_query = "SELECT location_id, location_name, description FROM storage_locations WHERE is_active = TRUE ORDER BY location_name";
-        $locations_stmt = $db->prepare($locations_query);
-        $locations_stmt->execute();
-        $storage_locations = $locations_stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Get device statuses (from ENUM)
-        $device_statuses = [
-            ['value' => 'NEW', 'label' => 'New'],
-            ['value' => 'REPAIR', 'label' => 'Repair'],
-            ['value' => 'USED', 'label' => 'Used'],
-            ['value' => 'WITHDRAWN', 'label' => 'Withdrawn']
-        ];
+        // Get device statuses (from ENUM) - removed as these columns don't exist in current schema
+        $device_statuses = [];
 
         // Get installation types
         $installation_types = [
@@ -61,8 +44,6 @@ if ($method === 'GET') {
         Response::success([
             'types' => $types,
             'brands' => $brands,
-            'issues' => $issues,
-            'storage_locations' => $storage_locations,
             'device_statuses' => $device_statuses,
             'installation_types' => $installation_types
         ], 'Metadata retrieved successfully');

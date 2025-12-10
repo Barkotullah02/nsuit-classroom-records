@@ -666,6 +666,8 @@ body::after {
     margin-left: 280px;
     padding: 32px;
     min-height: 100vh;
+    overflow-x: auto;
+    overflow-y: auto;
 }
 
 .content-header {
@@ -828,6 +830,7 @@ body::after {
 
 table {
     width: 100%;
+    min-width: 800px;
     border-collapse: collapse;
 }
 

@@ -171,8 +171,8 @@ async function importDevices(rows, skipDuplicates) {
         return;
     }
 
-    const types = metadataResult.data.types;
-    const brands = metadataResult.data.brands;
+    let types = metadataResult.data.types;
+    let brands = metadataResult.data.brands;
 
     for (let i = 0; i < dataRows.length; i++) {
         const row = dataRows[i];
@@ -190,20 +190,57 @@ async function importDevices(rows, skipDuplicates) {
             notes: row[7] || null
         };
 
-        // Find type_id and brand_id
-        const type = types.find(t => t.type_name.toLowerCase() === deviceData.type_name.toLowerCase());
-        const brand = brands.find(b => b.brand_name.toLowerCase() === deviceData.brand_name.toLowerCase());
+        // Find or create type_id
+        let type = types.find(t => t.type_name.toLowerCase() === deviceData.type_name.toLowerCase());
+        
+        if (!type && deviceData.type_name) {
+            // Create new device type
+            const createTypeResult = await Utils.apiRequest('/metadata.php', {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'device_type',
+                    type_name: deviceData.type_name,
+                    description: `Auto-created from CSV import`
+                })
+            });
 
-        if (!type) {
-            errors.push(`Row ${i + 2}: Device type "${deviceData.type_name}" not found`);
-            errorCount++;
-            continue;
+            if (createTypeResult.success) {
+                type = {
+                    type_id: createTypeResult.data.type_id,
+                    type_name: deviceData.type_name
+                };
+                types.push(type);
+            } else {
+                errors.push(`Row ${i + 2}: Failed to create device type "${deviceData.type_name}": ${createTypeResult.message}`);
+                errorCount++;
+                continue;
+            }
         }
 
-        if (!brand) {
-            errors.push(`Row ${i + 2}: Brand "${deviceData.brand_name}" not found`);
-            errorCount++;
-            continue;
+        // Find or create brand_id
+        let brand = brands.find(b => b.brand_name.toLowerCase() === deviceData.brand_name.toLowerCase());
+        
+        if (!brand && deviceData.brand_name) {
+            // Create new brand
+            const createBrandResult = await Utils.apiRequest('/metadata.php', {
+                method: 'POST',
+                body: JSON.stringify({
+                    type: 'brand',
+                    brand_name: deviceData.brand_name
+                })
+            });
+
+            if (createBrandResult.success) {
+                brand = {
+                    brand_id: createBrandResult.data.brand_id,
+                    brand_name: deviceData.brand_name
+                };
+                brands.push(brand);
+            } else {
+                errors.push(`Row ${i + 2}: Failed to create brand "${deviceData.brand_name}": ${createBrandResult.message}`);
+                errorCount++;
+                continue;
+            }
         }
 
         const payload = {
