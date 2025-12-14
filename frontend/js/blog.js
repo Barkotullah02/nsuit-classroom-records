@@ -255,7 +255,7 @@ async function loadPost(postId) {
     const container = document.getElementById('postContent');
     
     try {
-        const response = await Utils.apiRequest(`${CONFIG.ENDPOINTS.BLOG_POSTS}?id=${postId}`, 'GET');
+        const response = await Utils.apiRequest(`${CONFIG.ENDPOINTS.BLOG_POSTS}?post_id=${postId}`, 'GET');
         
         if (response.success && response.data) {
             const post = response.data;
