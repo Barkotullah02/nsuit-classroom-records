@@ -336,10 +336,10 @@ async function toggleReaction(postId, reactionType) {
         
         if (currentReactions.data.user_reaction === reactionType) {
             // Remove reaction
-            await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_REACTIONS, 'DELETE', { post_id: postId });
+            await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_REACTIONS, { method: 'DELETE', body: JSON.stringify({ post_id: postId }) });
         } else {
             // Add/update reaction
-            await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_REACTIONS, 'POST', { post_id: postId, reaction_type: reactionType });
+            await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_REACTIONS, { method: 'POST', body: JSON.stringify({ post_id: postId, reaction_type: reactionType }) });
         }
         
         // Reload reactions
@@ -417,9 +417,12 @@ async function submitComment(postId) {
     }
     
     try {
-        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_COMMENTS, 'POST', {
-            post_id: postId,
-            comment_text: text
+        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_COMMENTS, {
+            method: 'POST',
+            body: JSON.stringify({
+                post_id: postId,
+                comment_text: text
+            })
         });
         
         document.getElementById('commentText').value = '';
@@ -440,10 +443,13 @@ async function submitReply(parentCommentId, postId) {
     }
     
     try {
-        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_COMMENTS, 'POST', {
-            post_id: postId,
-            comment_text: text,
-            parent_comment_id: parentCommentId
+        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_COMMENTS, {
+            method: 'POST',
+            body: JSON.stringify({
+                post_id: postId,
+                comment_text: text,
+                parent_comment_id: parentCommentId
+            })
         });
         
         document.getElementById(`reply-text-${parentCommentId}`).value = '';
@@ -459,7 +465,7 @@ async function deleteComment(commentId, postId) {
     if (!confirm('Are you sure you want to delete this comment?')) return;
     
     try {
-        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_COMMENTS, 'DELETE', { comment_id: commentId });
+        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_COMMENTS, { method: 'DELETE', body: JSON.stringify({ comment_id: commentId }) });
         showNotification('Comment deleted successfully', 'success');
         await loadComments(postId);
     } catch (error) {
@@ -472,7 +478,7 @@ async function deletePost(postId) {
     if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) return;
     
     try {
-        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, 'DELETE', { post_id: postId });
+        await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, { method: 'DELETE', body: JSON.stringify({ post_id: postId }) });
         showNotification('Post deleted successfully', 'success');
         setTimeout(() => window.location.href = 'blog.html', 1500);
     } catch (error) {

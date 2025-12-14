@@ -199,10 +199,16 @@ async function handleFormSubmit(e) {
         if (postId) {
             // Update existing post
             formData.post_id = postId;
-            response = await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, 'PUT', formData);
+            response = await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, {
+                method: 'PUT',
+                body: JSON.stringify(formData)
+            });
         } else {
             // Create new post
-            response = await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, 'POST', formData);
+            response = await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
         }
 
         console.log('API Response:', response);
@@ -226,7 +232,10 @@ async function deletePost(postId) {
     }
 
     try {
-        const response = await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, 'DELETE', { post_id: postId });
+        const response = await Utils.apiRequest(CONFIG.ENDPOINTS.BLOG_POSTS, {
+            method: 'DELETE',
+            body: JSON.stringify({ post_id: postId })
+        });
         
         if (response.success) {
             showNotification('Post deleted successfully', 'success');
