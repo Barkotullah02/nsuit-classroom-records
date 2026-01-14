@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room History - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .history-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .room-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .room-header h1 {
+            margin: 0 0 0.5rem 0;
+            font-size: 2rem;
+        }
+
+        .room-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .room-info-item {
+            background: rgba(255,255,255,0.1);
+            padding: 0.75rem;
+            border-radius: 5px;
+        }
+
+        .room-info-item label {
+            display: block;
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .room-info-item strong {
+            font-size: 1.1rem;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 2rem 0 1rem 0;
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .section-header h2 {
+            margin: 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .section-count {
+            background: #667eea;
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .devices-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .device-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .device-card:hover {
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .device-card.active {
+            border-left: 4px solid #4CAF50;
+        }
+
+        .device-card.withdrawn {
+            border-left: 4px solid #FF9800;
+            background: #fffaf5;
+        }
+
+        .device-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .device-title {
+            flex: 1;
+        }
+
+        .device-title h3 {
+            margin: 0 0 0.25rem 0;
+            color: #333;
+            font-size: 1.1rem;
+        }
+
+        .device-id {
+            color: #666;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-badge.withdrawn {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .device-info {
+            display: grid;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .device-info-row {
+            display: flex;
+            padding: 0.5rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .device-info-row label {
+            font-weight: 600;
+            color: #666;
+            min-width: 120px;
+        }
+
+        .device-info-row span {
+            color: #333;
+        }
+
+        .device-notes {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #f0f4ff;
+            border-left: 3px solid #667eea;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+
+        .device-notes strong {
+            display: block;
+            margin-bottom: 0.25rem;
+            color: #667eea;
+        }
+
+        .current-location {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #e8f5e9;
+            border-left: 3px solid #4CAF50;
+            border-radius: 5px;
+        }
+
+        .current-location strong {
+            color: #2e7d32;
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .current-location span {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .history-table {
+            width: 100%;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .history-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .history-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+            font-size: 1.1rem;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        @media print {
+            .sidebar, .action-buttons, .btn {
+                display: none !important;
+            }
+            
+            .main-content {
+                margin: 0 !important;
+                padding: 1rem !important;
+            }
+
+            .device-card {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+
+            .section-header {
+                break-after: avoid;
+                page-break-after: avoid;
+            }
+
+            .room-header {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            /* Add print header */
+            @page {
+                margin: 1cm;
+            }
+
+            body::before {
+                content: "Room History Report";
+                display: block;
+                text-align: center;
+                font-size: 24px;
+                font-weight: bold;
+                margin-bottom: 1rem;
+                padding-bottom: 0.5rem;
+                border-bottom: 2px solid #333;
+            }
+
+            /* Print footer with page numbers */
+            @page {
+                @bottom-right {
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+            }
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            border-left: 4px solid #c62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><img src="images/bot.png" alt="Logo" style="height: 50px; vertical-align: middle; margin-right: 8px;"> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html" class="active"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="history-container">
+                <!-- Room Header -->
+                <div class="room-header" id="roomHeader">
+                    <div class="spinner"></div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="window.location.href='rooms.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Rooms
+                    </button>
+                    <button class="btn btn-primary" onclick="window.print()">
+                        <i class="fas fa-print"></i> Print History
+                    </button>
+                </div>
+
+                <!-- Currently Installed Devices -->
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                        Currently Installed Devices
+                        <span class="section-count" id="activeCount">0</span>
+                    </h2>
+                </div>
+                <div class="devices-grid" id="activeDevicesGrid">
+                    <div class="text-center" style="grid-column: 1/-1;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+
+                <!-- Previously Withdrawn Devices -->
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-history" style="color: #FF9800;"></i>
+                        Previously Withdrawn Devices
+                        <span class="section-count" id="withdrawnCount">0</span>
+                    </h2>
+                </div>
+                <div class="devices-grid" id="withdrawnDevicesGrid">
+                    <div class="text-center" style="grid-column: 1/-1;">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+
+                <!-- Complete History Table -->
+                <div class="section-header">
+                    <h2>
+                        <i class="fas fa-table"></i>
+                        Complete Installation History
+                    </h2>
+                </div>
+                <div class="history-table" id="historyTableContainer">
+                    <div class="text-center">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        let roomId = null;
+        let roomData = null;
+        let allHistory = [];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            
+            // Get room ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            roomId = urlParams.get('room_id');
+            
+            if (!roomId) {
+                showError('No room ID provided');
+                setTimeout(() => window.location.href = 'rooms.html', 2000);
+                return;
+            }
+            
+            loadRoomHistory();
+        });
+
+        async function loadRoomHistory() {
+            try {
+                const token = localStorage.getItem('token');
+                
+                // Load comprehensive room history using the optimized endpoint
+                const response = await fetch(`${API_URL}/room-history.php?room_id=${roomId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    roomData = {
+                        ...result.data.room,
+                        active_devices: result.data.active_devices,
+                        withdrawn_devices: result.data.withdrawn_devices,
+                        active_device_count: result.data.statistics.active_count,
+                        withdrawn_device_count: result.data.statistics.withdrawn_count
+                    };
+                    allHistory = result.data.complete_history;
+                    
+                    displayRoomHeader();
+                    displayActiveDevices();
+                    displayWithdrawnDevices();
+                    displayHistoryTable(allHistory);
+                } else {
+                    showError(result.message || 'Failed to load room data');
+                }
+            } catch (error) {
+                console.error('Error loading room history:', error);
+                showError('Failed to load room history');
+            }
+        }
+
+        function displayRoomHeader() {
+            const header = document.getElementById('roomHeader');
+            header.innerHTML = `
+                <h1><i class="fas fa-door-open"></i> ${roomData.room_name}</h1>
+                <div class="room-info">
+                    <div class="room-info-item">
+                        <label>Room Number</label>
+                        <strong>${roomData.room_number}</strong>
+                    </div>
+                    <div class="room-info-item">
+                        <label>Building</label>
+                        <strong>${roomData.building || 'N/A'}</strong>
+                    </div>
+                    <div class="room-info-item">
+                        <label>Floor</label>
+                        <strong>${roomData.floor || 'N/A'}</strong>
+                    </div>
+                    <div class="room-info-item">
+                        <label>Capacity</label>
+                        <strong>${roomData.capacity || 'N/A'}</strong>
+                    </div>
+                    <div class="room-info-item">
+                        <label>Active Devices</label>
+                        <strong>${roomData.active_device_count}</strong>
+                    </div>
+                    <div class="room-info-item">
+                        <label>Total History Records</label>
+                        <strong>${roomData.active_device_count + roomData.withdrawn_device_count}</strong>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayActiveDevices() {
+            const grid = document.getElementById('activeDevicesGrid');
+            const countEl = document.getElementById('activeCount');
+            
+            countEl.textContent = roomData.active_device_count;
+            
+            if (roomData.active_devices.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-data" style="grid-column: 1/-1;">
+                        <i class="fas fa-inbox"></i>
+                        <p>No devices currently installed in this room</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = roomData.active_devices.map(device => `
+                <div class="device-card active">
+                    <div class="device-header">
+                        <div class="device-title">
+                            <h3>${device.type_name || 'Unknown Type'}</h3>
+                            <div class="device-id">${device.device_unique_id}</div>
+                        </div>
+                        <span class="status-badge active">Active</span>
+                    </div>
+                    
+                    <div class="device-info">
+                        <div class="device-info-row">
+                            <label>Brand:</label>
+                            <span>${device.brand_name || 'N/A'}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Model:</label>
+                            <span>${device.model || 'N/A'}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Serial Number:</label>
+                            <span>${device.serial_number || 'N/A'}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Installed Date:</label>
+                            <span>${formatDate(device.installed_date)}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Installed By:</label>
+                            <span>${device.installed_by_name || 'N/A'}</span>
+                        </div>
+                    </div>
+                    
+                    ${device.installation_notes ? `
+                        <div class="device-notes">
+                            <strong>Installation Notes:</strong>
+                            ${device.installation_notes}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function displayWithdrawnDevices() {
+            const grid = document.getElementById('withdrawnDevicesGrid');
+            const countEl = document.getElementById('withdrawnCount');
+            
+            countEl.textContent = roomData.withdrawn_device_count;
+            
+            if (roomData.withdrawn_devices.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-data" style="grid-column: 1/-1;">
+                        <i class="fas fa-inbox"></i>
+                        <p>No withdrawn devices found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            grid.innerHTML = roomData.withdrawn_devices.map(device => `
+                <div class="device-card withdrawn">
+                    <div class="device-header">
+                        <div class="device-title">
+                            <h3>${device.type_name || 'Unknown Type'}</h3>
+                            <div class="device-id">${device.device_unique_id}</div>
+                        </div>
+                        <span class="status-badge withdrawn">Withdrawn</span>
+                    </div>
+                    
+                    <div class="device-info">
+                        <div class="device-info-row">
+                            <label>Brand:</label>
+                            <span>${device.brand_name || 'N/A'}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Model:</label>
+                            <span>${device.model || 'N/A'}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Serial Number:</label>
+                            <span>${device.serial_number || 'N/A'}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Withdrawn Date:</label>
+                            <span>${formatDate(device.withdrawn_date)}</span>
+                        </div>
+                        <div class="device-info-row">
+                            <label>Withdrawn By:</label>
+                            <span>${device.withdrawn_by_name || 'N/A'}</span>
+                        </div>
+                    </div>
+                    
+                    ${device.withdrawal_notes ? `
+                        <div class="device-notes">
+                            <strong>Withdrawal Notes:</strong>
+                            ${device.withdrawal_notes}
+                        </div>
+                    ` : ''}
+                    
+                    ${device.current_location ? `
+                        <div class="current-location">
+                            <strong><i class="fas fa-map-marker-alt"></i> Currently Installed At:</strong>
+                            <span>${device.current_location.room_number} - ${device.current_location.room_name}</span>
+                            <br><small>Since ${formatDate(device.current_location.installed_date)}</small>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function displayHistoryTable(history) {
+            const container = document.getElementById('historyTableContainer');
+            
+            if (history.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>No history records found</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Sort by date (most recent first)
+            history.sort((a, b) => new Date(b.installed_date) - new Date(a.installed_date));
+            
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Type</th>
+                            <th>Brand</th>
+                            <th>Installed Date</th>
+                            <th>Withdrawn Date</th>
+                            <th>Days in Room</th>
+                            <th>Status</th>
+                            <th>Installed By</th>
+                            <th>Withdrawn By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${history.map(record => `
+                            <tr>
+                                <td><strong>${record.device_unique_id}</strong></td>
+                                <td>${record.type_name || 'N/A'}</td>
+                                <td>${record.brand_name || 'N/A'}</td>
+                                <td>${formatDate(record.installed_date)}</td>
+                                <td>${record.withdrawn_date ? formatDate(record.withdrawn_date) : '<span style="color: #4CAF50;">Active</span>'}</td>
+                                <td>${record.days_in_room} days</td>
+                                <td>
+                                    <span class="status-badge ${record.status}">
+                                        ${record.status}
+                                    </span>
+                                </td>
+                                <td>${record.installed_by || 'N/A'}</td>
+                                <td>${record.withdrawn_by || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+
+        function showError(message) {
+            const roomHeader = document.getElementById('roomHeader');
+            roomHeader.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    ${message}
+                </div>
+            `;
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    </script>
+</body>
+</html>

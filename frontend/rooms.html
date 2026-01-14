@@ -47,6 +47,7 @@
                     <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
                     <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
                     <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                    <li id="userManagementNav" style="display: none;"><a href="users.html"><i class="fas fa-users-cog"></i> User Management</a></li>
                 </ul>
             </nav>
 
@@ -146,7 +147,7 @@
 
     <!-- Room Devices Modal -->
     <div id="devicesModal" class="modal">
-        <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-content" style="max-width: 1000px;">
             <div class="modal-header">
                 <h3><i class="fas fa-desktop"></i> Devices in <span id="devicesRoomName"></span></h3>
                 <button class="btn-close" onclick="closeDevicesModal()">&times;</button>
@@ -158,6 +159,24 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeDevicesModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Device History Modal -->
+    <div id="deviceHistoryModal" class="modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="fas fa-history"></i> Device History: <span id="historyDeviceId"></span></h3>
+                <button class="btn-close" onclick="closeDeviceHistoryModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="deviceHistoryContainer">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeviceHistoryModal()">Close</button>
             </div>
         </div>
     </div>
@@ -226,8 +245,11 @@
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px; border-top: 1px solid var(--border-color); padding-top: 16px;">
+                            <button class="btn btn-sm btn-info" onclick="window.location.href='room-history.html?room_id=${room.room_id}'" style="flex: 1;">
+                                <i class="fas fa-history"></i> History
+                            </button>
                             <button class="btn btn-sm btn-success" onclick="viewRoomDevices(${room.room_id}, '${escapeHtml(room.room_number)} - ${escapeHtml(room.room_name)}')" style="flex: 1;">
-                                <i class="fas fa-desktop"></i> View Devices
+                                <i class="fas fa-desktop"></i> Devices
                             </button>
                             <button class="btn btn-sm btn-primary" onclick="showEditRoomModal(${room.room_id}, '${escapeHtml(room.room_number)}', '${escapeHtml(room.room_name)}', '${escapeHtml(room.building || '')}', '${escapeHtml(room.floor || '')}', ${room.capacity || 'null'})" style="flex: 1;">
                                 <i class="fas fa-edit"></i> Edit
@@ -382,47 +404,143 @@
             document.getElementById('devicesListContainer').innerHTML = '<div class="spinner"></div>';
 
             try {
-                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.INSTALLATIONS + '?room_id=' + roomId, {
+                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.ROOMS + '?room_id=' + roomId, {
                     method: 'GET'
                 });
 
                 if (result.success && result.data) {
-                    displayDevicesList(result.data);
+                    displayRoomDevices(result.data);
                 } else {
-                    document.getElementById('devicesListContainer').innerHTML = '<p class="text-center">No devices found in this room</p>';
+                    document.getElementById('devicesListContainer').innerHTML = '<p class="text-center">No devices found</p>';
                 }
             } catch (error) {
-                console.error('Error loading devices:', error);
+                console.error('Error loading room details:', error);
                 document.getElementById('devicesListContainer').innerHTML = '<p class="text-center text-danger">Error loading devices</p>';
             }
         }
 
-        function displayDevicesList(installations) {
+        function displayRoomDevices(roomData) {
             const container = document.getElementById('devicesListContainer');
             
-            if (!installations || installations.length === 0) {
-                container.innerHTML = '<p class="text-center">No devices installed in this room</p>';
+            let html = '';
+            
+            // Active Devices Section
+            html += '<h4 style="margin-bottom: 16px;"><i class="fas fa-check-circle" style="color: var(--success-color);"></i> Active Devices</h4>';
+            
+            if (!roomData.active_devices || roomData.active_devices.length === 0) {
+                html += '<p class="text-center" style="color: var(--text-secondary); margin-bottom: 30px;">No active devices</p>';
+            } else {
+                html += '<div class="table-container" style="margin-bottom: 30px;"><table class="data-table"><thead><tr>';
+                html += '<th>Device ID</th>';
+                html += '<th>Type</th>';
+                html += '<th>Brand</th>';
+                html += '<th>Model</th>';
+                html += '<th>Installed By</th>';
+                html += '<th>Installation Date</th>';
+                html += '<th>Actions</th>';
+                html += '</tr></thead><tbody>';
+
+                roomData.active_devices.forEach(device => {
+                    html += '<tr>';
+                    html += `<td><code>${escapeHtml(device.device_unique_id)}</code></td>`;
+                    html += `<td>${escapeHtml(device.type_name || 'N/A')}</td>`;
+                    html += `<td>${escapeHtml(device.brand_name || 'N/A')}</td>`;
+                    html += `<td>${escapeHtml(device.model || 'N/A')}</td>`;
+                    html += `<td>${escapeHtml(device.installed_by_name || 'N/A')}</td>`;
+                    html += `<td>${device.installed_date ? new Date(device.installed_date).toLocaleDateString() : 'N/A'}</td>`;
+                    html += `<td><button class="btn btn-sm btn-info" onclick="showDeviceHistory(${device.device_id}, '${escapeHtml(device.device_unique_id)}')"><i class="fas fa-history"></i> History</button></td>`;
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table></div>';
+            }
+            
+            // Withdrawn Devices Section
+            html += '<h4 style="margin-bottom: 16px;"><i class="fas fa-arrow-down" style="color: var(--danger-color);"></i> Recently Withdrawn Devices</h4>';
+            
+            if (!roomData.withdrawn_devices || roomData.withdrawn_devices.length === 0) {
+                html += '<p class="text-center" style="color: var(--text-secondary);">No withdrawn devices</p>';
+            } else {
+                html += '<div class="table-container"><table class="data-table"><thead><tr>';
+                html += '<th>Device ID</th>';
+                html += '<th>Type</th>';
+                html += '<th>Brand</th>';
+                html += '<th>Model</th>';
+                html += '<th>Withdrawn By</th>';
+                html += '<th>Withdrawal Date</th>';
+                html += '<th>Reason</th>';
+                html += '<th>Actions</th>';
+                html += '</tr></thead><tbody>';
+
+                roomData.withdrawn_devices.forEach(device => {
+                    html += '<tr>';
+                    html += `<td><code>${escapeHtml(device.device_unique_id)}</code></td>`;
+                    html += `<td>${escapeHtml(device.type_name || 'N/A')}</td>`;
+                    html += `<td>${escapeHtml(device.brand_name || 'N/A')}</td>`;
+                    html += `<td>${escapeHtml(device.model || 'N/A')}</td>`;
+                    html += `<td>${escapeHtml(device.withdrawn_by_name || 'N/A')}</td>`;
+                    html += `<td>${device.withdrawn_date ? new Date(device.withdrawn_date).toLocaleDateString() : 'N/A'}</td>`;
+                    html += `<td><span style="font-size: 12px;">${escapeHtml(device.withdrawal_notes || 'N/A')}</span></td>`;
+                    html += `<td><button class="btn btn-sm btn-info" onclick="showDeviceHistory(${device.device_id}, '${escapeHtml(device.device_unique_id)}')"><i class="fas fa-history"></i> History</button></td>`;
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table></div>';
+            }
+
+            container.innerHTML = html;
+        }
+
+        async function showDeviceHistory(deviceId, deviceUniqueId) {
+            document.getElementById('historyDeviceId').textContent = deviceUniqueId;
+            document.getElementById('deviceHistoryModal').classList.add('active');
+            document.getElementById('deviceHistoryContainer').innerHTML = '<div class="spinner"></div>';
+
+            try {
+                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.DEVICE_HISTORY + '?device_id=' + deviceId, {
+                    method: 'GET'
+                });
+
+                if (result.success && result.data) {
+                    displayDeviceHistory(result.data);
+                } else {
+                    document.getElementById('deviceHistoryContainer').innerHTML = '<p class="text-center">No history found</p>';
+                }
+            } catch (error) {
+                console.error('Error loading device history:', error);
+                document.getElementById('deviceHistoryContainer').innerHTML = '<p class="text-center text-danger">Error loading history</p>';
+            }
+        }
+
+        function displayDeviceHistory(history) {
+            const container = document.getElementById('deviceHistoryContainer');
+            
+            if (!history || history.length === 0) {
+                container.innerHTML = '<p class="text-center">No history records found</p>';
                 return;
             }
 
             let html = '<div class="table-container"><table class="data-table"><thead><tr>';
-            html += '<th>Device Type</th>';
-            html += '<th>Serial Number</th>';
-            html += '<th>Status</th>';
+            html += '<th>Room</th>';
             html += '<th>Installation Date</th>';
             html += '<th>Installed By</th>';
+            html += '<th>Status</th>';
+            html += '<th>Withdrawal Date</th>';
+            html += '<th>Withdrawn By</th>';
+            html += '<th>Reason</th>';
             html += '</tr></thead><tbody>';
 
-            installations.forEach(inst => {
-                const statusClass = inst.status === 'active' ? 'success' : inst.status === 'withdrawn' ? 'danger' : 'warning';
-                const statusIcon = inst.status === 'active' ? 'check-circle' : inst.status === 'withdrawn' ? 'times-circle' : 'clock';
+            history.forEach(record => {
+                const statusClass = record.status === 'active' ? 'success' : record.status === 'withdrawn' ? 'danger' : 'warning';
                 
                 html += '<tr>';
-                html += `<td>${inst.device_type || 'N/A'}</td>`;
-                html += `<td><code>${inst.serial_number || 'N/A'}</code></td>`;
-                html += `<td><span class="badge badge-${statusClass}"><i class="fas fa-${statusIcon}"></i> ${inst.status || 'N/A'}</span></td>`;
-                html += `<td>${inst.installation_date ? new Date(inst.installation_date).toLocaleDateString() : 'N/A'}</td>`;
-                html += `<td>${inst.installed_by_name || 'N/A'}</td>`;
+                html += `<td><strong>${escapeHtml(record.room_number || 'N/A')}</strong> - ${escapeHtml(record.room_name || 'N/A')}</td>`;
+                html += `<td>${record.installation_date ? new Date(record.installation_date).toLocaleDateString() : 'N/A'}</td>`;
+                html += `<td>${escapeHtml(record.installed_by_name || record.installer_name || 'N/A')}</td>`;
+                html += `<td><span class="badge badge-${statusClass}">${escapeHtml(record.status || 'N/A')}</span></td>`;
+                html += `<td>${record.withdrawal_date ? new Date(record.withdrawal_date).toLocaleDateString() : '-'}</td>`;
+                html += `<td>${escapeHtml(record.withdrawn_by_name || '-')}</td>`;
+                html += `<td><span style="font-size: 12px;">${escapeHtml(record.withdrawal_reason || '-')}</span></td>`;
                 html += '</tr>';
             });
 
@@ -430,8 +548,12 @@
             container.innerHTML = html;
         }
 
-        function closeDevicesModal() {
-            document.getElementById('devicesModal').classList.remove('active');
+        function closeDeviceHistoryModal() {
+            document.getElementById('deviceHistoryModal').classList.remove('active');
+        }
+
+        function closeDeviceHistoryModal() {
+            document.getElementById('deviceHistoryModal').classList.remove('active');
         }
 
         // Close modals when clicking outside
@@ -444,6 +566,9 @@
             }
             if (event.target.id === 'devicesModal') {
                 closeDevicesModal();
+            }
+            if (event.target.id === 'deviceHistoryModal') {
+                closeDeviceHistoryModal();
             }
         });
     </script>

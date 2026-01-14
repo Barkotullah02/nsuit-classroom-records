@@ -107,8 +107,8 @@ switch ($method) {
         break;
 
     case 'POST':
-        // Create new device
-        $auth->requireAdmin();
+        // Create new device - staff or admin can add
+        $auth->requireCreate();
         
         try {
             // Validate required fields
@@ -172,7 +172,7 @@ switch ($method) {
         break;
 
     case 'PUT':
-        // Update device
+        // Update device - only admin can edit
         $auth->requireAdmin();
         
         try {

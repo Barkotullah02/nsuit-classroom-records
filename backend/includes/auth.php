@@ -122,6 +122,33 @@ class Auth {
     }
 
     /**
+     * Check if current user is staff (can add/edit data)
+     * @return bool
+     */
+    public function isStaff() {
+        $user = $this->getCurrentUser();
+        return $user && $user['role'] === 'staff';
+    }
+
+    /**
+     * Check if current user is viewer (read-only)
+     * @return bool
+     */
+    public function isViewer() {
+        $user = $this->getCurrentUser();
+        return $user && $user['role'] === 'viewer';
+    }
+
+    /**
+     * Check if user can create (admin or staff)
+     * @return bool
+     */
+    public function canCreate() {
+        $user = $this->getCurrentUser();
+        return $user && ($user['role'] === 'admin' || $user['role'] === 'staff');
+    }
+
+    /**
      * Require authentication
      */
     public function requireAuth() {
@@ -142,6 +169,46 @@ class Auth {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Admin access required']);
             exit();
+        }
+    }
+
+    /**
+     * Require create permission (admin or staff - can only add, not edit)
+     */
+    public function requireCreate() {
+        $this->requireAuth();
+        
+        if (!$this->canCreate()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'You do not have permission to add data. Contact administrator.']);
+            exit();
+        }
+    }
+
+    /**
+     * Check permission for specific action
+     * @param string $action 'read', 'create', 'edit', 'admin'
+     * @return bool
+     */
+    public function hasPermission($action) {
+        $user = $this->getCurrentUser();
+        
+        if (!$user) {
+            return false;
+        }
+
+        switch ($action) {
+            case 'read':
+                return true; // All authenticated users can read
+            case 'create':
+                return $user['role'] === 'admin' || $user['role'] === 'staff';
+            case 'edit':
+            case 'delete':
+                return $user['role'] === 'admin'; // Only admin can edit/delete
+            case 'admin':
+                return $user['role'] === 'admin';
+            default:
+                return false;
         }
     }
 

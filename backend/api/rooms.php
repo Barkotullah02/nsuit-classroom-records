@@ -19,37 +19,125 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
     try {
-        $query = "SELECT 
-                    room_id,
-                    room_number,
-                    room_name,
-                    building,
-                    floor,
-                    capacity,
-                    is_active,
-                    (SELECT COUNT(*) FROM device_installations di 
-                     WHERE di.room_id = r.room_id 
-                     AND di.status = 'active' 
-                     AND di.is_deleted = FALSE) as device_count
-                FROM rooms r
-                WHERE is_active = TRUE
-                ORDER BY room_number";
-
-        $stmt = $db->prepare($query);
-        $stmt->execute();
+        $room_id = $_GET['room_id'] ?? null;
         
-        $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        if ($room_id) {
+            // Get room details with devices
+            $room_query = "SELECT 
+                            room_id,
+                            room_number,
+                            room_name,
+                            building,
+                            floor,
+                            capacity,
+                            is_active
+                        FROM rooms
+                        WHERE room_id = :room_id AND is_active = TRUE";
+            
+            $room_stmt = $db->prepare($room_query);
+            $room_stmt->bindParam(':room_id', $room_id);
+            $room_stmt->execute();
+            $room = $room_stmt->fetch(PDO::FETCH_ASSOC);
+            
+            if (!$room) {
+                Response::error('Room not found', 404);
+            }
+            
+            // Get devices installed in this room (active)
+            $active_devices_query = "SELECT 
+                                    d.device_id,
+                                    d.device_unique_id,
+                                    dt.type_name,
+                                    db.brand_name,
+                                    d.model,
+                                    d.serial_number,
+                                    di.status,
+                                    di.installation_id,
+                                    di.installed_date,
+                                    di.installation_notes,
+                                    u.full_name as installed_by_name
+                                FROM device_installations di
+                                JOIN devices d ON di.device_id = d.device_id
+                                LEFT JOIN device_types dt ON d.type_id = dt.type_id
+                                LEFT JOIN device_brands db ON d.brand_id = db.brand_id
+                                LEFT JOIN users u ON di.installed_by = u.user_id
+                                WHERE di.room_id = :room_id 
+                                AND di.status = 'active'
+                                AND di.is_deleted = FALSE
+                                ORDER BY di.installed_date DESC";
+            
+            $active_stmt = $db->prepare($active_devices_query);
+            $active_stmt->bindParam(':room_id', $room_id);
+            $active_stmt->execute();
+            $active_devices = $active_stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            // Get withdrawn devices from this room (get all, not just 10)
+            $withdrawn_devices_query = "SELECT 
+                                        d.device_id,
+                                        d.device_unique_id,
+                                        dt.type_name,
+                                        db.brand_name,
+                                        d.model,
+                                        d.serial_number,
+                                        di.status,
+                                        di.installation_id,
+                                        di.installed_date,
+                                        di.withdrawn_date,
+                                        di.installation_notes,
+                                        di.withdrawal_notes,
+                                        u.full_name as withdrawn_by_name
+                                    FROM device_installations di
+                                    JOIN devices d ON di.device_id = d.device_id
+                                    LEFT JOIN device_types dt ON d.type_id = dt.type_id
+                                    LEFT JOIN device_brands db ON d.brand_id = db.brand_id
+                                    LEFT JOIN users u ON di.withdrawn_by = u.user_id
+                                    WHERE di.room_id = :room_id 
+                                    AND di.status = 'withdrawn'
+                                    AND di.is_deleted = FALSE
+                                    ORDER BY di.withdrawn_date DESC";
+            
+            $withdrawn_stmt = $db->prepare($withdrawn_devices_query);
+            $withdrawn_stmt->bindParam(':room_id', $room_id);
+            $withdrawn_stmt->execute();
+            $withdrawn_devices = $withdrawn_stmt->fetchAll(PDO::FETCH_ASSOC);
+            
+            $room['active_devices'] = $active_devices;
+            $room['withdrawn_devices'] = $withdrawn_devices;
+            $room['active_device_count'] = count($active_devices);
+            $room['withdrawn_device_count'] = count($withdrawn_devices);
+            
+            Response::success($room, 'Room details retrieved successfully');
+        } else {
+            // Get all rooms (existing logic)
+            $query = "SELECT 
+                        room_id,
+                        room_number,
+                        room_name,
+                        building,
+                        floor,
+                        capacity,
+                        is_active,
+                        (SELECT COUNT(*) FROM device_installations di 
+                         WHERE di.room_id = r.room_id 
+                         AND di.status = 'active' 
+                         AND di.is_deleted = FALSE) as device_count
+                    FROM rooms r
+                    WHERE is_active = TRUE
+                    ORDER BY room_number";
 
-        Response::success($rooms, 'Rooms retrieved successfully');
+            $stmt = $db->prepare($query);
+            $stmt->execute();
+            
+            $rooms = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            Response::success($rooms, 'Rooms retrieved successfully');
+        }
     } catch (Exception $e) {
         Response::error('Failed to retrieve rooms: ' . $e->getMessage());
     }
 } elseif ($method === 'POST') {
-    // Admin only
-    $user = $auth->getCurrentUser();
-    if ($user['role'] !== 'admin') {
-        Response::error('Unauthorized. Admin access required.', 403);
-    }
+    // Staff or admin can create rooms
+    $auth->requireCreate();
 
     try {
         $data = json_decode(file_get_contents('php://input'), true);
@@ -88,11 +176,8 @@ if ($method === 'GET') {
         Response::error('Failed to create room: ' . $e->getMessage());
     }
 } elseif ($method === 'PUT') {
-    // Admin only - Update room
-    $user = $auth->getCurrentUser();
-    if ($user['role'] !== 'admin') {
-        Response::error('Unauthorized. Admin access required.', 403);
-    }
+    // Only admin can update rooms
+    $auth->requireAdmin();
 
     try {
         $data = json_decode(file_get_contents('php://input'), true);

@@ -196,3 +196,25 @@ function updateLastUpdated() {
         lastUpdatedEl.textContent = `Last updated: ${now.toLocaleTimeString()}`;
     }
 }
+
+/**
+ * Navigate to devices page filtered by withdrawn devices
+ */
+function navigateToWithdrawnDevices() {
+    // Store filter state in sessionStorage
+    sessionStorage.setItem('deviceFilter', JSON.stringify({
+        status: 'withdrawn'
+    }));
+    window.location.href = 'devices.html';
+}
+
+/**
+ * Navigate to devices page filtered by available devices
+ */
+function navigateToAvailableDevices() {
+    // Store filter state in sessionStorage
+    sessionStorage.setItem('deviceFilter', JSON.stringify({
+        status: 'available'
+    }));
+    window.location.href = 'devices.html';
+}

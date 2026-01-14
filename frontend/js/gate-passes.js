@@ -96,7 +96,7 @@ function renderGatePasses() {
     const tbody = document.getElementById('gatePassesTableBody');
 
     if (filteredGatePasses.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="text-center">No gate passes found</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center">No gate passes found</td></tr>';
         return;
     }
 
@@ -108,17 +108,29 @@ function renderGatePasses() {
             ? '<span class="badge badge-info">Completed</span>'
             : '<span class="badge badge-warning">Cancelled</span>';
 
-        const carrierInfo = gp.carrier_name + (gp.carrier_id ? ` (${gp.carrier_id})` : '');
-        const destination = gp.room_number ? `${gp.room_number} - ${gp.room_name}` : 'N/A';
+        // Device count badge
+        const deviceCount = gp.device_count || 1;
+        const deviceBadge = deviceCount > 1 
+            ? `<span class="badge badge-primary" title="${deviceCount} devices">${deviceCount} devices</span>`
+            : `<span class="badge badge-secondary" title="1 device">1 device</span>`;
+
+        // Direction badge
+        const directionBadge = gp.pass_direction === 'incoming'
+            ? '<span class="badge badge-info">Incoming</span>'
+            : '<span class="badge badge-warning">Outgoing</span>';
+
+        // Department and vendor/destination
+        const department = gp.department || 'N/A';
+        const vendorDest = gp.vendor_destination || 'N/A';
 
         html += `
             <tr>
                 <td><strong>${gp.gate_pass_number}</strong></td>
                 <td>${Utils.formatDate(gp.gate_pass_date)}</td>
-                <td>${gp.device_unique_id}</td>
-                <td>${gp.type_name}</td>
-                <td>${destination}</td>
-                <td>${carrierInfo}</td>
+                <td>${deviceBadge}</td>
+                <td>${department}</td>
+                <td>${directionBadge}</td>
+                <td>${vendorDest}</td>
                 <td>${statusBadge}</td>
                 <td>
                     <button class="btn btn-sm btn-primary" onclick="viewGatePass(${gp.gate_pass_id})" title="View Gate Pass">

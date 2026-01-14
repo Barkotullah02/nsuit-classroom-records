@@ -13,6 +13,7 @@ const CONFIG = {
         INSTALLATIONS: '/installations.php',
         DEVICE_HISTORY: '/device-history.php',
         ROOMS: '/rooms.php',
+        ROOM_HISTORY: '/room-history.php',
         METADATA: '/metadata.php',
         DASHBOARD: '/dashboard.php',
         GATE_PASSES: '/gate-passes.php',
@@ -22,12 +23,14 @@ const CONFIG = {
         BLOG_REACTIONS: '/blog-reactions.php',
         BLOG_CATEGORIES: '/blog-categories.php',
         SUPPORT_TEAM: '/support-team.php',
-        CLASSROOM_SUPPORT: '/classroom-support.php'
+        CLASSROOM_SUPPORT: '/classroom-support.php',
+        USERS: '/users.php'
     },
 
     // User roles
     ROLES: {
         ADMIN: 'admin',
+        STAFF: 'staff',
         VIEWER: 'viewer'
     },
 

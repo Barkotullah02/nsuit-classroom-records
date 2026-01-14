@@ -105,7 +105,9 @@ switch ($method) {
         break;
 
     case 'POST':
-        // Create new installation
+        // Create new installation - staff or admin can add
+        $auth->requireCreate();
+        
         try {
             // Validate required fields
             $required = ['device_id', 'room_id', 'installed_date'];
@@ -176,7 +178,9 @@ switch ($method) {
         break;
 
     case 'PUT':
-        // Withdraw device (update installation)
+        // Withdraw device (update installation) - only admin can edit
+        $auth->requireAdmin();
+        
         try {
             if (!isset($data['installation_id'])) {
                 Response::error('Installation ID is required');

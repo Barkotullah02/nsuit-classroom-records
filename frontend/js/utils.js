@@ -198,9 +198,32 @@ const Utils = {
         const userRoleEl = document.getElementById('userRole');
         const userAvatarEl = document.getElementById('userAvatar');
 
-        if (userNameEl) userNameEl.textContent = user.full_name;
-        if (userRoleEl) userRoleEl.textContent = user.role.charAt(0).toUpperCase() + user.role.slice(1);
-        if (userAvatarEl) userAvatarEl.textContent = this.getUserInitials(user.full_name);
+        if (userNameEl) userNameEl.textContent = user.full_name || user.username;
+        if (userRoleEl) {
+            // Display role with proper capitalization
+            const roleDisplay = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            userRoleEl.textContent = roleDisplay;
+        }
+        if (userAvatarEl) {
+            userAvatarEl.textContent = this.getUserInitials(user.full_name || user.username);
+        }
+
+        // Show User Management menu for admins only
+        const userManagementNav = document.getElementById('userManagementNav');
+        if (userManagementNav && user.role === CONFIG.ROLES.ADMIN) {
+            userManagementNav.style.display = 'block';
+        }
+    },
+
+    /**
+     * Check authentication and initialize user info
+     */
+    checkAuth() {
+        if (!this.requireAuth()) {
+            return false;
+        }
+        this.initUserInfo();
+        return true;
     },
 
     /**

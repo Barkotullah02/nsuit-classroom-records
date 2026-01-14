@@ -24,6 +24,65 @@
             background: white;
             padding: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Flashy watermark using bot.png */
+        .gate-pass-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 400px;
+            background-image: url('images/bot.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.2;
+            z-index: 0;
+            pointer-events: none;
+            filter: brightness(1.2) contrast(1.1);
+        }
+
+        .gate-pass-container > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Tech circuit pattern overlay */
+        .watermark-pattern {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.02;
+        }
+
+        .circuit-line {
+            position: absolute;
+            background: linear-gradient(90deg, transparent, rgba(0, 123, 255, 0.3), transparent);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .circuit-node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border: 2px solid rgba(0, 123, 255, 0.4);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 8px rgba(0, 123, 255, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
         }
 
         .header {
@@ -71,6 +130,55 @@
             padding: 5px 0;
             border-bottom: 1px solid #333;
             font-size: 11px;
+        }
+
+        .checkbox {
+            display: inline-block;
+            width: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .header-fields {
+            margin: 8px 0 10px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .vendor-destination {
+            margin: 8px 0 10px;
+            font-size: 11px;
+        }
+
+        .signature-container {
+            margin-top: 14px;
+            border: 2px solid #000;
+            padding: 10px;
+        }
+
+        .signature-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .sig-box {
+            flex: 1;
+            font-size: 10px;
+            min-height: 110px;
+        }
+
+        .sig-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-align: center;
+            text-decoration: underline;
+        }
+
+        .sig-line {
+            border-top: 1px solid #000;
+            margin-top: 10px;
+            padding-top: 3px;
         }
 
         .consignee-info {
@@ -203,6 +311,17 @@
                 transform-origin: top center;
             }
 
+            /* Keep watermark visible in print */
+            .gate-pass-container::before {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+                opacity: 0.08 !important;
+            }
+
+            .watermark-pattern {
+                display: none;
+            }
+
             .gate-pass-container:last-child {
                 margin-bottom: 0;
             }
@@ -256,7 +375,7 @@
     <script>
         const CONFIG = {
             API_BASE_URL: '../backend/api',
-            LOGO_PATH: 'images/bot.png'
+            LOGO_PATH: 'images/nsu_logo.png'
         };
 
         function getUrlParameter(name) {
@@ -272,6 +391,16 @@
                 month: 'long', 
                 day: 'numeric' 
             });
+        }
+
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            // Expecting HH:MM or HH:MM:SS
+            const parts = String(timeString).split(':');
+            if (parts.length < 2) return timeString;
+            const hh = parts[0].padStart(2, '0');
+            const mm = parts[1].padStart(2, '0');
+            return `${hh}:${mm}`;
         }
 
         async function loadGatePass() {
@@ -332,8 +461,34 @@
                     `;
                 });
             }
+
+            // Generate tech circuit pattern with flashy effects
+            let circuitPattern = '<div class="watermark-pattern">';
+            // Horizontal glowing lines
+            for (let i = 0; i < 8; i++) {
+                const top = 15 + (i * 10);
+                const left = 5 + Math.random() * 20;
+                const width = 40 + Math.random() * 40;
+                const delay = Math.random() * 2;
+                circuitPattern += `<div class="circuit-line" style="top:${top}%;left:${left}%;width:${width}%;height:2px;animation-delay:${delay}s;"></div>`;
+            }
+            // Vertical glowing lines
+            for (let i = 0; i < 8; i++) {
+                const top = 10 + Math.random() * 30;
+                const left = 10 + (i * 11);
+                const height = 30 + Math.random() * 40;
+                const delay = Math.random() * 2;
+                circuitPattern += `<div class="circuit-line" style="top:${top}%;left:${left}%;height:${height}%;width:2px;animation-delay:${delay}s;"></div>`;
+            }
+            // Glowing circuit nodes
+            for (let i = 0; i < 20; i++) {
+                const top = 15 + Math.random() * 70;
+                const left = 10 + Math.random() * 80;
+                circuitPattern += `<div class="circuit-node" style="top:${top}%;left:${left}%;"></div>`;
+            }
+            circuitPattern += '</div>';
             
-            const html = `
+            const html = circuitPattern + `
                 <div class="header">
                     <img src="${CONFIG.LOGO_PATH}" alt="NSU Logo" class="logo">
                     <div class="title">North South University</div>
@@ -345,18 +500,26 @@
 
                 <div class="gate-pass-info">
                     <div class="info-item">
-                        <span class="info-label">Date:</span> ${data.gate_pass_date ? formatDate(data.gate_pass_date) : 'N/A'} &nbsp;&nbsp;
-                        <span class="info-label">Time:</span> ${new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}
+                        <span class="info-label">Incoming</span> <span class="checkbox">${data.pass_direction === 'incoming' ? '☑' : '☐'}</span>
+                        &nbsp;&nbsp;
+                        <span class="info-label">Outgoing</span> <span class="checkbox">${data.pass_direction === 'outgoing' || !data.pass_direction ? '☑' : '☐'}</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">AM/PM:</span> ${new Date().toLocaleTimeString('en-US', {hour12: true}).split(' ')[1]} &nbsp;&nbsp;
                         <span class="info-label">Serial:</span> ${data.gate_pass_number}
                     </div>
                 </div>
 
-                <div class="consignee-info">
-                    <div class="consignee-label">Name & Address of Consignee:</div>
-                    <div>${data.consignee_name || 'N/A'}</div>
+                <div class="header-fields">
+                    <div>
+                        <span class="info-label">Date:</span> ${data.gate_pass_date ? formatDate(data.gate_pass_date) : 'N/A'}
+                        &nbsp;&nbsp;
+                        <span class="info-label">Time:</span> ${formatTime(data.gate_pass_time) || new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}
+                    </div>
+                    <div>
+                        <span class="info-label">Department:</span> ${data.department || ''}
+                        &nbsp;&nbsp;
+                        <span class="info-label">Departure/Incoming Gate:</span> ${data.gate_name || ''}
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -375,32 +538,39 @@
                     </table>
                 </div>
 
-                <div class="signatures">
-                    <div class="signature-block">
-                        <div class="signature-line">
-                            <strong>Signature:</strong> _______________<br>
-                            <strong>Name:</strong> ${data.carrier_name || ''}<br>
-                            <strong>Appointment:</strong> ${data.carrier_appointment || ''}<br>
-                            <strong>Department:</strong> ${data.carrier_department || ''}<br>
-                            <strong>Telephone:</strong> ${data.carrier_telephone || ''}
+                <div class="vendor-destination">
+                    <span class="info-label">Vendor/Destination:</span> ${data.vendor_destination || data.destination || ''}
+                </div>
+
+                <div class="signature-container">
+                    <div class="signature-grid">
+                        <div class="sig-box">
+                            <div class="sig-title">Bearer Details</div>
+                            <div><strong>Name:</strong> ${data.bearer_name || data.carrier_name || ''}</div>
+                            <div><strong>Company:</strong> ${data.bearer_company || data.carrier_department || ''}</div>
+                            <div><strong>Contact No:</strong> ${data.bearer_contact_no || data.carrier_telephone || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.bearer_signature_date ? '(' + formatDate(data.bearer_signature_date) + ')' : ''}</div>
                         </div>
-                    </div>
-                    <div class="signature-block">
-                        <div class="signature-line">
-                            <strong>Signature:</strong> _______________<br>
-                            <strong>Name:</strong> ${data.security_name || ''}<br>
-                            <strong>Appointment:</strong> ${data.security_appointment || ''}<br>
-                            <strong>Department:</strong> ${data.security_department || 'Duty Security Officer'}<br>
-                            <strong>Telephone:</strong> ${data.security_telephone || ''}
+                        <div class="sig-box">
+                            <div class="sig-title">Security Office</div>
+                            <div><strong>Duty Officer Name:</strong> ${data.security_officer_name || data.security_name || ''}</div>
+                            <div><strong>Designation:</strong> ${data.security_officer_designation || data.security_appointment || ''}</div>
+                            <div><strong>Ext:</strong> ${data.security_officer_ext || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.security_officer_signature_date ? '(' + formatDate(data.security_officer_signature_date) + ')' : ''}</div>
                         </div>
-                    </div>
-                    <div class="signature-block">
-                        <div class="signature-line">
-                            <strong>Signature:</strong> _______________<br>
-                            <strong>Name:</strong> ${data.receiver_name || ''}<br>
-                            <strong>Appointment:</strong> ${data.receiver_appointment || ''}<br>
-                            <strong>Department:</strong> ${data.receiver_department || ''}<br>
-                            <strong>Telephone:</strong> ${data.receiver_telephone || ''}
+                        <div class="sig-box">
+                            <div class="sig-title">Processing Person</div>
+                            <div><strong>Name:</strong> ${data.processing_name || data.receiver_name || ''}</div>
+                            <div><strong>Designation:</strong> ${data.processing_designation || data.receiver_appointment || ''}</div>
+                            <div><strong>Ext:</strong> ${data.processing_ext || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.processing_signature_date ? '(' + formatDate(data.processing_signature_date) + ')' : ''}</div>
+                        </div>
+                        <div class="sig-box">
+                            <div class="sig-title">Authorized By</div>
+                            <div><strong>Name:</strong> ${data.authorized_name || ''}</div>
+                            <div><strong>Designation:</strong> ${data.authorized_designation || ''}</div>
+                            <div><strong>Ext:</strong> ${data.authorized_ext || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.authorized_signature_date ? '(' + formatDate(data.authorized_signature_date) + ')' : ''}</div>
                         </div>
                     </div>
                 </div>

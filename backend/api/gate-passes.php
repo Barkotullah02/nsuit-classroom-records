@@ -28,6 +28,31 @@ try {
                         gp.gate_pass_id,
                         gp.gate_pass_number,
                         gp.gate_pass_date,
+                        gp.pass_direction,
+                        gp.gate_pass_time,
+                        gp.department,
+                        gp.gate_name,
+                        gp.vendor_destination,
+                        gp.bearer_name,
+                        gp.bearer_company,
+                        gp.bearer_contact_no,
+                        gp.bearer_signature,
+                        gp.bearer_signature_date,
+                        gp.security_officer_name,
+                        gp.security_officer_designation,
+                        gp.security_officer_ext,
+                        gp.security_officer_signature,
+                        gp.security_officer_signature_date,
+                        gp.processing_name,
+                        gp.processing_designation,
+                        gp.processing_ext,
+                        gp.processing_signature,
+                        gp.processing_signature_date,
+                        gp.authorized_name,
+                        gp.authorized_designation,
+                        gp.authorized_ext,
+                        gp.authorized_signature,
+                        gp.authorized_signature_date,
                         gp.consignee_name,
                         gp.destination,
                         gp.carrier_name,
@@ -90,6 +115,11 @@ try {
                         gp.gate_pass_id,
                         gp.gate_pass_number,
                         gp.gate_pass_date,
+                        gp.pass_direction,
+                        gp.department,
+                        gp.gate_name,
+                        gp.vendor_destination,
+                        gp.bearer_name,
                         gp.consignee_name,
                         gp.destination,
                         gp.carrier_name,
@@ -116,12 +146,39 @@ try {
         $user = $auth->getCurrentUser();
         $data = json_decode(file_get_contents('php://input'), true);
 
+        // Backward-compatible mapping: allow older clients to still send the previous fields
+        $passDirection = $data['pass_direction'] ?? 'outgoing';
+        if ($passDirection !== 'incoming' && $passDirection !== 'outgoing') {
+            $passDirection = 'outgoing';
+        }
+
+        $department = $data['department'] ?? ($data['consignee_name'] ?? null);
+        $gateName = $data['gate_name'] ?? null;
+        $vendorDestination = $data['vendor_destination'] ?? ($data['destination'] ?? null);
+
+        $bearerName = $data['bearer_name'] ?? ($data['carrier_name'] ?? null);
+        $bearerCompany = $data['bearer_company'] ?? ($data['carrier_department'] ?? null);
+        $bearerContactNo = $data['bearer_contact_no'] ?? ($data['carrier_telephone'] ?? null);
+
+        $securityOfficerName = $data['security_officer_name'] ?? ($data['security_name'] ?? null);
+        $securityOfficerDesignation = $data['security_officer_designation'] ?? ($data['security_appointment'] ?? null);
+        $securityOfficerExt = $data['security_officer_ext'] ?? null;
+
+        $processingName = $data['processing_name'] ?? ($data['receiver_name'] ?? null);
+        $processingDesignation = $data['processing_designation'] ?? ($data['receiver_appointment'] ?? null);
+        $processingExt = $data['processing_ext'] ?? null;
+
+        $authorizedName = $data['authorized_name'] ?? null;
+        $authorizedDesignation = $data['authorized_designation'] ?? null;
+        $authorizedExt = $data['authorized_ext'] ?? null;
+
         // Validate required fields
-        if (empty($data['devices']) || !is_array($data['devices']) || empty($data['gate_pass_number']) || 
-            empty($data['gate_pass_date']) || empty($data['consignee_name']) ||
-            empty($data['destination']) || empty($data['carrier_name']) ||
-            empty($data['carrier_appointment']) || empty($data['carrier_department']) ||
-            empty($data['carrier_telephone'])) {
+        if (empty($data['devices']) || !is_array($data['devices']) || empty($data['gate_pass_number']) || empty($data['gate_pass_date'])) {
+            Response::error('Missing required fields');
+        }
+
+        // New format required fields (kept fairly strict for printing)
+        if (empty($department) || empty($vendorDestination) || empty($bearerName) || empty($bearerCompany) || empty($bearerContactNo)) {
             Response::error('Missing required fields');
         }
 
@@ -135,36 +192,95 @@ try {
             Response::error('Gate pass number already exists');
         }
 
-        $query = "INSERT INTO gate_passes 
-                 (gate_pass_number, gate_pass_date, consignee_name, destination,
-                  carrier_name, carrier_appointment, carrier_department, carrier_telephone,
-                  security_name, security_appointment, security_department, security_telephone,
-                  receiver_name, receiver_appointment, receiver_department, receiver_telephone,
-                  created_by, status) 
-                 VALUES 
-                 (:gate_pass_number, :gate_pass_date, :consignee_name, :destination,
-                  :carrier_name, :carrier_appointment, :carrier_department, :carrier_telephone,
-                  :security_name, :security_appointment, :security_department, :security_telephone,
-                  :receiver_name, :receiver_appointment, :receiver_department, :receiver_telephone,
-                  :created_by, 'active')";
+    $query = "INSERT INTO gate_passes 
+         (gate_pass_number, gate_pass_date, pass_direction, gate_pass_time, department, gate_name, vendor_destination,
+          bearer_name, bearer_company, bearer_contact_no, bearer_signature, bearer_signature_date,
+          security_officer_name, security_officer_designation, security_officer_ext, security_officer_signature, security_officer_signature_date,
+          processing_name, processing_designation, processing_ext, processing_signature, processing_signature_date,
+          authorized_name, authorized_designation, authorized_ext, authorized_signature, authorized_signature_date,
+          consignee_name, destination,
+          carrier_name, carrier_appointment, carrier_department, carrier_telephone,
+          security_name, security_appointment, security_department, security_telephone,
+          receiver_name, receiver_appointment, receiver_department, receiver_telephone,
+          purpose, remarks,
+          created_by, status) 
+         VALUES 
+         (:gate_pass_number, :gate_pass_date, :pass_direction, :gate_pass_time, :department, :gate_name, :vendor_destination,
+          :bearer_name, :bearer_company, :bearer_contact_no, :bearer_signature, :bearer_signature_date,
+          :security_officer_name, :security_officer_designation, :security_officer_ext, :security_officer_signature, :security_officer_signature_date,
+          :processing_name, :processing_designation, :processing_ext, :processing_signature, :processing_signature_date,
+          :authorized_name, :authorized_designation, :authorized_ext, :authorized_signature, :authorized_signature_date,
+          :consignee_name, :destination,
+          :carrier_name, :carrier_appointment, :carrier_department, :carrier_telephone,
+          :security_name, :security_appointment, :security_department, :security_telephone,
+          :receiver_name, :receiver_appointment, :receiver_department, :receiver_telephone,
+          :purpose, :remarks,
+          :created_by, 'active')";
 
         $stmt = $db->prepare($query);
         $stmt->bindParam(':gate_pass_number', $data['gate_pass_number']);
         $stmt->bindParam(':gate_pass_date', $data['gate_pass_date']);
-        $stmt->bindParam(':consignee_name', $data['consignee_name']);
-        $stmt->bindParam(':destination', $data['destination']);
-        $stmt->bindParam(':carrier_name', $data['carrier_name']);
-        $stmt->bindParam(':carrier_appointment', $data['carrier_appointment']);
-        $stmt->bindParam(':carrier_department', $data['carrier_department']);
-        $stmt->bindParam(':carrier_telephone', $data['carrier_telephone']);
+
+        $stmt->bindParam(':pass_direction', $passDirection);
+        $stmt->bindParam(':gate_pass_time', $data['gate_pass_time']);
+        $stmt->bindParam(':department', $department);
+        $stmt->bindParam(':gate_name', $gateName);
+        $stmt->bindParam(':vendor_destination', $vendorDestination);
+
+        $stmt->bindParam(':bearer_name', $bearerName);
+        $stmt->bindParam(':bearer_company', $bearerCompany);
+        $stmt->bindParam(':bearer_contact_no', $bearerContactNo);
+        $stmt->bindParam(':bearer_signature', $data['bearer_signature']);
+        $stmt->bindParam(':bearer_signature_date', $data['bearer_signature_date']);
+
+        $stmt->bindParam(':security_officer_name', $securityOfficerName);
+        $stmt->bindParam(':security_officer_designation', $securityOfficerDesignation);
+        $stmt->bindParam(':security_officer_ext', $securityOfficerExt);
+        $stmt->bindParam(':security_officer_signature', $data['security_officer_signature']);
+        $stmt->bindParam(':security_officer_signature_date', $data['security_officer_signature_date']);
+
+        $stmt->bindParam(':processing_name', $processingName);
+        $stmt->bindParam(':processing_designation', $processingDesignation);
+        $stmt->bindParam(':processing_ext', $processingExt);
+        $stmt->bindParam(':processing_signature', $data['processing_signature']);
+        $stmt->bindParam(':processing_signature_date', $data['processing_signature_date']);
+
+        $stmt->bindParam(':authorized_name', $authorizedName);
+        $stmt->bindParam(':authorized_designation', $authorizedDesignation);
+        $stmt->bindParam(':authorized_ext', $authorizedExt);
+        $stmt->bindParam(':authorized_signature', $data['authorized_signature']);
+        $stmt->bindParam(':authorized_signature_date', $data['authorized_signature_date']);
+
+        // Keep older fields populated too (for backward compatibility with existing UI)
+        $consigneeNameCompat = $data['consignee_name'] ?? $department;
+        $destinationCompat = $data['destination'] ?? $vendorDestination;
+        $carrierNameCompat = $data['carrier_name'] ?? $bearerName;
+        $carrierAppointmentCompat = $data['carrier_appointment'] ?? null;
+        $carrierDepartmentCompat = $data['carrier_department'] ?? $bearerCompany;
+        $carrierTelephoneCompat = $data['carrier_telephone'] ?? $bearerContactNo;
+        $securityDepartmentCompat = $data['security_department'] ?? 'Duty Security Officer';
+
+        $stmt->bindParam(':consignee_name', $consigneeNameCompat);
+        $stmt->bindParam(':destination', $destinationCompat);
+        $stmt->bindParam(':carrier_name', $carrierNameCompat);
+        $stmt->bindParam(':carrier_appointment', $carrierAppointmentCompat);
+        $stmt->bindParam(':carrier_department', $carrierDepartmentCompat);
+        $stmt->bindParam(':carrier_telephone', $carrierTelephoneCompat);
         $stmt->bindParam(':security_name', $data['security_name']);
         $stmt->bindParam(':security_appointment', $data['security_appointment']);
-        $stmt->bindParam(':security_department', $data['security_department']);
+        $stmt->bindParam(':security_department', $securityDepartmentCompat);
         $stmt->bindParam(':security_telephone', $data['security_telephone']);
         $stmt->bindParam(':receiver_name', $data['receiver_name']);
         $stmt->bindParam(':receiver_appointment', $data['receiver_appointment']);
         $stmt->bindParam(':receiver_department', $data['receiver_department']);
         $stmt->bindParam(':receiver_telephone', $data['receiver_telephone']);
+
+        // Some DBs still have these columns as NOT NULL (older schema)
+        $purposeCompat = $data['purpose'] ?? 'Other';
+        $remarksCompat = $data['remarks'] ?? null;
+        $stmt->bindParam(':purpose', $purposeCompat);
+        $stmt->bindParam(':remarks', $remarksCompat);
+
         $stmt->bindParam(':created_by', $user['user_id']);
         $stmt->execute();
 

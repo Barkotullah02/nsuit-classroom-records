@@ -116,6 +116,7 @@ async function loadDevices() {
     if (result.success) {
         // Filter to only show devices without active installations
         devices = result.data.filter(device => !device.current_room_id);
+        console.log('Available devices for installation:', devices.length);
         populateDeviceDropdown();
     }
 }
@@ -245,18 +246,129 @@ function populateRoomDropdowns() {
 }
 
 /**
- * Populate device dropdown
+ * Initialize device autocomplete
  */
 function populateDeviceDropdown() {
-    const deviceSelect = document.getElementById('deviceSelect');
-    deviceSelect.innerHTML = '<option value="">Choose a device...</option>';
+    const searchInput = document.getElementById('deviceSearch');
+    
+    if (!searchInput) {
+        console.error('Device search input not found');
+        return;
+    }
 
-    devices.forEach(device => {
-        deviceSelect.innerHTML += `
-            <option value="${device.device_id}">
-                ${device.device_unique_id} - ${device.type_name} (${device.brand_name})
-            </option>
-        `;
+    // Remove any existing event listeners by cloning
+    const newSearchInput = searchInput.cloneNode(true);
+    searchInput.parentNode.replaceChild(newSearchInput, searchInput);
+
+    // Get fresh references after cloning
+    const deviceSearchInput = document.getElementById('deviceSearch');
+    const deviceDropdown = document.getElementById('deviceDropdown');
+    const hiddenInput = document.getElementById('deviceSelect');
+
+    console.log('Initializing autocomplete with', devices.length, 'devices');
+
+    // Handle input for searching
+    deviceSearchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        hiddenInput.value = ''; // Clear selection when typing
+
+        if (searchTerm.length < 1) {
+            deviceDropdown.innerHTML = '';
+            deviceDropdown.style.display = 'none';
+            return;
+        }
+
+        // Filter devices based on search term
+        const filteredDevices = devices.filter(device => {
+            const deviceText = `${device.device_unique_id} ${device.type_name} ${device.brand_name} ${device.model || ''}`.toLowerCase();
+            return deviceText.includes(searchTerm);
+        });
+
+        console.log('Found', filteredDevices.length, 'devices matching:', searchTerm);
+
+        // Display results
+        if (filteredDevices.length > 0) {
+            const resultsHtml = filteredDevices.slice(0, 50).map(device => `
+                <div class="autocomplete-item" data-device-id="${device.device_id}">
+                    <strong>${device.device_unique_id}</strong> - ${device.type_name} (${device.brand_name}${device.model ? ' ' + device.model : ''})
+                </div>
+            `).join('');
+            
+            deviceDropdown.innerHTML = resultsHtml;
+            deviceDropdown.style.display = 'block';
+
+            // Add click handlers to results
+            deviceDropdown.querySelectorAll('.autocomplete-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const deviceId = this.getAttribute('data-device-id');
+                    const device = devices.find(d => d.device_id == deviceId);
+                    
+                    if (device) {
+                        const hiddenInputRef = document.getElementById('deviceSelect');
+                        const searchInputRef = document.getElementById('deviceSearch');
+                        const dropdownRef = document.getElementById('deviceDropdown');
+                        
+                        searchInputRef.value = `${device.device_unique_id} - ${device.type_name} (${device.brand_name})`;
+                        hiddenInputRef.value = device.device_id;
+                        dropdownRef.innerHTML = '';
+                        dropdownRef.style.display = 'none';
+                    }
+                });
+            });
+        } else {
+            deviceDropdown.innerHTML = '<div class="autocomplete-item no-results">No available devices found matching "' + searchTerm + '"</div>';
+            deviceDropdown.style.display = 'block';
+        }
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const searchRef = document.getElementById('deviceSearch');
+        const dropdownRef = document.getElementById('deviceDropdown');
+        if (searchRef && dropdownRef && !searchRef.contains(e.target) && !dropdownRef.contains(e.target)) {
+            dropdownRef.style.display = 'none';
+        }
+    });
+
+    // Handle focus - show recent/all options if empty
+    deviceSearchInput.addEventListener('focus', function() {
+        const dropdownRef = document.getElementById('deviceDropdown');
+        
+        if (this.value.length === 0) {
+            if (devices.length > 0) {
+                const recentDevices = devices.slice(0, 20);
+                const resultsHtml = recentDevices.map(device => `
+                    <div class="autocomplete-item" data-device-id="${device.device_id}">
+                        <strong>${device.device_unique_id}</strong> - ${device.type_name} (${device.brand_name}${device.model ? ' ' + device.model : ''})
+                    </div>
+                `).join('');
+                
+                dropdownRef.innerHTML = '<div class="autocomplete-header">Available devices (${devices.length} total - type to search)</div>' + resultsHtml;
+                dropdownRef.style.display = 'block';
+
+                // Add click handlers
+                dropdownRef.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const deviceId = this.getAttribute('data-device-id');
+                        const device = devices.find(d => d.device_id == deviceId);
+                        
+                        if (device) {
+                            const hiddenInputRef = document.getElementById('deviceSelect');
+                            const searchInputRef = document.getElementById('deviceSearch');
+                            const dropdownRef2 = document.getElementById('deviceDropdown');
+                            
+                            searchInputRef.value = `${device.device_unique_id} - ${device.type_name} (${device.brand_name})`;
+                            hiddenInputRef.value = device.device_id;
+                            dropdownRef2.innerHTML = '';
+                            dropdownRef2.style.display = 'none';
+                        }
+                    });
+                });
+            } else {
+                dropdownRef.innerHTML = '<div class="autocomplete-item no-results">No devices available for installation. All devices may be currently installed.</div>';
+                dropdownRef.style.display = 'block';
+            }
+        }
     });
 }
 
@@ -276,6 +388,12 @@ function clearFilters() {
 function openInstallModal() {
     const modal = document.getElementById('installModal');
     document.getElementById('installForm').reset();
+    
+    // Clear autocomplete fields
+    document.getElementById('deviceSearch').value = '';
+    document.getElementById('deviceSelect').value = '';
+    document.getElementById('deviceDropdown').innerHTML = '';
+    document.getElementById('deviceDropdown').style.display = 'none';
     
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('installedDate').value = today;

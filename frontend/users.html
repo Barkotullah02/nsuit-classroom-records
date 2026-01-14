@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .role-badge {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-badge.admin {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .role-badge.staff {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .role-badge.viewer {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .user-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .user-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-card.inactive {
+            opacity: 0.6;
+            background: #f5f5f5;
+        }
+
+        .user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+        }
+
+        .user-info h3 {
+            margin: 0 0 0.5rem 0;
+            color: #333;
+        }
+
+        .user-meta {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .permissions-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-bottom: 1rem;
+        }
+
+        .permissions-info h4 {
+            margin: 0 0 0.5rem 0;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .permissions-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .permission-item {
+            padding: 0.75rem;
+            background: white;
+            border-radius: 5px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .permission-item h5 {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .permission-item ul {
+            margin: 0;
+            padding-left: 1.25rem;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .permission-item ul li {
+            margin-bottom: 0.25rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2><img src="images/bot.png" alt="Logo" style="height: 50px; vertical-align: middle; margin-right: 8px;"> Device Manager</h2>
+            </div>
+
+            <nav>
+                <ul class="sidebar-nav">
+                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
+                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
+                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
+                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
+                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
+                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
+                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                    <li id="userManagementNav" style="display: none;"><a href="users.html" class="active"><i class="fas fa-users-cog"></i> User Management</a></li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar"></div>
+                    <div class="user-details">
+                        <h4 id="userName">Loading...</h4>
+                        <p id="userRole">Role</p>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="content-header">
+                <h1><i class="fas fa-users-cog"></i> User Management</h1>
+                <button class="btn btn-primary" onclick="showAddUserModal()">
+                    <i class="fas fa-user-plus"></i> Add User
+                </button>
+            </div>
+
+            <!-- Permissions Info -->
+            <div class="permissions-info">
+                <h4><i class="fas fa-info-circle"></i> User Role Permissions</h4>
+                <div class="permissions-grid">
+                    <div class="permission-item">
+                        <h5><i class="fas fa-crown" style="color: #1976d2;"></i> Admin</h5>
+                        <ul>
+                            <li>Full system access</li>
+                            <li>Manage users</li>
+                            <li>Add/Edit/Delete all data</li>
+                            <li>View all reports</li>
+                        </ul>
+                    </div>
+                    <div class="permission-item">
+                        <h5><i class="fas fa-user-edit" style="color: #7b1fa2;"></i> Staff</h5>
+                        <ul>
+                            <li>Add new data only</li>
+                            <li>Cannot edit existing data</li>
+                            <li>Cannot delete data</li>
+                            <li>View all reports</li>
+                        </ul>
+                    </div>
+                    <div class="permission-item">
+                        <h5><i class="fas fa-eye" style="color: #388e3c;"></i> Viewer</h5>
+                        <ul>
+                            <li>Read-only access</li>
+                            <li>View all data</li>
+                            <li>View reports</li>
+                            <li>Cannot modify anything</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users List -->
+            <div id="usersContainer">
+                <div class="text-center">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit User Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle"><i class="fas fa-user-plus"></i> Add User</h3>
+                <button class="btn-close" onclick="closeUserModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    
+                    <div class="form-group">
+                        <label for="username">Username *</label>
+                        <input type="text" id="username" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <input type="text" id="fullName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="role">Role *</label>
+                        <select id="role" required>
+                            <option value="">Select Role</option>
+                            <option value="admin">Admin - Full Access</option>
+                            <option value="staff">Staff - Can Add/Edit Data</option>
+                            <option value="viewer">Viewer - Read Only</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="passwordGroup">
+                        <label for="password">Password *</label>
+                        <input type="password" id="password" minlength="6">
+                        <small>Minimum 6 characters</small>
+                    </div>
+
+                    <div class="form-group" id="confirmPasswordGroup">
+                        <label for="confirmPassword">Confirm Password *</label>
+                        <input type="password" id="confirmPassword" minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="isActive" checked>
+                            Active User
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+                <button class="btn btn-primary" onclick="saveUser()">
+                    <i class="fas fa-save"></i> Save User
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-exclamation-triangle"></i> Deactivate User</h3>
+                <button class="btn-close" onclick="closeDeleteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to deactivate <strong id="deleteUserName"></strong>?</p>
+                <p class="text-danger">This user will no longer be able to access the system.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">
+                    <i class="fas fa-user-slash"></i> Deactivate User
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script>
+        let currentUserId = null;
+        let deleteUserId = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            
+            // Check if user is admin
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.role === 'admin') {
+                document.getElementById('userManagementNav').style.display = 'block';
+                loadUsers();
+            } else {
+                window.location.href = 'dashboard.html';
+            }
+        });
+
+        async function loadUsers() {
+            try {
+                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.USERS, {
+                    method: 'GET'
+                });
+
+                if (result.success) {
+                    displayUsers(result.data);
+                } else {
+                    Utils.showAlert(result.message || 'Failed to load users', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading users:', error);
+                Utils.showAlert('Failed to load users', 'error');
+            }
+        }
+
+        function displayUsers(users) {
+            const container = document.getElementById('usersContainer');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = '<p class="text-center">No users found</p>';
+                return;
+            }
+
+            let html = '';
+            users.forEach(user => {
+                const isActive = user.is_active == 1;
+                const roleClass = user.role;
+                const createdDate = new Date(user.created_at).toLocaleDateString();
+
+                html += `
+                    <div class="user-card ${!isActive ? 'inactive' : ''}">
+                        <div class="user-header">
+                            <div class="user-info">
+                                <h3>
+                                    <i class="fas fa-user-circle"></i> ${escapeHtml(user.full_name)}
+                                    ${!isActive ? '<span style="color: #f44336;">(Inactive)</span>' : ''}
+                                </h3>
+                                <div class="user-meta">
+                                    <strong>@${escapeHtml(user.username)}</strong> | 
+                                    ${escapeHtml(user.email)} | 
+                                    <span class="role-badge ${roleClass}">${user.role}</span>
+                                </div>
+                                <div class="user-meta" style="margin-top: 0.5rem;">
+                                    <i class="fas fa-calendar"></i> Created: ${createdDate}
+                                </div>
+                            </div>
+                            <div class="user-actions">
+                                <button class="btn btn-sm btn-primary" onclick="showEditUserModal(${user.user_id}, '${escapeHtml(user.username)}', '${escapeHtml(user.full_name)}', '${escapeHtml(user.email)}', '${user.role}', ${user.is_active})">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="showDeleteModal(${user.user_id}, '${escapeHtml(user.full_name)}')" ${!isActive ? 'disabled' : ''}>
+                                    <i class="fas fa-user-slash"></i> Deactivate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function showAddUserModal() {
+            currentUserId = null;
+            document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-user-plus"></i> Add User';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            document.getElementById('isActive').checked = true;
+            document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('confirmPasswordGroup').style.display = 'block';
+            document.getElementById('password').required = true;
+            document.getElementById('confirmPassword').required = true;
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        function showEditUserModal(id, username, fullName, email, role, isActive) {
+            currentUserId = id;
+            document.getElementById('userModalTitle').innerHTML = '<i class="fas fa-edit"></i> Edit User';
+            document.getElementById('userId').value = id;
+            document.getElementById('username').value = username;
+            document.getElementById('fullName').value = fullName;
+            document.getElementById('email').value = email;
+            document.getElementById('role').value = role;
+            document.getElementById('isActive').checked = isActive == 1;
+            
+            // Make password optional for editing
+            document.getElementById('passwordGroup').style.display = 'block';
+            document.getElementById('confirmPasswordGroup').style.display = 'block';
+            document.getElementById('password').required = false;
+            document.getElementById('confirmPassword').required = false;
+            document.getElementById('password').value = '';
+            document.getElementById('confirmPassword').value = '';
+            
+            const passwordLabel = document.querySelector('label[for="password"]');
+            passwordLabel.textContent = 'New Password (leave blank to keep current)';
+            
+            document.getElementById('userModal').classList.add('active');
+        }
+
+        function closeUserModal() {
+            document.getElementById('userModal').classList.remove('active');
+            currentUserId = null;
+        }
+
+        async function saveUser() {
+            const userData = {
+                username: document.getElementById('username').value.trim(),
+                full_name: document.getElementById('fullName').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                role: document.getElementById('role').value,
+                is_active: document.getElementById('isActive').checked
+            };
+
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate
+            if (!userData.username || !userData.full_name || !userData.email || !userData.role) {
+                Utils.showAlert('Please fill all required fields', 'error');
+                return;
+            }
+
+            // Password validation
+            if (currentUserId) {
+                // Editing - password is optional
+                if (password || confirmPassword) {
+                    if (password !== confirmPassword) {
+                        Utils.showAlert('Passwords do not match', 'error');
+                        return;
+                    }
+                    if (password.length < 6) {
+                        Utils.showAlert('Password must be at least 6 characters', 'error');
+                        return;
+                    }
+                    userData.password = password;
+                }
+                userData.user_id = currentUserId;
+            } else {
+                // Adding - password is required
+                if (!password || !confirmPassword) {
+                    Utils.showAlert('Password is required', 'error');
+                    return;
+                }
+                if (password !== confirmPassword) {
+                    Utils.showAlert('Passwords do not match', 'error');
+                    return;
+                }
+                if (password.length < 6) {
+                    Utils.showAlert('Password must be at least 6 characters', 'error');
+                    return;
+                }
+                userData.password = password;
+            }
+
+            try {
+                const method = currentUserId ? 'PUT' : 'POST';
+                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.USERS, {
+                    method: method,
+                    body: JSON.stringify(userData)
+                });
+
+                if (result.success) {
+                    Utils.showAlert(result.message, 'success');
+                    closeUserModal();
+                    loadUsers();
+                } else {
+                    Utils.showAlert(result.message || 'Failed to save user', 'error');
+                }
+            } catch (error) {
+                console.error('Error saving user:', error);
+                Utils.showAlert('Failed to save user', 'error');
+            }
+        }
+
+        function showDeleteModal(userId, userName) {
+            deleteUserId = userId;
+            document.getElementById('deleteUserName').textContent = userName;
+            document.getElementById('deleteModal').classList.add('active');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('active');
+            deleteUserId = null;
+        }
+
+        async function confirmDelete() {
+            if (!deleteUserId) return;
+
+            try {
+                const result = await Utils.apiRequest(CONFIG.ENDPOINTS.USERS, {
+                    method: 'DELETE',
+                    body: JSON.stringify({ user_id: deleteUserId })
+                });
+
+                if (result.success) {
+                    Utils.showAlert(result.message, 'success');
+                    closeDeleteModal();
+                    loadUsers();
+                } else {
+                    Utils.showAlert(result.message || 'Failed to deactivate user', 'error');
+                }
+            } catch (error) {
+                console.error('Error deactivating user:', error);
+                Utils.showAlert('Failed to deactivate user', 'error');
+            }
+        }
+
+        // Logout
+        document.getElementById('logoutBtn').addEventListener('click', logout);
+    </script>
+</body>
+</html>

@@ -10,6 +10,10 @@ let devices = [];
 document.addEventListener('DOMContentLoaded', async () => {
     await loadMetadata();
     await loadRooms();
+    
+    // Check for filters from dashboard
+    checkDashboardFilter();
+    
     await loadDevices();
 
     initializeEventListeners();
@@ -269,6 +273,27 @@ function populateFormDropdowns() {
 /**
  * Clear filters
  */
+/**
+ * Check for filters from dashboard navigation
+ */
+function checkDashboardFilter() {
+    const filterData = sessionStorage.getItem('deviceFilter');
+    if (filterData) {
+        try {
+            const filter = JSON.parse(filterData);
+            if (filter.status === 'withdrawn') {
+                document.getElementById('filterStatus').value = 'withdrawn';
+            } else if (filter.status === 'available') {
+                document.getElementById('filterStatus').value = 'available';
+            }
+            // Clear the session storage after applying
+            sessionStorage.removeItem('deviceFilter');
+        } catch (e) {
+            console.error('Error parsing dashboard filter:', e);
+        }
+    }
+}
+
 function clearFilters() {
     document.getElementById('filterDeviceId').value = '';
     document.getElementById('filterType').value = '';

@@ -37,6 +37,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         dateField.value = `${year}-${month}-${day}`;
     }
 
+    const timeField = document.getElementById('gatePassTime');
+    if (timeField) {
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, '0');
+        const mm = String(now.getMinutes()).padStart(2, '0');
+        timeField.value = `${hh}:${mm}`;
+    }
+
     // Setup event listeners
     setupEventListeners();
 
@@ -64,6 +72,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setupEventListeners() {
     // Logout
     document.getElementById('logoutBtn').addEventListener('click', Utils.logout);
+
+    // Pass type (Incoming/Outgoing) - behave like a single-choice checkbox group
+    const incoming = document.getElementById('passIncoming');
+    const outgoing = document.getElementById('passOutgoing');
+    if (incoming && outgoing) {
+        const enforceSingle = (changed) => {
+            if (changed === 'incoming' && incoming.checked) {
+                outgoing.checked = false;
+            }
+            if (changed === 'outgoing' && outgoing.checked) {
+                incoming.checked = false;
+            }
+            // Never allow both unchecked
+            if (!incoming.checked && !outgoing.checked) {
+                outgoing.checked = true;
+            }
+        };
+
+        incoming.addEventListener('change', () => enforceSingle('incoming'));
+        outgoing.addEventListener('change', () => enforceSingle('outgoing'));
+
+        // Default safeguard
+        enforceSingle('outgoing');
+    }
 
     // Form submission
     document.getElementById('gatePassForm').addEventListener('submit', handleFormSubmit);
@@ -332,24 +364,64 @@ async function handleFormSubmit(e) {
         return;
     }
 
+    const incoming = document.getElementById('passIncoming');
+    const outgoing = document.getElementById('passOutgoing');
+    const passDirection = incoming && incoming.checked ? 'incoming' : 'outgoing';
+
+    const department = document.getElementById('department').value.trim();
+    const vendorDestination = document.getElementById('vendorDestination').value.trim();
+
     const gatePassData = {
-        devices: selectedDevices.map(d => d.device_id), // Array of device IDs
+        devices: selectedDevices.map(d => d.device_id),
         gate_pass_number: document.getElementById('gatePassNumber').value.trim(),
         gate_pass_date: document.getElementById('gatePassDate').value,
-        consignee_name: document.getElementById('consigneeName').value.trim(),
-        destination: document.getElementById('destination').value.trim(),
-        carrier_name: document.getElementById('carrierName').value.trim(),
-        carrier_appointment: document.getElementById('carrierAppointment').value.trim(),
-        carrier_department: document.getElementById('carrierDepartment').value.trim(),
-        carrier_telephone: document.getElementById('carrierTelephone').value.trim(),
-        security_name: document.getElementById('securityName').value.trim() || null,
-        security_appointment: document.getElementById('securityAppointment').value.trim() || null,
-        security_department: document.getElementById('securityDepartment').value.trim() || null,
-        security_telephone: document.getElementById('securityTelephone').value.trim() || null,
-        receiver_name: document.getElementById('receiverName').value.trim() || null,
-        receiver_appointment: document.getElementById('receiverAppointment').value.trim() || null,
-        receiver_department: document.getElementById('receiverDepartment').value.trim() || null,
-        receiver_telephone: document.getElementById('receiverTelephone').value.trim() || null
+        gate_pass_time: (document.getElementById('gatePassTime').value || null),
+        pass_direction: passDirection,
+        department: department,
+        gate_name: document.getElementById('gateName').value.trim(),
+        vendor_destination: vendorDestination,
+
+        bearer_name: document.getElementById('bearerName').value.trim(),
+        bearer_company: document.getElementById('bearerCompany').value.trim(),
+        bearer_contact_no: document.getElementById('bearerContactNo').value.trim(),
+        bearer_signature: document.getElementById('bearerSignature').value.trim() || null,
+        bearer_signature_date: document.getElementById('bearerSignatureDate').value || null,
+
+        security_officer_name: document.getElementById('securityOfficerName').value.trim() || null,
+        security_officer_designation: document.getElementById('securityOfficerDesignation').value.trim() || null,
+        security_officer_ext: document.getElementById('securityOfficerExt').value.trim() || null,
+        security_officer_signature: document.getElementById('securityOfficerSignature').value.trim() || null,
+        security_officer_signature_date: document.getElementById('securityOfficerSignatureDate').value || null,
+
+        processing_name: document.getElementById('processingName').value.trim() || null,
+        processing_designation: document.getElementById('processingDesignation').value.trim() || null,
+        processing_ext: document.getElementById('processingExt').value.trim() || null,
+        processing_signature: document.getElementById('processingSignature').value.trim() || null,
+        processing_signature_date: document.getElementById('processingSignatureDate').value || null,
+
+        authorized_name: document.getElementById('authorizedName').value.trim() || null,
+        authorized_designation: document.getElementById('authorizedDesignation').value.trim() || null,
+        authorized_ext: document.getElementById('authorizedExt').value.trim() || null,
+        authorized_signature: document.getElementById('authorizedSignature').value.trim() || null,
+        authorized_signature_date: document.getElementById('authorizedSignatureDate').value || null,
+
+        // Backward compatibility payload (safe to keep)
+        consignee_name: department,
+        destination: vendorDestination,
+        carrier_name: document.getElementById('bearerName').value.trim(),
+        carrier_department: document.getElementById('bearerCompany').value.trim(),
+        carrier_telephone: document.getElementById('bearerContactNo').value.trim(),
+        carrier_appointment: null,
+        security_name: document.getElementById('securityOfficerName').value.trim() || null,
+        security_appointment: document.getElementById('securityOfficerDesignation').value.trim() || null,
+        security_department: 'Duty Security Officer',
+        security_telephone: null,
+        receiver_name: document.getElementById('processingName').value.trim() || null,
+        receiver_appointment: document.getElementById('processingDesignation').value.trim() || null,
+        receiver_department: null,
+        receiver_telephone: null,
+        purpose: 'Other',
+        remarks: null
     };
 
     // Create gate pass

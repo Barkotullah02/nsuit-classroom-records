@@ -61,6 +61,19 @@
                 <div style="padding: 30px;">
                     <form id="gatePassForm">
                         <div class="form-group">
+                            <label>Pass Type *</label>
+                            <div style="display: flex; gap: 20px; align-items: center; padding: 10px 0;">
+                                <label style="display: flex; gap: 8px; align-items: center; margin: 0;">
+                                    <input type="checkbox" id="passIncoming"> Incoming
+                                </label>
+                                <label style="display: flex; gap: 8px; align-items: center; margin: 0;">
+                                    <input type="checkbox" id="passOutgoing" checked> Outgoing
+                                </label>
+                            </div>
+                            <small class="form-text">Select exactly one</small>
+                        </div>
+
+                        <div class="form-group">
                             <label for="deviceSelect">Select Device *</label>
                             <select id="deviceSelect" class="form-control" required>
                                 <option value="">Choose a device...</option>
@@ -95,76 +108,119 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="consigneeName">Name & Address of Consignee *</label>
-                            <textarea id="consigneeName" class="form-control" rows="2" placeholder="Enter name and address of consignee" required></textarea>
-                            <small class="form-text">Person or department receiving the device</small>
+                            <label for="gatePassTime">Gate Pass Time</label>
+                            <input type="time" id="gatePassTime" class="form-control">
                         </div>
 
                         <div class="form-group">
-                            <label for="destination">Destination *</label>
-                            <input type="text" id="destination" class="form-control" placeholder="Enter destination location" required>
-                            <small class="form-text">Where is the device being moved to?</small>
+                            <label for="department">Department *</label>
+                            <input type="text" id="department" class="form-control" placeholder="Enter department" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="carrierName">Carrier/Handler Name *</label>
-                            <input type="text" id="carrierName" class="form-control" placeholder="Name of person carrying the device" required>
+                            <label for="gateName">Departure/Incoming Gate *</label>
+                            <input type="text" id="gateName" class="form-control" placeholder="Enter gate" required>
                         </div>
 
                         <div class="form-group">
-                            <label for="carrierAppointment">Carrier Appointment *</label>
-                            <input type="text" id="carrierAppointment" class="form-control" placeholder="Job title/position" required>
+                            <label for="vendorDestination">Vendor/Destination *</label>
+                            <input type="text" id="vendorDestination" class="form-control" placeholder="Enter vendor or destination" required>
                         </div>
 
-                        <div class="form-group">
-                            <label for="carrierDepartment">Carrier Department *</label>
-                            <input type="text" id="carrierDepartment" class="form-control" placeholder="Department name" required>
+                        <div style="margin: 30px 0 10px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px; background: #fafafa;">
+                            <h4 style="margin-bottom: 15px; color: var(--primary-color);">Bearer Details</h4>
+                            <div class="form-group">
+                                <label for="bearerName">Name *</label>
+                                <input type="text" id="bearerName" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bearerCompany">Company *</label>
+                                <input type="text" id="bearerCompany" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bearerContactNo">Contact No *</label>
+                                <input type="tel" id="bearerContactNo" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="bearerSignature">Signature</label>
+                                <input type="text" id="bearerSignature" class="form-control" placeholder="(Optional)">
+                            </div>
+                            <div class="form-group">
+                                <label for="bearerSignatureDate">Signature Date</label>
+                                <input type="date" id="bearerSignatureDate" class="form-control">
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="carrierTelephone">Carrier Telephone *</label>
-                            <input type="tel" id="carrierTelephone" class="form-control" placeholder="Contact number" required>
+                        <div style="margin: 20px 0 10px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px; background: #fafafa;">
+                            <h4 style="margin-bottom: 15px; color: var(--primary-color);">Security Office</h4>
+                            <div class="form-group">
+                                <label for="securityOfficerName">Duty Officer Name</label>
+                                <input type="text" id="securityOfficerName" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="securityOfficerDesignation">Designation</label>
+                                <input type="text" id="securityOfficerDesignation" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="securityOfficerExt">Ext</label>
+                                <input type="text" id="securityOfficerExt" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="securityOfficerSignature">Signature</label>
+                                <input type="text" id="securityOfficerSignature" class="form-control" placeholder="(Optional)">
+                            </div>
+                            <div class="form-group">
+                                <label for="securityOfficerSignatureDate">Signature Date</label>
+                                <input type="date" id="securityOfficerSignatureDate" class="form-control">
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="securityName">Security Officer Name</label>
-                            <input type="text" id="securityName" class="form-control" placeholder="Name">
+                        <div style="margin: 20px 0 10px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px; background: #fafafa;">
+                            <h4 style="margin-bottom: 15px; color: var(--primary-color);">Processing Person</h4>
+                            <div class="form-group">
+                                <label for="processingName">Name</label>
+                                <input type="text" id="processingName" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="processingDesignation">Designation</label>
+                                <input type="text" id="processingDesignation" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="processingExt">Ext</label>
+                                <input type="text" id="processingExt" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="processingSignature">Signature</label>
+                                <input type="text" id="processingSignature" class="form-control" placeholder="(Optional)">
+                            </div>
+                            <div class="form-group">
+                                <label for="processingSignatureDate">Signature Date</label>
+                                <input type="date" id="processingSignatureDate" class="form-control">
+                            </div>
                         </div>
 
-                        <div class="form-group">
-                            <label for="securityAppointment">Security Officer Appointment</label>
-                            <input type="text" id="securityAppointment" class="form-control" placeholder="Position">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="securityDepartment">Security Officer Department</label>
-                            <input type="text" id="securityDepartment" class="form-control" placeholder="Department" value="Duty Security Officer">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="securityTelephone">Security Officer Telephone</label>
-                            <input type="tel" id="securityTelephone" class="form-control" placeholder="Contact number">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="receiverName">Receiver Name</label>
-                            <input type="text" id="receiverName" class="form-control" placeholder="Name">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="receiverAppointment">Receiver Appointment</label>
-                            <input type="text" id="receiverAppointment" class="form-control" placeholder="Position">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="receiverDepartment">Receiver Department</label>
-                            <input type="text" id="receiverDepartment" class="form-control" placeholder="Department">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="receiverTelephone">Receiver Telephone</label>
-                            <input type="tel" id="receiverTelephone" class="form-control" placeholder="Contact number">
-                        </div>
+                        <div style="margin: 20px 0 10px; padding: 15px; border: 1px solid #e5e5e5; border-radius: 8px; background: #fafafa;">
+                            <h4 style="margin-bottom: 15px; color: var(--primary-color);">Authorized By</h4>
+                            <div class="form-group">
+                                <label for="authorizedName">Name</label>
+                                <input type="text" id="authorizedName" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="authorizedDesignation">Designation</label>
+                                <input type="text" id="authorizedDesignation" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="authorizedExt">Ext</label>
+                                <input type="text" id="authorizedExt" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="authorizedSignature">Signature</label>
+                                <input type="text" id="authorizedSignature" class="form-control" placeholder="(Optional)">
+                            </div>
+                            <div class="form-group">
+                                <label for="authorizedSignatureDate">Signature Date</label>
+                                <input type="date" id="authorizedSignatureDate" class="form-control">
+                            </div>
                         </div>
 
                         <div class="modal-footer" style="padding: 0; border: none; margin-top: 30px;">

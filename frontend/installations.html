@@ -26,6 +26,7 @@
                     <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
                     <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
                     <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
+                    <li id="userManagementNav" style="display: none;"><a href="users.html"><i class="fas fa-users-cog"></i> User Management</a></li>
                 </ul>
             </nav>
 
@@ -129,10 +130,13 @@
             </div>
             <form id="installForm">
                 <div class="form-group">
-                    <label for="deviceSelect">Select Device *</label>
-                    <select id="deviceSelect" class="form-control" required>
-                        <option value="">Choose a device...</option>
-                    </select>
+                    <label for="deviceSearch">Select Device *</label>
+                    <input type="text" id="deviceSearch" class="form-control" 
+                           placeholder="Type to search by NSU ID, type, or brand..." 
+                           autocomplete="off" required>
+                    <input type="hidden" id="deviceSelect" required>
+                    <div id="deviceDropdown" class="autocomplete-dropdown"></div>
+                    <small class="form-text">Start typing to search for available devices</small>
                 </div>
 
                 <div class="form-group">

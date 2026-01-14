@@ -51,13 +51,63 @@
         .gate-pass-info {
             display: flex;
             justify-content: space-between;
-            margin: 20px 0;
-            padding: 10px 0;
-            border-bottom: 2px solid #333;
+            margin: 10px 0;
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+            font-size: 11px;
         }
 
         .info-item {
-            font-size: 14px;
+            font-size: 11px;
+        }
+
+        .checkbox {
+            display: inline-block;
+            width: 14px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .header-fields {
+            margin: 8px 0 10px;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .vendor-destination {
+            margin: 8px 0 10px;
+            font-size: 11px;
+        }
+
+        .signature-container {
+            margin-top: 20px;
+            border: 2px solid #000;
+            padding: 10px;
+        }
+
+        .signature-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .sig-box {
+            flex: 1;
+            font-size: 10px;
+            min-height: 110px;
+        }
+
+        .sig-title {
+            font-weight: bold;
+            margin-bottom: 6px;
+            text-align: center;
+            text-decoration: underline;
+        }
+
+        .sig-line {
+            border-top: 1px solid #000;
+            margin-top: 10px;
+            padding-top: 3px;
         }
 
         .info-label {
@@ -231,6 +281,15 @@
             });
         }
 
+        function formatTime(timeString) {
+            if (!timeString) return '';
+            const parts = String(timeString).split(':');
+            if (parts.length < 2) return timeString;
+            const hh = parts[0].padStart(2, '0');
+            const mm = parts[1].padStart(2, '0');
+            return `${hh}:${mm}`;
+        }
+
         /**
          * Load gate pass data
          */
@@ -278,16 +337,34 @@
             const html = `
                 <div class="header">
                     <img src="${CONFIG.LOGO_PATH}" alt="NSU Logo" class="logo">
-                    <div class="title">NORTH SOUTH UNIVERSITY</div>
-                    <div class="subtitle">GATE PASS</div>
+                    <div class="title">North South University</div>
+                    <div class="university-address" style="font-size: 11px; margin: 2px 0; color: #333;">Plot# 15, Block# B, Basundhara, Dhaka-1229</div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <div style="font-size: 14px; font-weight: bold; margin: 10px auto; padding: 5px 15px; border: 2px solid #000; display: inline-block;">MATERIAL GATE PASS</div>
+                    </div>
                 </div>
 
                 <div class="gate-pass-info">
                     <div class="info-item">
-                        <span class="info-label">Gate Pass No:</span> ${data.gate_pass_number || 'N/A'}
+                        <span class="info-label">Incoming</span> <span class="checkbox">${data.pass_direction === 'incoming' ? '☑' : '☐'}</span>
+                        &nbsp;&nbsp;
+                        <span class="info-label">Outgoing</span> <span class="checkbox">${data.pass_direction === 'outgoing' || !data.pass_direction ? '☑' : '☐'}</span>
                     </div>
                     <div class="info-item">
+                        <span class="info-label">Serial:</span> ${data.gate_pass_number || 'N/A'}
+                    </div>
+                </div>
+
+                <div class="header-fields">
+                    <div>
                         <span class="info-label">Date:</span> ${formatDate(data.gate_pass_date || data.installed_date)}
+                        &nbsp;&nbsp;
+                        <span class="info-label">Time:</span> ${formatTime(data.gate_pass_time) || new Date().toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}
+                    </div>
+                    <div>
+                        <span class="info-label">Department:</span> ${data.department || ''}
+                        &nbsp;&nbsp;
+                        <span class="info-label">Departure/Incoming Gate:</span> ${data.gate_name || ''}
                     </div>
                 </div>
 
@@ -295,70 +372,62 @@
                     <table>
                         <thead>
                             <tr>
-                                <th class="sl-col">SL</th>
-                                <th class="desc-col">Description of Item</th>
+                                <th class="sl-col">Sl</th>
+                                <th class="desc-col">Description of Material</th>
                                 <th class="qty-col">Quantity</th>
                                 <th class="remarks-col">Remarks</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td class="sl-col">1</td>
+                                <td class="sl-col">01</td>
                                 <td class="desc-col">
-                                    <strong>${data.type_name} - ${data.brand_name}</strong><br>
-                                    Model: ${data.model}<br>
-                                    Device ID: ${data.device_unique_id}<br>
-                                    ${data.installation_notes ? 'Notes: ' + data.installation_notes : ''}
+                                    ${data.type_name} - ${data.brand_name}${data.model ? ', ' + data.model : ''}<br>
+                                    Serial: ${data.serial_number || 'N/A'}<br>
+                                    Device ID: ${data.device_unique_id}
+                                    ${data.room_number ? '<br>Currently Installed in: ' + data.room_number + (data.room_name ? ' (' + data.room_name + ')' : '') : ''}
                                 </td>
-                                <td class="qty-col">1</td>
-                                <td class="remarks-col">
-                                    Room: ${data.room_number} (${data.room_name})<br>
-                                    Installed: ${formatDate(data.installed_date)}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="sl-col">2</td>
-                                <td class="desc-col"></td>
-                                <td class="qty-col"></td>
-                                <td class="remarks-col"></td>
-                            </tr>
-                            <tr>
-                                <td class="sl-col">3</td>
-                                <td class="desc-col"></td>
-                                <td class="qty-col"></td>
-                                <td class="remarks-col"></td>
-                            </tr>
-                            <tr>
-                                <td class="sl-col">4</td>
-                                <td class="desc-col"></td>
-                                <td class="qty-col"></td>
-                                <td class="remarks-col"></td>
-                            </tr>
-                            <tr>
-                                <td class="sl-col">5</td>
-                                <td class="desc-col"></td>
-                                <td class="qty-col"></td>
-                                <td class="remarks-col"></td>
+                                <td class="qty-col">01</td>
+                                <td class="remarks-col">${data.vendor_destination || data.destination || ''}</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="signatures">
-                    <div class="signature-block">
-                        <div class="signature-line">
-                            ${data.installed_by_name || 'Authorized Person'}<br>
-                            ${data.installed_by_id ? 'ID: ' + data.installed_by_id : ''}
+                <div class="vendor-destination">
+                    <span class="info-label">Vendor/Destination:</span> ${data.vendor_destination || data.destination || ''}
+                </div>
+
+                <div class="signature-container">
+                    <div class="signature-grid">
+                        <div class="sig-box">
+                            <div class="sig-title">Bearer Details</div>
+                            <div><strong>Name:</strong> ${data.bearer_name || data.carrier_name || data.installed_by_name || ''}</div>
+                            <div><strong>Company:</strong> ${data.bearer_company || data.carrier_department || ''}</div>
+                            <div><strong>Contact No:</strong> ${data.bearer_contact_no || data.carrier_telephone || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.bearer_signature_date ? '(' + formatDate(data.bearer_signature_date) + ')' : ''}</div>
                         </div>
-                        <div style="margin-top: 10px;">Issued By</div>
-                    </div>
-                    <div class="signature-block">
-                        <div class="signature-line">Security Officer</div>
-                        <div style="margin-top: 10px;">Verified By</div>
-                    </div>
-                    <div class="signature-block">
-                        <div class="signature-line">Receiving Authority</div>
-                        <div style="margin-top: 10px;">Received By</div>
+                        <div class="sig-box">
+                            <div class="sig-title">Security Office</div>
+                            <div><strong>Duty Officer Name:</strong> ${data.security_officer_name || data.security_name || ''}</div>
+                            <div><strong>Designation:</strong> ${data.security_officer_designation || data.security_appointment || ''}</div>
+                            <div><strong>Ext:</strong> ${data.security_officer_ext || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.security_officer_signature_date ? '(' + formatDate(data.security_officer_signature_date) + ')' : ''}</div>
+                        </div>
+                        <div class="sig-box">
+                            <div class="sig-title">Processing Person</div>
+                            <div><strong>Name:</strong> ${data.processing_name || data.receiver_name || ''}</div>
+                            <div><strong>Designation:</strong> ${data.processing_designation || data.receiver_appointment || ''}</div>
+                            <div><strong>Ext:</strong> ${data.processing_ext || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.processing_signature_date ? '(' + formatDate(data.processing_signature_date) + ')' : ''}</div>
+                        </div>
+                        <div class="sig-box">
+                            <div class="sig-title">Authorized By</div>
+                            <div><strong>Name:</strong> ${data.authorized_name || ''}</div>
+                            <div><strong>Designation:</strong> ${data.authorized_designation || ''}</div>
+                            <div><strong>Ext:</strong> ${data.authorized_ext || ''}</div>
+                            <div class="sig-line"><strong>Signature & Date:</strong> ____________________ ${data.authorized_signature_date ? '(' + formatDate(data.authorized_signature_date) + ')' : ''}</div>
+                        </div>
                     </div>
                 </div>
 

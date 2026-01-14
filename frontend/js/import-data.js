@@ -67,6 +67,18 @@ DEV005,B101,2024-04-05,15:20:00,David Brown,EMP007,,,,,Admin User,active,Seminar
 }
 
 /**
+ * Download gate pass template CSV
+ */
+function downloadGatePassTemplate() {
+    const csv = `gate_pass_number,device_unique_ids,pass_direction,gate_pass_date,gate_pass_time,department,gate_name,vendor_destination,bearer_name,bearer_company,bearer_contact_no,security_officer_name,security_officer_designation,security_officer_ext,processing_name,processing_designation,processing_ext,authorized_name,authorized_designation,authorized_ext
+GP001,DEV001,outgoing,2026-01-04,10:30,IT Department,Main Gate,ABC Vendor Ltd,John Smith,NSU,01712345678,Officer Ahmed,Security Officer,101,Manager Khan,IT Manager,201,Director Rahman,Director,301
+GP002,"DEV002,DEV003",incoming,2026-01-05,14:00,Engineering,Back Gate,XYZ Supplier,Sarah Lee,Tech Corp,01798765432,Officer Hassan,Security Officer,102,Supervisor Ali,Engineering Lead,202,VP Tech,Vice President,302
+GP003,DEV004,outgoing,2026-01-06,09:15,Admin,Front Gate,LMN Company,Mike Johnson,NSU,01623456789,Officer Karim,Senior Officer,103,Coordinator Alam,Admin Coordinator,203,Manager Hoque,Department Head,303`;
+
+    downloadCSV(csv, 'gate_passes_template.csv');
+}
+
+/**
  * Helper function to download CSV
  */
 function downloadCSV(content, filename) {
@@ -117,6 +129,8 @@ async function handleImport(e) {
             await importRooms(rows, skipDuplicates);
         } else if (importType === 'installations') {
             await importInstallations(rows, skipDuplicates);
+        } else if (importType === 'gate-passes') {
+            await importGatePasses(rows, skipDuplicates);
         }
     };
 
@@ -387,6 +401,140 @@ async function importInstallations(rows, skipDuplicates) {
         const result = await Utils.apiRequest(CONFIG.ENDPOINTS.INSTALLATIONS, {
             method: 'POST',
             body: JSON.stringify(installationData)
+        });
+
+        if (result.success) {
+            successCount++;
+        } else {
+            if (skipDuplicates && result.message.includes('already exists')) {
+                skippedCount++;
+            } else {
+                errors.push(`Row ${i + 2}: ${result.message}`);
+                errorCount++;
+            }
+        }
+
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+
+    showResults(successCount, errorCount, skippedCount, errors);
+}
+
+/**
+ * Import gate passes from CSV
+ */
+async function importGatePasses(rows, skipDuplicates) {
+    const headers = rows[0];
+    const dataRows = rows.slice(1);
+
+    let successCount = 0;
+    let errorCount = 0;
+    let skippedCount = 0;
+    const errors = [];
+
+    for (let i = 0; i < dataRows.length; i++) {
+        const row = dataRows[i];
+        updateProgress((i + 1) / dataRows.length * 100, `Processing row ${i + 1} of ${dataRows.length}...`);
+
+        // Parse device_unique_ids (can be comma-separated)
+        const deviceUniqueIds = row[1] ? row[1].split(',').map(id => id.trim()) : [];
+        
+        if (deviceUniqueIds.length === 0) {
+            errors.push(`Row ${i + 2}: No devices specified`);
+            errorCount++;
+            continue;
+        }
+
+        // Get device IDs from device unique IDs
+        const deviceIds = [];
+        for (const uniqueId of deviceUniqueIds) {
+            const deviceResult = await Utils.apiRequest(`${CONFIG.ENDPOINTS.DEVICES}?device_unique_id=${encodeURIComponent(uniqueId)}`);
+            
+            if (!deviceResult.success || deviceResult.data.length === 0) {
+                errors.push(`Row ${i + 2}: Device "${uniqueId}" not found`);
+                errorCount++;
+                continue;
+            }
+            
+            deviceIds.push(deviceResult.data[0].device_id);
+        }
+
+        if (deviceIds.length === 0) {
+            continue; // Already logged error above
+        }
+
+        // Build gate pass data
+        const gatePassData = {
+            devices: deviceIds,
+            gate_pass_number: row[0] || null,
+            pass_direction: row[2] || 'outgoing',
+            gate_pass_date: row[3] || null,
+            gate_pass_time: row[4] || null,
+            department: row[5] || null,
+            gate_name: row[6] || null,
+            vendor_destination: row[7] || null,
+            bearer_name: row[8] || null,
+            bearer_company: row[9] || null,
+            bearer_contact_no: row[10] || null,
+            bearer_signature: null,
+            bearer_signature_date: null,
+            security_officer_name: row[11] || null,
+            security_officer_designation: row[12] || null,
+            security_officer_ext: row[13] || null,
+            security_officer_signature: null,
+            security_officer_signature_date: null,
+            processing_name: row[14] || null,
+            processing_designation: row[15] || null,
+            processing_ext: row[16] || null,
+            processing_signature: null,
+            processing_signature_date: null,
+            authorized_name: row[17] || null,
+            authorized_designation: row[18] || null,
+            authorized_ext: row[19] || null,
+            authorized_signature: null,
+            authorized_signature_date: null,
+            // Backward compatibility fields
+            consignee_name: row[5] || null,
+            destination: row[7] || null,
+            carrier_name: row[8] || null,
+            carrier_department: row[9] || null,
+            carrier_telephone: row[10] || null,
+            carrier_appointment: null,
+            security_name: row[11] || null,
+            security_appointment: row[12] || null,
+            security_department: 'Duty Security Officer',
+            security_telephone: null,
+            receiver_name: row[14] || null,
+            receiver_appointment: row[15] || null,
+            receiver_department: null,
+            receiver_telephone: null,
+            purpose: 'Bulk Import',
+            remarks: null
+        };
+
+        // Validate required fields
+        if (!gatePassData.gate_pass_number) {
+            errors.push(`Row ${i + 2}: Gate pass number is required`);
+            errorCount++;
+            continue;
+        }
+
+        if (!gatePassData.gate_pass_date) {
+            errors.push(`Row ${i + 2}: Gate pass date is required`);
+            errorCount++;
+            continue;
+        }
+
+        if (!gatePassData.department || !gatePassData.vendor_destination || !gatePassData.bearer_name || !gatePassData.bearer_company || !gatePassData.bearer_contact_no) {
+            errors.push(`Row ${i + 2}: Missing required fields (department, vendor_destination, bearer details)`);
+            errorCount++;
+            continue;
+        }
+
+        // Create gate pass
+        const result = await Utils.apiRequest(CONFIG.ENDPOINTS.GATE_PASSES, {
+            method: 'POST',
+            body: JSON.stringify(gatePassData)
         });
 
         if (result.success) {
