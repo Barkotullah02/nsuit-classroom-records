@@ -296,11 +296,11 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
+            Utils.checkAuth();
             
             // Check if user is admin
-            const user = JSON.parse(localStorage.getItem('user'));
-            if (user && user.role === 'admin') {
+            const user = Utils.getCurrentUser();
+            if (user && user.role === CONFIG.ROLES.ADMIN) {
                 document.getElementById('userManagementNav').style.display = 'block';
                 loadUsers();
             } else {
@@ -344,12 +344,12 @@
                         <div class="user-header">
                             <div class="user-info">
                                 <h3>
-                                    <i class="fas fa-user-circle"></i> ${escapeHtml(user.full_name)}
+                                    <i class="fas fa-user-circle"></i> ${Utils.escapeHtml(user.full_name)}
                                     ${!isActive ? '<span style="color: #f44336;">(Inactive)</span>' : ''}
                                 </h3>
                                 <div class="user-meta">
-                                    <strong>@${escapeHtml(user.username)}</strong> | 
-                                    ${escapeHtml(user.email)} | 
+                                    <strong>@${Utils.escapeHtml(user.username)}</strong> | 
+                                    ${Utils.escapeHtml(user.email)} | 
                                     <span class="role-badge ${roleClass}">${user.role}</span>
                                 </div>
                                 <div class="user-meta" style="margin-top: 0.5rem;">
@@ -357,10 +357,10 @@
                                 </div>
                             </div>
                             <div class="user-actions">
-                                <button class="btn btn-sm btn-primary" onclick="showEditUserModal(${user.user_id}, '${escapeHtml(user.username)}', '${escapeHtml(user.full_name)}', '${escapeHtml(user.email)}', '${user.role}', ${user.is_active})">
+                                <button class="btn btn-sm btn-primary" onclick="showEditUserModal(${user.user_id}, '${Utils.escapeHtml(user.username)}', '${Utils.escapeHtml(user.full_name)}', '${Utils.escapeHtml(user.email)}', '${user.role}', ${user.is_active})">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
-                                <button class="btn btn-sm btn-danger" onclick="showDeleteModal(${user.user_id}, '${escapeHtml(user.full_name)}')" ${!isActive ? 'disabled' : ''}>
+                                <button class="btn btn-sm btn-danger" onclick="showDeleteModal(${user.user_id}, '${Utils.escapeHtml(user.full_name)}')" ${!isActive ? 'disabled' : ''}>
                                     <i class="fas fa-user-slash"></i> Deactivate
                                 </button>
                             </div>
@@ -518,7 +518,7 @@
         }
 
         // Logout
-        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('logoutBtn').addEventListener('click', () => Utils.logout());
     </script>
 </body>
 </html>

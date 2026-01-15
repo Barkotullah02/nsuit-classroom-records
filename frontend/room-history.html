@@ -440,7 +440,7 @@
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
+            Utils.checkAuth();
             
             // Get room ID from URL
             const urlParams = new URLSearchParams(window.location.search);
@@ -457,16 +457,10 @@
 
         async function loadRoomHistory() {
             try {
-                const token = localStorage.getItem('token');
-                
                 // Load comprehensive room history using the optimized endpoint
-                const response = await fetch(`${API_URL}/room-history.php?room_id=${roomId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
+                const result = await Utils.apiRequest(`${CONFIG.ENDPOINTS.ROOM_HISTORY}?room_id=${roomId}`, {
+                    method: 'GET'
                 });
-                
-                const result = await response.json();
                 
                 if (result.success) {
                     roomData = {
@@ -725,7 +719,7 @@
         }
 
         // Logout
-        document.getElementById('logoutBtn').addEventListener('click', logout);
+        document.getElementById('logoutBtn').addEventListener('click', () => Utils.logout());
     </script>
 </body>
 </html>

@@ -1,0 +1,23 @@
+-- Step 1: Disable foreign key checks (easier option)
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- Step 2: Truncate all tables in any order
+TRUNCATE TABLE sessions;
+TRUNCATE TABLE audit_log;
+TRUNCATE TABLE blog_comments;
+TRUNCATE TABLE blog_reactions;
+TRUNCATE TABLE blog_posts;
+TRUNCATE TABLE blog_categories;
+TRUNCATE TABLE classroom_support_records;
+TRUNCATE TABLE gate_pass_devices;
+TRUNCATE TABLE gate_passes;
+TRUNCATE TABLE device_installations;
+TRUNCATE TABLE devices;
+TRUNCATE TABLE support_team_members;
+TRUNCATE TABLE device_types;
+TRUNCATE TABLE device_brands;
+TRUNCATE TABLE rooms;
+TRUNCATE TABLE users;
+
+-- Step 3: Re-enable foreign key checks
+SET FOREIGN_KEY_CHECKS = 1;
