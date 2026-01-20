@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 14, 2025 at 09:24 AM
+-- Generation Time: Jan 20, 2026 at 09:31 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.0.28
 
@@ -97,55 +97,42 @@ CREATE TABLE `audit_log` (
 --
 
 INSERT INTO `audit_log` (`log_id`, `user_id`, `action`, `table_name`, `record_id`, `old_values`, `new_values`, `ip_address`, `user_agent`, `created_at`) VALUES
-(1, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:13:46'),
-(2, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:14:22'),
-(3, 2, 'LOGIN', 'users', 2, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:14:48'),
-(4, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:16:47'),
-(5, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:16:59'),
-(6, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', '2025-11-28 16:22:53'),
-(7, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:31:16'),
-(8, 2, 'LOGIN', 'users', 2, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:31:16'),
-(9, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:31:26'),
-(10, 2, 'LOGIN', 'users', 2, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:31:28'),
-(11, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:32:09'),
-(12, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:32:49'),
-(13, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:33:12'),
-(14, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:33:30'),
-(15, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 16:33:49'),
-(16, 1, 'CREATE', 'devices', 1, NULL, '{\"device_unique_id\":\"dfrgggggh34\",\"type_id\":\"1\",\"brand_id\":\"2\",\"model\":\"drgt\",\"serial_number\":\"dfgd\",\"purchase_date\":\"2025-11-29\",\"warranty_period\":\"3\",\"notes\":\"trrryt\"}', NULL, NULL, '2025-11-28 18:09:39'),
-(17, 1, 'CREATE', 'device_installations', 1, NULL, '{\"device_id\":\"1\",\"room_id\":\"10\",\"installed_date\":\"2025-11-28\",\"installation_notes\":\"erg. e er eg\"}', NULL, NULL, '2025-11-28 18:10:09'),
-(18, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 18:13:15'),
-(19, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-11-28 18:16:17'),
-(20, 1, 'SOFT_DELETE', 'devices', 1, NULL, NULL, NULL, NULL, '2025-11-28 18:21:54'),
-(21, 1, 'CREATE', 'devices', 2, NULL, '{\"device_unique_id\":\"jgujg kihlioh lo\",\"type_id\":\"1\",\"brand_id\":\"1\",\"model\":\"jugiu g\",\"serial_number\":\"ugihy\",\"purchase_date\":\"2025-11-29\",\"warranty_period\":\"23\",\"notes\":\"utku\"}', NULL, NULL, '2025-11-29 04:09:45'),
-(22, 1, 'CREATE', 'device_installations', 2, NULL, '{\"device_id\":\"2\",\"room_id\":\"11\",\"installed_date\":\"2025-11-29\",\"installation_notes\":\"\"}', NULL, NULL, '2025-11-29 04:10:34'),
-(23, 1, 'UPDATE', 'device_installations', 2, '{\"installation_id\":2,\"device_id\":2,\"room_id\":11,\"installed_date\":\"2025-11-29\",\"withdrawn_date\":null,\"installed_by\":1,\"withdrawn_by\":null,\"installation_notes\":\"\",\"withdrawal_notes\":null,\"status\":\"active\",\"is_deleted\":0,\"deleted_at\":null,\"deleted_by\":null,\"created_at\":\"2025-11-29 10:10:34\",\"updated_at\":\"2025-11-29 10:10:34\"}', '{\"installation_id\":\"2\",\"withdrawn_date\":\"2025-11-29\",\"withdrawal_notes\":\"\"}', NULL, NULL, '2025-11-29 04:10:59'),
-(24, 1, 'CREATE', 'device_installations', 3, NULL, '{\"device_id\":\"2\",\"room_id\":\"12\",\"installed_date\":\"2025-11-29\",\"installation_notes\":\"\"}', NULL, NULL, '2025-11-29 04:11:28'),
-(25, 1, 'CREATE', 'devices', 3, NULL, '{\"device_unique_id\":\"AD DWWQ\",\"type_id\":\"2\",\"brand_id\":\"4\",\"model\":\"zsv\",\"serial_number\":\"awff\",\"purchase_date\":\"2025-11-29\",\"warranty_period\":\"20\",\"notes\":\"afesd\"}', NULL, NULL, '2025-11-29 05:25:58'),
-(26, 1, 'INSERT', 'gate_passes', 1, NULL, NULL, NULL, NULL, '2025-11-29 06:39:31'),
-(27, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', '2025-11-30 06:41:44'),
-(28, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', '2025-12-02 03:21:10'),
-(29, 1, 'CREATE', 'devices', 4, NULL, '{\"device_unique_id\":\"hjbj iuh8ih 8\",\"type_id\":\"2\",\"brand_id\":\"3\",\"model\":\"gfcytui\",\"serial_number\":\"kiuhioho\",\"purchase_date\":\"2025-12-02\",\"warranty_period\":\"45\",\"notes\":\"kjb iuh oih. ohj9jhjp\"}', NULL, NULL, '2025-12-02 05:55:40'),
-(30, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-12-02 06:56:26'),
-(31, 1, 'RESTORE', 'devices', 1, NULL, NULL, NULL, NULL, '2025-12-02 07:05:04'),
-(32, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-12-02 07:08:21'),
-(33, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36', '2025-12-03 08:10:47'),
-(34, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2025-12-09 06:12:15'),
-(35, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2025-12-09 07:28:32'),
-(36, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-12-09 08:53:10'),
-(37, 1, 'CREATE', 'devices', 5, NULL, '{\"device_unique_id\":\"DEV004\",\"type_id\":\"2\",\"brand_id\":\"8\",\"model\":\"S24R350\",\"serial_number\":\"SN654321987\",\"purchase_date\":\"2024-03-05\",\"warranty_period\":\"24\",\"notes\":\"Lab monitor\"}', NULL, NULL, '2025-12-09 09:05:02'),
-(38, 1, 'CREATE', 'devices', 6, NULL, '{\"device_unique_id\":\"50-ITD-0508-00545\",\"type_id\":\"1\",\"brand_id\":\"16\",\"model\":\"OptiPlex 7090\",\"serial_number\":\"XZC253501179\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"36\",\"notes\":\"Computer lab desktop\"}', NULL, NULL, '2025-12-09 09:13:40'),
-(39, 1, 'CREATE', 'devices', 7, NULL, '{\"device_unique_id\":\"50-ITD-0508-00544\",\"type_id\":\"1\",\"brand_id\":\"17\",\"model\":\"OptiPlex 7091\",\"serial_number\":\"XZC253201181\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"24\",\"notes\":\"Faculty laptop\"}', NULL, NULL, '2025-12-09 09:13:40'),
-(40, 1, 'CREATE', 'devices', 8, NULL, '{\"device_unique_id\":\"50-ITD-0508-00543\",\"type_id\":\"1\",\"brand_id\":\"17\",\"model\":\"OptiPlex 7092\",\"serial_number\":\"XZC253201215\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"12\",\"notes\":\"Classroom projector\"}', NULL, NULL, '2025-12-09 09:13:40'),
-(41, 1, 'CREATE', 'devices', 9, NULL, '{\"device_unique_id\":\"50-ITD-0508-00547\",\"type_id\":\"1\",\"brand_id\":\"17\",\"model\":\"OptiPlex 7093\",\"serial_number\":\"XZC253201224\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"24\",\"notes\":\"Lab monitor\"}', NULL, NULL, '2025-12-09 09:13:40'),
-(42, 1, 'CREATE', 'devices', 10, NULL, '{\"device_unique_id\":\"50-ITD-0508-0327\",\"type_id\":\"1\",\"brand_id\":\"17\",\"model\":\"OptiPlex 7094\",\"serial_number\":\"F9IE03694\",\"purchase_date\":\"12\\/2\\/25\",\"warranty_period\":\"12\",\"notes\":\"Office printer\"}', NULL, NULL, '2025-12-09 09:13:40'),
-(43, 1, 'CREATE', 'devices', 11, NULL, '{\"device_unique_id\":\"50-ITD-0508-284\",\"type_id\":\"1\",\"brand_id\":\"18\",\"model\":\"OptiPlex 7095\",\"serial_number\":\"F9GE01947\",\"purchase_date\":\"12\\/2\\/25\",\"warranty_period\":\"7.2\",\"notes\":\"Computer lab desktop\"}', NULL, NULL, '2025-12-09 09:13:40'),
-(44, 1, 'CREATE', 'devices', 12, NULL, '{\"device_unique_id\":\"50-ITD-0508-00537\",\"type_id\":\"1\",\"brand_id\":\"18\",\"model\":\"OptiPlex 7096\",\"serial_number\":\"XZC250301029\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"2.4\",\"notes\":\"Faculty laptop\"}', NULL, NULL, '2025-12-09 09:13:41'),
-(45, 1, 'CREATE', 'devices', 13, NULL, '{\"device_unique_id\":\"50-ITD-0508-N\\/A\",\"type_id\":\"1\",\"brand_id\":\"17\",\"model\":\"OptiPlex 7097\",\"serial_number\":\"F1LE14628\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"2.4\",\"notes\":\"Classroom projector\"}', NULL, NULL, '2025-12-09 09:13:41'),
-(46, 1, 'CREATE', 'devices', 14, NULL, '{\"device_unique_id\":\"50-ITD-0508-0349\",\"type_id\":\"1\",\"brand_id\":\"18\",\"model\":\"OptiPlex 7098\",\"serial_number\":\"F1AE09532\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"7.2\",\"notes\":\"Lab monitor\"}', NULL, NULL, '2025-12-09 09:13:41'),
-(47, 1, 'CREATE', 'devices', 15, NULL, '{\"device_unique_id\":\"50-ITD-00508-00460\",\"type_id\":\"1\",\"brand_id\":\"18\",\"model\":\"OptiPlex 7099\",\"serial_number\":\"PDA7P01402000\",\"purchase_date\":\"12\\/1\\/25\",\"warranty_period\":\"12\",\"notes\":\"Office printer\"}', NULL, NULL, '2025-12-09 09:13:41'),
-(48, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36', '2025-12-14 02:57:41'),
-(49, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2025-12-14 03:04:17');
+(1, 1, 'CREATE', 'devices', 18, NULL, '{\"device_unique_id\":\"50-ITD-00508-00553\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201217\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:07'),
+(2, 1, 'CREATE', 'devices', 19, NULL, '{\"device_unique_id\":\"50-ITD-00508-00564\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC25350185\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:08'),
+(3, 1, 'CREATE', 'devices', 20, NULL, '{\"device_unique_id\":\"50-ITD-00508-00565\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201221\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:08'),
+(4, 1, 'CREATE', 'devices', 21, NULL, '{\"device_unique_id\":\"50-ITD-00508-00555\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501067\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:08'),
+(5, 1, 'CREATE', 'devices', 22, NULL, '{\"device_unique_id\":\"50-ITD-00508-00566\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501170\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:08'),
+(6, 1, 'CREATE', 'devices', 23, NULL, '{\"device_unique_id\":\"50-ITD-00508-00554\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201199\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:08'),
+(7, 1, 'CREATE', 'devices', 24, NULL, '{\"device_unique_id\":\"50-ITD-00508-00567\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201200\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:08'),
+(8, 1, 'CREATE', 'devices', 25, NULL, '{\"device_unique_id\":\"50-ITD-00508-00568\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201191\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:08'),
+(9, 1, 'CREATE', 'devices', 26, NULL, '{\"device_unique_id\":\"50-ITD-00508-00571\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501148\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:09'),
+(10, 1, 'CREATE', 'devices', 27, NULL, '{\"device_unique_id\":\"50-ITD-00508-00569\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201222\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:09'),
+(11, 1, 'CREATE', 'devices', 28, NULL, '{\"device_unique_id\":\"50-ITD-00508-00572\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501139\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:09'),
+(12, 1, 'CREATE', 'devices', 29, NULL, '{\"device_unique_id\":\"50-ITD-00508-00552\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501178\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:09'),
+(13, 1, 'CREATE', 'devices', 30, NULL, '{\"device_unique_id\":\"50-ITD-00508-00551\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501165\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:09'),
+(14, 1, 'CREATE', 'devices', 31, NULL, '{\"device_unique_id\":\"50-ITD-00508-00559\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501146\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:10'),
+(15, 1, 'CREATE', 'devices', 32, NULL, '{\"device_unique_id\":\"50-ITD-00508-00560\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501167\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:10'),
+(16, 1, 'CREATE', 'devices', 33, NULL, '{\"device_unique_id\":\"50-ITD-00508-00561\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201216\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:10'),
+(17, 1, 'CREATE', 'devices', 34, NULL, '{\"device_unique_id\":\"50-ITD-00508-00562\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201233\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:10'),
+(18, 1, 'CREATE', 'devices', 35, NULL, '{\"device_unique_id\":\"50-ITD-00508-00563\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501191\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:10'),
+(19, 1, 'CREATE', 'devices', 36, NULL, '{\"device_unique_id\":\"50-ITD-00508-00577\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201219\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:10'),
+(20, 1, 'CREATE', 'devices', 37, NULL, '{\"device_unique_id\":\"50-ITD-00508-00574\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501151\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:11'),
+(21, 1, 'CREATE', 'devices', 38, NULL, '{\"device_unique_id\":\"50-ITD-00508-00575\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501145\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:11'),
+(22, 1, 'CREATE', 'devices', 39, NULL, '{\"device_unique_id\":\"50-ITD-00508-00576\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501111\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:11'),
+(23, 1, 'CREATE', 'devices', 40, NULL, '{\"device_unique_id\":\"50-ITD-00508-00549\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501181\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:11'),
+(24, 1, 'CREATE', 'devices', 41, NULL, '{\"device_unique_id\":\"50-ITD-00508-00550\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201210\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:11'),
+(25, 1, 'CREATE', 'devices', 42, NULL, '{\"device_unique_id\":\"50-ITD-00508-00557\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201208\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:11'),
+(26, 1, 'CREATE', 'devices', 43, NULL, '{\"device_unique_id\":\"50-ITD-00508-00558\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201189\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:12'),
+(27, 1, 'CREATE', 'devices', 44, NULL, '{\"device_unique_id\":\"50-ITD-00508-00556\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501190\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:12'),
+(28, 1, 'CREATE', 'devices', 45, NULL, '{\"device_unique_id\":\"50-ITD-00508-00573\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501180\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:12'),
+(29, 1, 'CREATE', 'devices', 46, NULL, '{\"device_unique_id\":\"50-ITD-00508-00570\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501136\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:12'),
+(30, 1, 'CREATE', 'devices', 47, NULL, '{\"device_unique_id\":\"50-ITD-00508-00578\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253201227\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:12'),
+(31, 1, 'CREATE', 'devices', 48, NULL, '{\"device_unique_id\":\"50-ITD-00508-00579\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501172\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:12'),
+(32, 1, 'CREATE', 'devices', 49, NULL, '{\"device_unique_id\":\"50-ITD-00508-00542\",\"type_id\":\"10\",\"brand_id\":\"22\",\"model\":null,\"serial_number\":\"XZC253501137\",\"purchase_date\":null,\"warranty_period\":null,\"notes\":null}', NULL, NULL, '2026-01-15 10:50:12'),
+(33, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2026-01-20 07:24:15'),
+(34, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36', '2026-01-20 07:45:40'),
+(35, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2026-01-20 07:50:13'),
+(36, 1, 'LOGIN', 'users', 1, NULL, NULL, '127.0.0.1', 'curl/8.7.1', '2026-01-20 07:50:19');
 
 -- --------------------------------------------------------
 
@@ -160,17 +147,6 @@ CREATE TABLE `blog_categories` (
   `description` text DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `blog_categories`
---
-
-INSERT INTO `blog_categories` (`category_id`, `category_name`, `category_slug`, `description`, `created_at`) VALUES
-(1, 'Announcements', 'announcements', 'Important announcements and updates', '2025-12-02 06:45:28'),
-(2, 'Events', 'events', 'Upcoming and past events', '2025-12-02 06:45:28'),
-(3, 'Maintenance', 'maintenance', 'System and device maintenance updates', '2025-12-02 06:45:28'),
-(4, 'News', 'news', 'Latest news and information', '2025-12-02 06:45:28'),
-(5, 'Tips & Tricks', 'tips-tricks', 'Helpful tips for device management', '2025-12-02 06:45:28');
 
 -- --------------------------------------------------------
 
@@ -188,14 +164,6 @@ CREATE TABLE `blog_comments` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `blog_comments`
---
-
-INSERT INTO `blog_comments` (`comment_id`, `post_id`, `user_id`, `parent_comment_id`, `comment_text`, `is_deleted`, `created_at`, `updated_at`) VALUES
-(1, 1, 1, NULL, 'This is fantastic! Looking forward to more updates.', 0, '2025-12-02 06:57:26', '2025-12-02 06:57:26'),
-(2, 2, 1, NULL, 'Great event! Looking forward to it.', 0, '2025-12-14 03:06:55', '2025-12-14 03:06:55');
 
 -- --------------------------------------------------------
 
@@ -220,17 +188,6 @@ CREATE TABLE `blog_posts` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
---
--- Dumping data for table `blog_posts`
---
-
-INSERT INTO `blog_posts` (`post_id`, `title`, `slug`, `content`, `excerpt`, `category_id`, `author_id`, `featured_image`, `status`, `view_count`, `is_pinned`, `published_at`, `created_at`, `updated_at`) VALUES
-(1, 'Welcome to NSU IT Classroom Blog', 'welcome-to-nsu-it-classroom-blog', 'This is our first blog post! We are excited to share updates, news, and announcements with you all. Stay tuned for more content about upcoming events, maintenance schedules, and helpful tips & tricks for using our classroom devices.', 'Welcome to our new blog platform where we share updates and announcements.', 1, 1, NULL, 'published', 0, 0, '2025-12-02 01:56:36', '2025-12-02 06:56:36', '2025-12-02 06:56:36'),
-(2, 'Upcoming Tech Fest 2025', 'upcoming-tech-fest-2025', 'We are thrilled to announce the NSU IT Tech Fest 2025! Join us for three days of workshops, competitions, and networking. Event dates: March 15-17, 2025. Register now at the IT office. Topics include: AI/ML workshops, coding competitions, hackathons, and industry expert talks. Prizes worth $5000!', 'Join us for NSU IT Tech Fest 2025 - three days of technology, learning, and fun!', 2, 1, NULL, 'published', 0, 0, '2025-12-02 01:56:54', '2025-12-02 06:56:54', '2025-12-02 06:56:54'),
-(3, 'Lab Maintenance Scheduled', 'lab-maintenance-scheduled', 'Please be informed that Lab A and Lab B will undergo scheduled maintenance on February 10, 2025, from 9:00 AM to 2:00 PM. During this time, all devices will be unavailable. We will be updating software, replacing faulty equipment, and performing network upgrades. Classes scheduled during this time have been moved to Lab C. Thank you for your cooperation.', 'Lab A and B maintenance scheduled for Feb 10, 2025.', 3, 1, NULL, 'published', 0, 0, '2025-12-02 01:56:54', '2025-12-02 06:56:54', '2025-12-02 06:56:54'),
-(4, 'Test Post', 'test-post', 'This is a test blog post to verify functionality.', 'Testing the blog system', 1, 1, NULL, 'published', 0, 0, '2025-12-13 22:07:08', '2025-12-14 03:07:08', '2025-12-14 03:07:08'),
-(5, 'iuyg', 'iuyg', 'uygfuy uyg ug u g iug iuguigugu. iuhiuh. iu ug g', 'uyf. uyg uygg ig ig igiu gui i iuggiugiu', 5, 1, NULL, 'published', 1, 0, '2025-12-14 01:48:39', '2025-12-14 06:48:39', '2025-12-14 06:51:17');
-
 -- --------------------------------------------------------
 
 --
@@ -244,14 +201,6 @@ CREATE TABLE `blog_reactions` (
   `reaction_type` enum('like','love','celebrate','insightful') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `blog_reactions`
---
-
-INSERT INTO `blog_reactions` (`reaction_id`, `post_id`, `user_id`, `reaction_type`, `created_at`) VALUES
-(1, 1, 1, 'love', '2025-12-02 06:57:26'),
-(2, 2, 1, 'like', '2025-12-14 03:07:01');
 
 -- --------------------------------------------------------
 
@@ -360,21 +309,38 @@ CREATE TABLE `devices` (
 --
 
 INSERT INTO `devices` (`device_id`, `device_unique_id`, `type_id`, `brand_id`, `model`, `device_status`, `current_issue`, `storage_location`, `serial_number`, `purchase_date`, `warranty_period`, `notes`, `is_active`, `is_deleted`, `deleted_at`, `deleted_by`, `created_at`, `updated_at`) VALUES
-(1, 'dfrgggggh34', 1, 2, 'drgt', 'NEW', NULL, NULL, 'dfgd', '2025-11-29', 3, 'trrryt', 1, 0, NULL, NULL, '2025-11-28 18:09:39', '2025-12-02 07:05:04'),
-(2, 'jgujg kihlioh lo', 1, 1, 'jugiu g', 'NEW', NULL, NULL, 'ugihy', '2025-11-29', 23, 'utku', 1, 0, NULL, NULL, '2025-11-29 04:09:45', '2025-11-29 04:09:45'),
-(3, 'AD DWWQ', 2, 4, 'zsv', 'NEW', NULL, NULL, 'awff', '2025-11-29', 20, 'afesd', 1, 0, NULL, NULL, '2025-11-29 05:25:58', '2025-11-29 05:25:58'),
-(4, 'hjbj iuh8ih 8', 2, 3, 'gfcytui', 'NEW', NULL, NULL, 'kiuhioho', '2025-12-02', 45, 'kjb iuh oih. ohj9jhjp', 1, 0, NULL, NULL, '2025-12-02 05:55:40', '2025-12-02 05:55:40'),
-(5, 'DEV004', 2, 8, 'S24R350', 'NEW', NULL, NULL, 'SN654321987', '2024-03-05', 24, 'Lab monitor', 1, 0, NULL, NULL, '2025-12-09 09:05:02', '2025-12-09 09:05:02'),
-(6, '50-ITD-0508-00545', 1, 16, 'OptiPlex 7090', 'NEW', NULL, NULL, 'XZC253501179', '2012-01-25', 36, 'Computer lab desktop', 1, 0, NULL, NULL, '2025-12-09 09:13:40', '2025-12-09 09:13:40'),
-(7, '50-ITD-0508-00544', 1, 17, 'OptiPlex 7091', 'NEW', NULL, NULL, 'XZC253201181', '2012-01-25', 24, 'Faculty laptop', 1, 0, NULL, NULL, '2025-12-09 09:13:40', '2025-12-09 09:13:40'),
-(8, '50-ITD-0508-00543', 1, 17, 'OptiPlex 7092', 'NEW', NULL, NULL, 'XZC253201215', '2012-01-25', 12, 'Classroom projector', 1, 0, NULL, NULL, '2025-12-09 09:13:40', '2025-12-09 09:13:40'),
-(9, '50-ITD-0508-00547', 1, 17, 'OptiPlex 7093', 'NEW', NULL, NULL, 'XZC253201224', '2012-01-25', 24, 'Lab monitor', 1, 0, NULL, NULL, '2025-12-09 09:13:40', '2025-12-09 09:13:40'),
-(10, '50-ITD-0508-0327', 1, 17, 'OptiPlex 7094', 'NEW', NULL, NULL, 'F9IE03694', '2012-02-25', 12, 'Office printer', 1, 0, NULL, NULL, '2025-12-09 09:13:40', '2025-12-09 09:13:40'),
-(11, '50-ITD-0508-284', 1, 18, 'OptiPlex 7095', 'NEW', NULL, NULL, 'F9GE01947', '2012-02-25', 7, 'Computer lab desktop', 1, 0, NULL, NULL, '2025-12-09 09:13:40', '2025-12-09 09:13:40'),
-(12, '50-ITD-0508-00537', 1, 18, 'OptiPlex 7096', 'NEW', NULL, NULL, 'XZC250301029', '2012-01-25', 2, 'Faculty laptop', 1, 0, NULL, NULL, '2025-12-09 09:13:41', '2025-12-09 09:13:41'),
-(13, '50-ITD-0508-N/A', 1, 17, 'OptiPlex 7097', 'NEW', NULL, NULL, 'F1LE14628', '2012-01-25', 2, 'Classroom projector', 1, 0, NULL, NULL, '2025-12-09 09:13:41', '2025-12-09 09:13:41'),
-(14, '50-ITD-0508-0349', 1, 18, 'OptiPlex 7098', 'NEW', NULL, NULL, 'F1AE09532', '2012-01-25', 7, 'Lab monitor', 1, 0, NULL, NULL, '2025-12-09 09:13:41', '2025-12-09 09:13:41'),
-(15, '50-ITD-00508-00460', 1, 18, 'OptiPlex 7099', 'NEW', NULL, NULL, 'PDA7P01402000', '2012-01-25', 12, 'Office printer', 1, 0, NULL, NULL, '2025-12-09 09:13:41', '2025-12-09 09:13:41');
+(18, '50-ITD-00508-00553', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201217', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:07', '2026-01-15 10:50:07'),
+(19, '50-ITD-00508-00564', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC25350185', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:08', '2026-01-15 10:50:08'),
+(20, '50-ITD-00508-00565', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201221', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:08', '2026-01-15 10:50:08'),
+(21, '50-ITD-00508-00555', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501067', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:08', '2026-01-15 10:50:08'),
+(22, '50-ITD-00508-00566', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501170', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:08', '2026-01-15 10:50:08'),
+(23, '50-ITD-00508-00554', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201199', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:08', '2026-01-15 10:50:08'),
+(24, '50-ITD-00508-00567', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201200', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:08', '2026-01-15 10:50:08'),
+(25, '50-ITD-00508-00568', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201191', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:08', '2026-01-15 10:50:08'),
+(26, '50-ITD-00508-00571', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501148', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:09', '2026-01-15 10:50:09'),
+(27, '50-ITD-00508-00569', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201222', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:09', '2026-01-15 10:50:09'),
+(28, '50-ITD-00508-00572', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501139', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:09', '2026-01-15 10:50:09'),
+(29, '50-ITD-00508-00552', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501178', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:09', '2026-01-15 10:50:09'),
+(30, '50-ITD-00508-00551', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501165', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:09', '2026-01-15 10:50:09'),
+(31, '50-ITD-00508-00559', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501146', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:10', '2026-01-15 10:50:10'),
+(32, '50-ITD-00508-00560', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501167', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:10', '2026-01-15 10:50:10'),
+(33, '50-ITD-00508-00561', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201216', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:10', '2026-01-15 10:50:10'),
+(34, '50-ITD-00508-00562', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201233', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:10', '2026-01-15 10:50:10'),
+(35, '50-ITD-00508-00563', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501191', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:10', '2026-01-15 10:50:10'),
+(36, '50-ITD-00508-00577', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201219', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:10', '2026-01-15 10:50:10'),
+(37, '50-ITD-00508-00574', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501151', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:11', '2026-01-15 10:50:11'),
+(38, '50-ITD-00508-00575', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501145', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:11', '2026-01-15 10:50:11'),
+(39, '50-ITD-00508-00576', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501111', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:11', '2026-01-15 10:50:11'),
+(40, '50-ITD-00508-00549', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501181', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:11', '2026-01-15 10:50:11'),
+(41, '50-ITD-00508-00550', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201210', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:11', '2026-01-15 10:50:11'),
+(42, '50-ITD-00508-00557', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201208', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:11', '2026-01-15 10:50:11'),
+(43, '50-ITD-00508-00558', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201189', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:12', '2026-01-15 10:50:12'),
+(44, '50-ITD-00508-00556', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501190', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:12', '2026-01-15 10:50:12'),
+(45, '50-ITD-00508-00573', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501180', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:12', '2026-01-15 10:50:12'),
+(46, '50-ITD-00508-00570', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501136', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:12', '2026-01-15 10:50:12'),
+(47, '50-ITD-00508-00578', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253201227', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:12', '2026-01-15 10:50:12'),
+(48, '50-ITD-00508-00579', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501172', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:12', '2026-01-15 10:50:12'),
+(49, '50-ITD-00508-00542', 10, 22, NULL, 'NEW', NULL, NULL, 'XZC253501137', NULL, NULL, NULL, 1, 0, NULL, NULL, '2026-01-15 10:50:12', '2026-01-15 10:50:12');
 
 -- --------------------------------------------------------
 
@@ -393,24 +359,7 @@ CREATE TABLE `device_brands` (
 --
 
 INSERT INTO `device_brands` (`brand_id`, `brand_name`, `created_at`) VALUES
-(1, 'HP', '2025-11-28 16:02:13'),
-(2, 'Boxlight', '2025-11-28 16:02:13'),
-(3, 'A4Tech', '2025-11-28 16:02:13'),
-(4, 'Dell', '2025-11-28 16:02:13'),
-(5, 'Logitech', '2025-11-28 16:02:13'),
-(6, 'Sony', '2025-11-28 16:02:13'),
-(7, 'Epson', '2025-11-28 16:02:13'),
-(8, 'Samsung', '2025-11-28 16:02:13'),
-(9, 'LG', '2025-11-28 16:02:13'),
-(10, 'Microsoft', '2025-11-28 16:02:13'),
-(11, 'Test Brand', '2025-11-28 16:31:16'),
-(14, 'New Brand 123', '2025-11-28 16:32:50'),
-(15, 'TestBrand', '2025-11-28 16:33:12'),
-(16, 'BENQ', '2025-12-09 09:13:40'),
-(17, 'VIEW SONIC', '2025-12-09 09:13:40'),
-(18, 'MAXELL', '2025-12-09 09:13:40'),
-(19, 'OPTIMA', '2025-12-14 03:03:43'),
-(20, 'HITACHI', '2025-12-14 03:03:43');
+(22, 'VIEWSONIC', '2026-01-15 10:50:07');
 
 -- --------------------------------------------------------
 
@@ -446,15 +395,6 @@ CREATE TABLE `device_installations` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
---
--- Dumping data for table `device_installations`
---
-
-INSERT INTO `device_installations` (`installation_id`, `device_id`, `room_id`, `installed_date`, `withdrawn_date`, `installed_by`, `team_members`, `installation_type`, `installer_name`, `installer_id`, `withdrawn_by`, `withdrawer_name`, `withdrawer_id`, `data_entry_by`, `gate_pass_number`, `gate_pass_date`, `installation_notes`, `withdrawal_notes`, `issue_at_withdrawal`, `storage_location`, `status`, `is_deleted`, `deleted_at`, `deleted_by`, `created_at`, `updated_at`) VALUES
-(1, 1, 10, '2025-11-28', NULL, 1, NULL, 'NEW_INSTALLATION', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, 'erg. e er eg', NULL, NULL, NULL, 'active', 0, NULL, NULL, '2025-11-28 18:10:09', '2025-11-29 04:51:50'),
-(2, 2, 11, '2025-11-29', '2025-11-29', 1, NULL, 'NEW_INSTALLATION', NULL, NULL, 1, NULL, NULL, 1, NULL, NULL, '', '', NULL, NULL, 'withdrawn', 0, NULL, NULL, '2025-11-29 04:10:34', '2025-11-29 04:51:50'),
-(3, 2, 12, '2025-11-29', NULL, 1, NULL, 'NEW_INSTALLATION', NULL, NULL, NULL, NULL, NULL, 1, NULL, NULL, '', NULL, NULL, NULL, 'active', 0, NULL, NULL, '2025-11-29 04:11:28', '2025-11-29 04:51:50');
 
 -- --------------------------------------------------------
 
@@ -501,14 +441,7 @@ CREATE TABLE `device_types` (
 --
 
 INSERT INTO `device_types` (`type_id`, `type_name`, `description`, `created_at`) VALUES
-(1, 'Multimedia Projector', 'Digital multimedia projectors', '2025-11-28 16:02:13'),
-(2, 'Monitor', 'Computer monitors and displays', '2025-11-28 16:02:13'),
-(3, 'Speaker', 'Audio speakers and sound systems', '2025-11-28 16:02:13'),
-(4, 'Keyboard', 'Computer keyboards', '2025-11-28 16:02:13'),
-(5, 'Mouse', 'Computer mice and pointing devices', '2025-11-28 16:02:13'),
-(6, 'Test Device Type', 'Test description', '2025-11-28 16:31:16'),
-(8, 'Tablet', 'Touch screen tablets', '2025-11-28 16:33:31'),
-(9, 'Webcam', 'Video cameras', '2025-11-28 16:33:49');
+(10, 'Multimedia Projector', 'Auto-created from CSV import', '2026-01-15 10:50:07');
 
 -- --------------------------------------------------------
 
@@ -520,6 +453,31 @@ CREATE TABLE `gate_passes` (
   `gate_pass_id` int(11) NOT NULL,
   `gate_pass_number` varchar(50) NOT NULL,
   `gate_pass_date` date NOT NULL,
+  `pass_direction` enum('incoming','outgoing') NOT NULL DEFAULT 'outgoing',
+  `gate_pass_time` time DEFAULT NULL,
+  `department` varchar(255) DEFAULT NULL,
+  `gate_name` varchar(255) DEFAULT NULL,
+  `vendor_destination` varchar(255) DEFAULT NULL,
+  `bearer_name` varchar(150) DEFAULT NULL,
+  `bearer_company` varchar(150) DEFAULT NULL,
+  `bearer_contact_no` varchar(50) DEFAULT NULL,
+  `bearer_signature` varchar(255) DEFAULT NULL,
+  `bearer_signature_date` date DEFAULT NULL,
+  `security_officer_name` varchar(150) DEFAULT NULL,
+  `security_officer_designation` varchar(150) DEFAULT NULL,
+  `security_officer_ext` varchar(50) DEFAULT NULL,
+  `security_officer_signature` varchar(255) DEFAULT NULL,
+  `security_officer_signature_date` date DEFAULT NULL,
+  `processing_name` varchar(150) DEFAULT NULL,
+  `processing_designation` varchar(150) DEFAULT NULL,
+  `processing_ext` varchar(50) DEFAULT NULL,
+  `processing_signature` varchar(255) DEFAULT NULL,
+  `processing_signature_date` date DEFAULT NULL,
+  `authorized_name` varchar(150) DEFAULT NULL,
+  `authorized_designation` varchar(150) DEFAULT NULL,
+  `authorized_ext` varchar(50) DEFAULT NULL,
+  `authorized_signature` varchar(255) DEFAULT NULL,
+  `authorized_signature_date` date DEFAULT NULL,
   `consignee_name` text DEFAULT NULL,
   `destination` varchar(255) DEFAULT NULL,
   `destination_room_id` int(11) DEFAULT NULL,
@@ -546,13 +504,6 @@ CREATE TABLE `gate_passes` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `gate_passes`
---
-
-INSERT INTO `gate_passes` (`gate_pass_id`, `gate_pass_number`, `gate_pass_date`, `consignee_name`, `destination`, `destination_room_id`, `carrier_name`, `carrier_appointment`, `carrier_department`, `carrier_telephone`, `security_name`, `security_appointment`, `security_department`, `security_telephone`, `receiver_name`, `receiver_appointment`, `receiver_department`, `receiver_telephone`, `purpose`, `remarks`, `status`, `created_by`, `is_deleted`, `deleted_at`, `deleted_by`, `created_at`, `updated_at`) VALUES
-(1, '931243', '2025-11-29', NULL, NULL, NULL, 'hjvu', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 'Other', 'fdghjhk', 'active', 1, 0, NULL, NULL, '2025-11-29 06:39:31', '2025-11-29 06:39:31');
-
 -- --------------------------------------------------------
 
 --
@@ -565,13 +516,6 @@ CREATE TABLE `gate_pass_devices` (
   `device_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `gate_pass_devices`
---
-
-INSERT INTO `gate_pass_devices` (`gate_pass_device_id`, `gate_pass_id`, `device_id`, `created_at`) VALUES
-(1, 1, 3, '2025-11-29 07:06:25');
 
 -- --------------------------------------------------------
 
@@ -596,17 +540,35 @@ CREATE TABLE `rooms` (
 --
 
 INSERT INTO `rooms` (`room_id`, `room_number`, `room_name`, `building`, `floor`, `capacity`, `is_active`, `created_at`, `updated_at`) VALUES
-(1, 'R101', 'Computer Lab 1', 'Main Building', 1, 40, 0, '2025-11-28 16:02:13', '2025-12-02 04:41:08'),
-(2, 'R102', 'Computer Lab 2', 'Main Building', 1, 40, 0, '2025-11-28 16:02:13', '2025-12-02 04:24:41'),
-(3, 'R201', 'Conference Room', 'Main Building', 2, 20, 1, '2025-11-28 16:02:13', '2025-11-28 16:02:13'),
-(4, 'R202', 'Training Room', 'Main Building', 2, 30, 0, '2025-11-28 16:02:13', '2025-12-02 05:08:41'),
-(5, 'R301', 'Auditorium', 'Main Building', 3, 100, 0, '2025-11-28 16:02:13', '2025-12-02 07:04:49'),
-(6, 'TEST-101', 'Test Room', 'Test Building', 1, 30, 0, '2025-11-28 16:31:16', '2025-12-02 05:47:33'),
-(8, 'R-999', 'Test Lab', 'Main', 3, 25, 0, '2025-11-28 16:33:32', '2025-12-02 04:22:24'),
-(9, 'L-505', 'Computer Lab 5', 'IT Building', 5, 40, 0, '2025-11-28 16:33:49', '2025-12-02 04:10:57'),
-(10, 'SAC201', 'CLASSROOM', NULL, NULL, NULL, 1, '2025-11-28 18:08:36', '2025-11-28 18:08:36'),
-(11, 'SAC505', 'CLASSROOM', NULL, NULL, NULL, 0, '2025-11-29 04:10:32', '2025-12-02 05:45:27'),
-(12, 'SAC404', 'CLASSROOM', NULL, NULL, NULL, 1, '2025-11-29 04:11:20', '2025-11-29 04:11:20');
+(14, 'NAC 202', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:58', '2026-01-15 10:40:58'),
+(15, 'NAC 206', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:58', '2026-01-15 10:40:58'),
+(16, 'NAC 207', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:58', '2026-01-15 10:40:58'),
+(17, 'NAC 209', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:58', '2026-01-15 10:40:58'),
+(18, 'NAC 213', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:58', '2026-01-15 10:40:58'),
+(19, 'NAC 214', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:58', '2026-01-15 10:40:58'),
+(20, 'NAC 307', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:58', '2026-01-15 10:40:58'),
+(21, 'NAC 310', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:59', '2026-01-15 10:40:59'),
+(22, 'NAC 402', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:59', '2026-01-15 10:40:59'),
+(23, 'NAC 409', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:59', '2026-01-15 10:40:59'),
+(24, 'NAC 412', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:59', '2026-01-15 10:40:59'),
+(25, 'NAC 501', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:59', '2026-01-15 10:40:59'),
+(26, 'NAC 506', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:40:59', '2026-01-15 10:40:59'),
+(27, 'NAC 511', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:00', '2026-01-15 10:41:00'),
+(28, 'LIB 602', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:00', '2026-01-15 10:41:00'),
+(29, 'LIB 603', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:00', '2026-01-15 10:41:00'),
+(30, 'LIB 605', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:00', '2026-01-15 10:41:00'),
+(31, 'LIB 609', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:00', '2026-01-15 10:41:00'),
+(32, 'SAC 514', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:00', '2026-01-15 10:41:00'),
+(33, 'NAC 514', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:00', '2026-01-15 10:41:00'),
+(34, 'NAC 618', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:01', '2026-01-15 10:41:01'),
+(35, 'NAC 619', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:01', '2026-01-15 10:41:01'),
+(36, 'NAC 990', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:01', '2026-01-15 10:41:01'),
+(37, 'NAC 991', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:01', '2026-01-15 10:41:01'),
+(38, 'NAC 1077', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:01', '2026-01-15 10:41:01'),
+(39, 'SAC 303', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:01', '2026-01-15 10:41:01'),
+(40, 'SAC 511', 'Classroom', NULL, NULL, NULL, 1, '2026-01-15 10:41:02', '2026-01-15 10:41:02'),
+(41, 'NTR 2ND FLOOR', 'LAB Room', NULL, NULL, NULL, 1, '2026-01-15 10:41:02', '2026-01-15 10:41:02'),
+(42, 'SAC 401', 'LAB Room', NULL, NULL, NULL, 1, '2026-01-15 10:41:02', '2026-01-15 10:41:02');
 
 -- --------------------------------------------------------
 
@@ -667,15 +629,6 @@ CREATE TABLE `support_team_members` (
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Support team members who provide classroom assistance';
 
---
--- Dumping data for table `support_team_members`
---
-
-INSERT INTO `support_team_members` (`member_id`, `user_id`, `member_name`, `member_email`, `member_phone`, `department`, `is_active`, `created_at`, `created_by`, `updated_at`) VALUES
-(1, NULL, 'John Doe', 'john.doe@nsu.edu', NULL, 'IT Support', 1, '2025-12-09 07:23:53', NULL, '2025-12-09 07:23:53'),
-(2, NULL, 'Jane Smith', 'jane.smith@nsu.edu', NULL, 'Technical Services', 1, '2025-12-09 07:23:53', NULL, '2025-12-09 07:23:53'),
-(3, NULL, 'Mike Johnson', 'mike.johnson@nsu.edu', NULL, 'IT Support', 1, '2025-12-09 07:23:53', NULL, '2025-12-09 07:23:53');
-
 -- --------------------------------------------------------
 
 --
@@ -688,11 +641,11 @@ CREATE TABLE `users` (
   `password_hash` varchar(255) NOT NULL,
   `full_name` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `role` enum('viewer','admin') DEFAULT 'viewer',
+  `role` enum('admin','staff','viewer') DEFAULT 'viewer' COMMENT 'admin: full access, staff: can add/edit data, viewer: read-only access',
   `is_active` tinyint(1) DEFAULT 1,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='User accounts with role-based access control';
 
 --
 -- Dumping data for table `users`
@@ -700,7 +653,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`user_id`, `username`, `password_hash`, `full_name`, `email`, `role`, `is_active`, `created_at`, `updated_at`) VALUES
 (1, 'admin', '$2y$12$LBWhJsqBDCbH0AG0uX1Iy.RHyfCyPL5cOP0ZfG73o/sFVnE.2/gIa', 'System Administrator', 'admin@classroom.local', 'admin', 1, '2025-11-28 16:02:13', '2025-11-28 16:13:41'),
-(2, 'viewer', '$2y$12$LBWhJsqBDCbH0AG0uX1Iy.RHyfCyPL5cOP0ZfG73o/sFVnE.2/gIa', 'Guest Viewer', 'viewer@classroom.local', 'viewer', 1, '2025-11-28 16:02:13', '2025-11-28 16:13:41');
+(2, 'viewer', '$2y$10$Lb3toUxNB.ZESKb1KNmb1u47BuA080Wh/KfN/fjR9ob9fq/OQpxry', 'Guest Viewer', 'viewer@classroom.local', 'viewer', 1, '2025-11-28 16:02:13', '2026-01-14 02:35:22'),
+(3, 'staff1', '$2y$10$218awptu3MLjPBoZ5UnEn.qhCrzyd3wURnO2tR1LF9HuInmXgx5X6', 'Staff User', 'staff@test.com', 'staff', 1, '2026-01-14 02:34:00', '2026-01-14 02:34:00');
 
 -- --------------------------------------------------------
 
@@ -1098,7 +1052,8 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `username` (`username`),
   ADD UNIQUE KEY `email` (`email`),
   ADD KEY `idx_username` (`username`),
-  ADD KEY `idx_role` (`role`);
+  ADD KEY `idx_role` (`role`),
+  ADD KEY `idx_user_role_active` (`role`,`is_active`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -1108,7 +1063,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
-  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 
 --
 -- AUTO_INCREMENT for table `blog_categories`
@@ -1120,19 +1075,19 @@ ALTER TABLE `blog_categories`
 -- AUTO_INCREMENT for table `blog_comments`
 --
 ALTER TABLE `blog_comments`
-  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `comment_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `blog_posts`
 --
 ALTER TABLE `blog_posts`
-  MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `post_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `blog_reactions`
 --
 ALTER TABLE `blog_reactions`
-  MODIFY `reaction_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `reaction_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `classroom_support_records`
@@ -1144,49 +1099,49 @@ ALTER TABLE `classroom_support_records`
 -- AUTO_INCREMENT for table `devices`
 --
 ALTER TABLE `devices`
-  MODIFY `device_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `device_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `device_brands`
 --
 ALTER TABLE `device_brands`
-  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `brand_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `device_installations`
 --
 ALTER TABLE `device_installations`
-  MODIFY `installation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `installation_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `device_issues`
 --
 ALTER TABLE `device_issues`
-  MODIFY `issue_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `issue_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `device_types`
 --
 ALTER TABLE `device_types`
-  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+  MODIFY `type_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
 -- AUTO_INCREMENT for table `gate_passes`
 --
 ALTER TABLE `gate_passes`
-  MODIFY `gate_pass_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `gate_pass_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `gate_pass_devices`
 --
 ALTER TABLE `gate_pass_devices`
-  MODIFY `gate_pass_device_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `gate_pass_device_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `room_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=43;
 
 --
 -- AUTO_INCREMENT for table `storage_locations`
@@ -1204,7 +1159,7 @@ ALTER TABLE `support_team_members`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `user_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Constraints for dumped tables
