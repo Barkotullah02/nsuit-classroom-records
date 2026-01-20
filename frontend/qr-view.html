@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Information - QR Code View</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .qr-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            max-width: 600px;
+            width: 100%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .qr-header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #667eea;
+        }
+        .qr-header h1 {
+            color: #667eea;
+            margin: 0 0 10px 0;
+            font-size: 1.8rem;
+        }
+        .qr-header .device-id {
+            font-size: 1.2rem;
+            color: #555;
+            font-weight: bold;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-section h2 {
+            color: #764ba2;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .info-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .info-value {
+            color: #333;
+        }
+        .history-item {
+            background: #f8f9fa;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        .history-item.active {
+            border-left-color: #28a745;
+            background: #e8f5e9;
+        }
+        .notes-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 10px;
+            color: #856404;
+        }
+        .btn-view-full {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+        }
+        .btn-view-full:hover {
+            opacity: 0.9;
+        }
+        @media print {
+            body {
+                background: white;
+            }
+            .btn-view-full {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="qr-container">
+        <div class="qr-header">
+            <h1><i class="fas fa-qrcode"></i> Device Information</h1>
+            <div class="device-id" id="deviceUID">Loading...</div>
+        </div>
+
+        <div class="info-section">
+            <h2><i class="fas fa-info-circle"></i> Device Details</h2>
+            <div class="info-row">
+                <span class="info-label">Type:</span>
+                <span class="info-value" id="deviceType">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Brand:</span>
+                <span class="info-value" id="deviceBrand">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Model:</span>
+                <span class="info-value" id="deviceModel">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Serial Number:</span>
+                <span class="info-value" id="deviceSerial">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Purchase Date:</span>
+                <span class="info-value" id="purchaseDate">-</span>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2><i class="fas fa-door-open"></i> Current Location</h2>
+            <div class="info-row">
+                <span class="info-label">Room:</span>
+                <span class="info-value" id="currentRoom">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Installed Date:</span>
+                <span class="info-value" id="installedDate">-</span>
+            </div>
+        </div>
+
+        <div class="info-section" id="notesSection" style="display: none;">
+            <h2><i class="fas fa-exclamation-triangle"></i> Notes / Issues</h2>
+            <div class="notes-box" id="deviceNotes"></div>
+        </div>
+
+        <div class="info-section" id="historySection">
+            <h2><i class="fas fa-history"></i> Installation History</h2>
+            <div id="historyList"></div>
+        </div>
+
+        <a href="#" class="btn-view-full" id="viewFullBtn">
+            <i class="fas fa-chart-line"></i> View Full Device History
+        </a>
+    </div>
+
+    <script>
+        // Get data from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const encodedData = urlParams.get('data');
+
+        if (!encodedData) {
+            document.querySelector('.qr-container').innerHTML = `
+                <div class="qr-header">
+                    <h1 style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> Invalid QR Code</h1>
+                    <p>No device data found in QR code.</p>
+                </div>
+            `;
+        } else {
+            try {
+                // Decode the data
+                const jsonData = atob(decodeURIComponent(encodedData));
+                const deviceData = JSON.parse(jsonData);
+
+                // Populate device information
+                document.getElementById('deviceUID').textContent = deviceData.uid;
+                document.getElementById('deviceType').textContent = deviceData.type;
+                document.getElementById('deviceBrand').textContent = deviceData.brand;
+                document.getElementById('deviceModel').textContent = deviceData.model;
+                document.getElementById('deviceSerial').textContent = deviceData.serial;
+                document.getElementById('purchaseDate').textContent = deviceData.purchase_date;
+                document.getElementById('currentRoom').textContent = deviceData.current_room;
+                document.getElementById('installedDate').textContent = deviceData.installed_date;
+
+                // Show notes if available
+                if (deviceData.notes && deviceData.notes.trim() !== '') {
+                    document.getElementById('notesSection').style.display = 'block';
+                    document.getElementById('deviceNotes').textContent = deviceData.notes;
+                }
+
+                // Populate installation history
+                const historyList = document.getElementById('historyList');
+                if (deviceData.history && deviceData.history.length > 0) {
+                    historyList.innerHTML = deviceData.history.map(h => `
+                        <div class="history-item ${h.status === 'active' ? 'active' : ''}">
+                            <div><strong>${h.room}</strong></div>
+                            <div style="font-size: 0.9rem; color: #666;">
+                                <i class="fas fa-calendar"></i> ${h.from} 
+                                ${h.to !== 'Current' ? `→ ${h.to}` : '<span style="color: #28a745;">(Current)</span>'}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    historyList.innerHTML = '<div style="padding: 15px; background: #f8f9fa; border-radius: 8px; color: #666; text-align: center;"><i class="fas fa-info-circle"></i> No previous history available</div>';
+                }
+
+                // Update view full button - extract device ID from history or use uid
+                document.getElementById('viewFullBtn').href = 
+                    `device-history.html?uid=${encodeURIComponent(deviceData.uid)}`;
+
+            } catch (error) {
+                console.error('Error parsing device data:', error);
+                document.querySelector('.qr-container').innerHTML = `
+                    <div class="qr-header">
+                        <h1 style="color: #dc3545;"><i class="fas fa-exclamation-triangle"></i> Error</h1>
+                        <p>Failed to load device information.</p>
+                        <p style="font-size: 0.9rem; color: #999;">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

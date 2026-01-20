@@ -189,6 +189,9 @@ function displayDevices(devicesList) {
                 <td>${storage}</td>
                 <td>${lifetime}</td>
                 <td>
+                    <button class="btn btn-sm btn-success" onclick="generateQRCode(${device.device_id}, '${device.device_unique_id}')" title="Generate QR Code">
+                        <i class="fas fa-qrcode"></i> QR Code
+                    </button>
                     <button class="btn btn-sm btn-info" onclick="createGatePassForDevice(${device.device_id}, '${device.device_unique_id}')" title="Create Gate Pass">
                         <i class="fas fa-file-alt"></i> Gate Pass
                     </button>
@@ -425,6 +428,137 @@ async function deleteDevice(deviceId, deviceUniqueId) {
 function createGatePassForDevice(deviceId, deviceUniqueId) {
     // Redirect to create gate pass page with device pre-selected
     window.location.href = `create-gate-pass.html?device_id=${deviceId}`;
+}
+
+/**
+ * Generate QR Code for device
+ */
+function generateQRCode(deviceId, deviceUniqueId) {
+    const token = localStorage.getItem('jwt_token');
+    const qrUrl = `${CONFIG.API_BASE_URL}/generate-qr.php?device_id=${deviceId}`;
+    
+    // Fetch QR code with authentication header
+    fetch(qrUrl, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Failed to generate QR code');
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        const qrBlobUrl = URL.createObjectURL(blob);
+        
+        // Open in new window with print/save functionality
+        const qrWindow = window.open('', '_blank', 'width=500,height=600,resizable=yes,scrollbars=yes');
+        
+        if (qrWindow) {
+            qrWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>QR Code - ${deviceUniqueId}</title>
+                    <style>
+                        body {
+                            margin: 0;
+                            padding: 20px;
+                            font-family: Arial, sans-serif;
+                            text-align: center;
+                            background: #f5f5f5;
+                        }
+                        .qr-container {
+                            background: white;
+                            padding: 30px;
+                            border-radius: 10px;
+                            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                            display: inline-block;
+                        }
+                        h2 {
+                            color: #333;
+                            margin-top: 0;
+                        }
+                        .device-id {
+                            color: #666;
+                            font-size: 14px;
+                            margin-bottom: 20px;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                        }
+                        .button-group {
+                            margin-top: 20px;
+                            display: flex;
+                            gap: 10px;
+                            justify-content: center;
+                        }
+                        button {
+                            padding: 10px 20px;
+                            border: none;
+                            border-radius: 5px;
+                            cursor: pointer;
+                            font-size: 14px;
+                        }
+                        .btn-print {
+                            background: #667eea;
+                            color: white;
+                        }
+                        .btn-save {
+                            background: #28a745;
+                            color: white;
+                        }
+                        .btn-close {
+                            background: #dc3545;
+                            color: white;
+                        }
+                        @media print {
+                            .button-group { display: none; }
+                            body { background: white; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="qr-container">
+                        <h2>Device QR Code</h2>
+                        <div class="device-id">${deviceUniqueId}</div>
+                        <img src="${qrBlobUrl}" alt="QR Code for ${deviceUniqueId}" id="qrImage" />
+                        <div class="button-group">
+                            <button class="btn-print" onclick="window.print()">
+                                🖨️ Print
+                            </button>
+                            <button class="btn-save" onclick="saveImage()">
+                                💾 Save Image
+                            </button>
+                            <button class="btn-close" onclick="window.close()">
+                                ✖️ Close
+                            </button>
+                        </div>
+                    </div>
+                    <script>
+                        function saveImage() {
+                            const link = document.createElement('a');
+                            link.href = document.getElementById('qrImage').src;
+                            link.download = 'device-${deviceUniqueId}-qr.png';
+                            document.body.appendChild(link);
+                            link.click();
+                            document.body.removeChild(link);
+                        }
+                    </script>
+                </body>
+                </html>
+            `);
+            qrWindow.document.close();
+        } else {
+            alert('Please allow popups to view the QR code');
+        }
+    })
+    .catch(error => {
+        console.error('Error generating QR code:', error);
+        Utils.showAlert('Failed to generate QR code. Please try again.', 'error');
+    });
 }
 
 /**

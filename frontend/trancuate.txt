@@ -17,7 +17,6 @@ TRUNCATE TABLE support_team_members;
 TRUNCATE TABLE device_types;
 TRUNCATE TABLE device_brands;
 TRUNCATE TABLE rooms;
-TRUNCATE TABLE users;
 
 -- Step 3: Re-enable foreign key checks
 SET FOREIGN_KEY_CHECKS = 1;
