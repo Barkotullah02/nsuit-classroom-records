@@ -450,8 +450,15 @@ function generateQRCode(deviceId, deviceUniqueId) {
         return response.blob();
     })
     .then(blob => {
-        const qrBlobUrl = URL.createObjectURL(blob);
-        
+        // Convert blob to base64 data URL for cross-platform compatibility
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+        });
+    })
+    .then(dataUrl => {
         // Open in new window with print/save functionality
         const qrWindow = window.open('', '_blank', 'width=500,height=600,resizable=yes,scrollbars=yes');
         
@@ -524,7 +531,7 @@ function generateQRCode(deviceId, deviceUniqueId) {
                     <div class="qr-container">
                         <h2>Device QR Code</h2>
                         <div class="device-id">${deviceUniqueId}</div>
-                        <img src="${qrBlobUrl}" alt="QR Code for ${deviceUniqueId}" id="qrImage" />
+                        <img src="${dataUrl}" alt="QR Code for ${deviceUniqueId}" id="qrImage" />
                         <div class="button-group">
                             <button class="btn-print" onclick="window.print()">
                                 🖨️ Print
