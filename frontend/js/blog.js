@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ===== BLOG LISTING PAGE =====
 async function initBlogListing() {
     // Show create post button only for admins
-    if (currentUser.role === 'admin') {
+    if (['super_admin', 'admin'].includes(currentUser.role)) {
         const createBtn = document.getElementById('createPostBtn');
         createBtn.style.display = 'inline-flex';
         createBtn.addEventListener('click', () => {
@@ -277,7 +277,7 @@ async function loadPost(postId) {
             `;
 
             // Show admin actions if user is admin
-            if (currentUser.role === 'admin') {
+            if (['super_admin', 'admin'].includes(currentUser.role)) {
                 const adminActions = document.getElementById('adminActions');
                 adminActions.style.display = 'flex';
                 adminActions.innerHTML = `
@@ -373,7 +373,7 @@ async function loadComments(postId) {
 
 function renderComment(comment, postId, isReply = false) {
     const commentDate = new Date(comment.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-    const canEdit = currentUser.role === 'admin' || currentUser.user_id === comment.user_id;
+    const canEdit = ['super_admin', 'admin'].includes(currentUser.role) || currentUser.user_id === comment.user_id;
     
     let html = `
         <div class="comment ${isReply ? 'reply' : ''}" id="comment-${comment.comment_id}">

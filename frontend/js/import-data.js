@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * Setup event listeners
  */
 function setupEventListeners() {
-    document.getElementById('logoutBtn').addEventListener('click', Utils.logout);
+    document.getElementById('logoutBtn').addEventListener('click', () => Utils.logout());
     document.getElementById('importForm').addEventListener('submit', handleImport);
 }
 
@@ -56,12 +56,11 @@ B101,Seminar Room,Building B,1,50`;
  * Download installation history template CSV
  */
 function downloadInstallationTemplate() {
-    const csv = `device_unique_id,room_number,installation_date,installation_time,installer_name,installer_id,withdrawal_date,withdrawal_time,withdrawer_name,withdrawer_id,data_entry_by,status,notes
-DEV001,101,2024-01-15,10:30:00,John Doe,EMP001,,,,,Admin User,active,Initial installation
-DEV002,102,2024-02-20,14:00:00,Jane Smith,EMP002,2024-06-15,16:30:00,Mike Johnson,EMP003,Admin User,withdrawn,Moved to another room
-DEV003,201,2024-03-10,09:00:00,Robert Lee,EMP004,,,,,Admin User,active,Conference room setup
-DEV004,101,2023-12-01,11:15:00,Sarah Chen,EMP005,2024-05-20,13:45:00,Tom Wilson,EMP006,Admin User,withdrawn,Replaced with new model
-DEV005,B101,2024-04-05,15:20:00,David Brown,EMP007,,,,,Admin User,active,Seminar room installation`;
+    const csv = `device_unique_id,room_number,installed_date,installer_name,installer_id,team_members,installation_type,installation_notes,withdrawn_date,withdrawer_name,withdrawer_id,withdrawal_notes,issue_at_withdrawal,storage_location,gate_pass_number,gate_pass_date,status
+50-ITD-00508-00542,101,2024-01-15,John Doe,EMP001,,NEW_INSTALLATION,Initial installation,,,,,,,,,active
+50-ITD-00508-00543,102,2024-02-20,Jane Smith,EMP002,Tech Team A,NEW_INSTALLATION,New projector installed,2024-06-15,Mike Johnson,EMP003,Moved to room 201,,,,GP-2024-001,2024-06-15,withdrawn
+50-ITD-00508-00544,201,2024-03-10,Robert Lee,EMP004,,REPAIRED,Repaired and reinstalled,,,,,,,,,active
+50-ITD-00508-00545,B101,2024-04-05,Sarah Chen,EMP005,Installation Team,OLD_REINSTALL,Reinstalled old device,,,,,,,,,active`;
 
     downloadCSV(csv, 'installations_template.csv');
 }
@@ -380,21 +379,29 @@ async function importInstallations(rows, skipDuplicates) {
             continue;
         }
 
-        // Build installation data
+        // Build installation data matching database structure
+        // Template columns: device_unique_id,room_number,installed_date,installer_name,installer_id,
+        //                  team_members,installation_type,installation_notes,withdrawn_date,
+        //                  withdrawer_name,withdrawer_id,withdrawal_notes,issue_at_withdrawal,
+        //                  storage_location,gate_pass_number,gate_pass_date,status
         const installationData = {
             device_id: device.device_id,
             room_id: room.room_id,
-            installation_date: row[2] || null,
-            installation_time: row[3] || null,
-            installer_name: row[4] || null,
-            installer_id: row[5] || null,
-            withdrawal_date: row[6] || null,
-            withdrawal_time: row[7] || null,
-            withdrawer_name: row[8] || null,
-            withdrawer_id: row[9] || null,
-            data_entry_by: row[10] || null,
-            status: row[11] || 'active',
-            notes: row[12] || null
+            installed_date: row[2] || null,
+            installer_name: row[3] || null,
+            installer_id: row[4] || null,
+            team_members: row[5] || null,
+            installation_type: row[6] || 'NEW_INSTALLATION',
+            installation_notes: row[7] || null,
+            withdrawn_date: row[8] || null,
+            withdrawer_name: row[9] || null,
+            withdrawer_id: row[10] || null,
+            withdrawal_notes: row[11] || null,
+            issue_at_withdrawal: row[12] || null,
+            storage_location: row[13] || null,
+            gate_pass_number: row[14] || null,
+            gate_pass_date: row[15] || null,
+            status: row[16] || 'active'
         };
 
         // Create installation record

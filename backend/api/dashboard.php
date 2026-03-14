@@ -24,10 +24,18 @@ try {
     $total_devices_query = "SELECT COUNT(*) as count FROM devices WHERE is_deleted = FALSE";
     $total_devices = $db->query($total_devices_query)->fetch()['count'];
 
-    // Active installations
-    $active_installations_query = "SELECT COUNT(*) as count FROM device_installations 
-                                   WHERE status = 'active' AND is_deleted = FALSE";
-    $active_installations = $db->query($active_installations_query)->fetch()['count'];
+    // Total rooms
+    $total_rooms_query = "SELECT COUNT(*) as count FROM rooms WHERE is_active = TRUE";
+    $total_rooms = $db->query($total_rooms_query)->fetch()['count'];
+
+    // LAB rooms count (room_name contains 'LAB' or 'Lab' or 'lab')
+    $lab_rooms_query = "SELECT COUNT(*) as count FROM rooms 
+                        WHERE is_active = TRUE 
+                        AND (room_name LIKE '%LAB%' OR room_name LIKE '%Lab%' OR room_name LIKE '%lab%')";
+    $lab_rooms = $db->query($lab_rooms_query)->fetch()['count'];
+
+    // Classroom rooms (total rooms excluding LAB rooms)
+    $classroom_rooms = $total_rooms - $lab_rooms;
 
     // Withdrawn devices
     $withdrawn_devices_query = "SELECT COUNT(*) as count FROM device_installations 
@@ -43,10 +51,6 @@ try {
                                     AND is_deleted = FALSE
                                 )";
     $available_devices = $db->query($available_devices_query)->fetch()['count'];
-
-    // Total rooms
-    $total_rooms_query = "SELECT COUNT(*) as count FROM rooms WHERE is_active = TRUE";
-    $total_rooms = $db->query($total_rooms_query)->fetch()['count'];
 
     // Devices by type
     $devices_by_type_query = "SELECT dt.type_name, COUNT(d.device_id) as count
@@ -89,7 +93,8 @@ try {
 
     Response::success([
         'total_devices' => $total_devices,
-        'active_installations' => $active_installations,
+        'lab_rooms' => $lab_rooms,
+        'classroom_rooms' => $classroom_rooms,
         'withdrawn_devices' => $withdrawn_devices,
         'available_devices' => $available_devices,
         'total_rooms' => $total_rooms,

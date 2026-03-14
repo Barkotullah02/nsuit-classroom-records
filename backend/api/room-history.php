@@ -26,6 +26,39 @@ try {
         Response::error('Room ID is required');
     }
 
+    // Optional date_from / date_to filters (YYYY-MM-DD)
+    $date_from = isset($_GET['date_from']) && trim($_GET['date_from']) !== '' ? trim($_GET['date_from']) : null;
+    $date_to   = isset($_GET['date_to'])   && trim($_GET['date_to'])   !== '' ? trim($_GET['date_to'])   : null;
+
+    if ($date_from && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_from)) {
+        Response::error('Invalid date_from format. Use YYYY-MM-DD');
+    }
+    if ($date_to && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date_to)) {
+        Response::error('Invalid date_to format. Use YYYY-MM-DD');
+    }
+
+    // Overlap-based date conditions (record lifecycle intersects selected range):
+    //   Active    : [installed_date, CURDATE()]   overlaps [date_from, date_to]
+    //   Withdrawn : [installed_date, withdrawn_date] overlaps [date_from, date_to]
+    //   History   : [installed_date, IFNULL(withdrawn_date, CURDATE())] overlaps [date_from, date_to]
+    // Overlap condition:  record_start <= range_end  AND  record_end >= range_start
+    $active_date_cond    = '';
+    $withdrawn_date_cond = '';
+    $history_date_cond   = '';
+
+    if ($date_from) {
+        // record must still be running at or after date_from
+        $active_date_cond    .= " AND CURDATE() >= :date_from";
+        $withdrawn_date_cond .= " AND di.withdrawn_date >= :date_from";
+        $history_date_cond   .= " AND IFNULL(di.withdrawn_date, CURDATE()) >= :date_from";
+    }
+    if ($date_to) {
+        // record must have started at or before date_to
+        $active_date_cond    .= " AND di.installed_date <= :date_to";
+        $withdrawn_date_cond .= " AND di.installed_date <= :date_to";
+        $history_date_cond   .= " AND di.installed_date <= :date_to";
+    }
+
     // Get room details
     $room_query = "SELECT 
                     room_id,
@@ -68,10 +101,13 @@ try {
                         WHERE di.room_id = :room_id 
                         AND di.status = 'active'
                         AND di.is_deleted = FALSE
+                        {$active_date_cond}
                         ORDER BY di.installed_date DESC";
     
     $active_stmt = $db->prepare($active_devices_query);
     $active_stmt->bindParam(':room_id', $room_id);
+    if ($date_from) $active_stmt->bindParam(':date_from', $date_from);
+    if ($date_to)   $active_stmt->bindParam(':date_to',   $date_to);
     $active_stmt->execute();
     $active_devices = $active_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -98,10 +134,13 @@ try {
                             WHERE di.room_id = :room_id 
                             AND di.status = 'withdrawn'
                             AND di.is_deleted = FALSE
+                            {$withdrawn_date_cond}
                             ORDER BY di.withdrawn_date DESC";
     
     $withdrawn_stmt = $db->prepare($withdrawn_devices_query);
     $withdrawn_stmt->bindParam(':room_id', $room_id);
+    if ($date_from) $withdrawn_stmt->bindParam(':date_from', $date_from);
+    if ($date_to)   $withdrawn_stmt->bindParam(':date_to',   $date_to);
     $withdrawn_stmt->execute();
     $withdrawn_devices = $withdrawn_stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -158,10 +197,13 @@ try {
                     LEFT JOIN users u_withdrawn ON di.withdrawn_by = u_withdrawn.user_id
                     WHERE di.room_id = :room_id
                     AND di.is_deleted = FALSE
+                    {$history_date_cond}
                     ORDER BY di.installed_date DESC";
     
     $history_stmt = $db->prepare($history_query);
     $history_stmt->bindParam(':room_id', $room_id);
+    if ($date_from) $history_stmt->bindParam(':date_from', $date_from);
+    if ($date_to)   $history_stmt->bindParam(':date_to',   $date_to);
     $history_stmt->execute();
     $complete_history = $history_stmt->fetchAll(PDO::FETCH_ASSOC);
 

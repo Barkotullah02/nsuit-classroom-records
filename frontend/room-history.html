@@ -209,7 +209,7 @@
             width: 100%;
             background: white;
             border-radius: 10px;
-            overflow: hidden;
+            overflow: visible;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             margin-bottom: 2rem;
         }
@@ -259,9 +259,62 @@
             opacity: 0.5;
         }
 
+        .date-filter-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            background: white;
+            padding: 0.85rem 1.25rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .date-filter-bar label {
+            font-weight: 500;
+            color: #555;
+            white-space: nowrap;
+            margin: 0;
+        }
+
+        .date-range-label {
+            font-size: 0.9rem;
+            color: #777;
+            font-weight: 400;
+        }
+
+        .date-filter-bar input[type="date"] {
+            padding: 0.45rem 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .date-filter-info {
+            color: #667eea;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .print-date-note {
+            display: none;
+            text-align: center;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            font-style: italic;
+        }
+
         @media print {
-            .sidebar, .action-buttons, .btn {
+            .sidebar, .action-buttons, .btn, .date-filter-bar {
                 display: none !important;
+            }
+
+            .print-date-note {
+                display: block !important;
             }
             
             .main-content {
@@ -336,37 +389,7 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><img src="images/bot.png" alt="Logo" style="height: 50px; vertical-align: middle; margin-right: 8px;"> Device Manager</h2>
-            </div>
-
-            <nav>
-                <ul class="sidebar-nav">
-                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
-                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
-                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
-                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
-                    <li><a href="rooms.html" class="active"><i class="fas fa-door-open"></i> Rooms</a></li>
-                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
-                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
-                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
-                </ul>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar"></div>
-                    <div class="user-details">
-                        <h4 id="userName">Loading...</h4>
-                        <p id="userRole">Role</p>
-                    </div>
-                </div>
-                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </aside>
+        <aside class="sidebar" id="mainSidebar"></aside>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -386,9 +409,28 @@
                     </button>
                 </div>
 
+                <!-- Date Filter Bar -->
+                <div class="date-filter-bar">
+                    <label><i class="fas fa-calendar-alt"></i> Filter by date range:</label>
+                    <label for="dateFrom" class="date-range-label">From:</label>
+                    <input type="date" id="dateFrom" />
+                    <label for="dateTo" class="date-range-label">To:</label>
+                    <input type="date" id="dateTo" />
+                    <button class="btn btn-primary btn-sm" onclick="applyDateFilter()">
+                        <i class="fas fa-filter"></i> Apply Filter
+                    </button>
+                    <button class="btn btn-secondary btn-sm" id="clearFilterBtn" onclick="clearDateFilter()" style="display:none;">
+                        <i class="fas fa-times"></i> Clear
+                    </button>
+                    <span class="date-filter-info" id="filterInfo"></span>
+                </div>
+
+                <!-- Print-only date range note -->
+                <div class="print-date-note" id="printDateNote"></div>
+
                 <!-- Currently Installed Devices -->
                 <div class="section-header">
-                    <h2>
+                    <h2 style="color: #eeeeee !important;">
                         <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
                         Currently Installed Devices
                         <span class="section-count" id="activeCount">0</span>
@@ -402,7 +444,7 @@
 
                 <!-- Previously Withdrawn Devices -->
                 <div class="section-header">
-                    <h2>
+                    <h2 style="color: #eeeeee !important;">
                         <i class="fas fa-history" style="color: #FF9800;"></i>
                         Previously Withdrawn Devices
                         <span class="section-count" id="withdrawnCount">0</span>
@@ -416,7 +458,7 @@
 
                 <!-- Complete History Table -->
                 <div class="section-header">
-                    <h2>
+                    <h2  style="color: #eeeeee !important;">
                         <i class="fas fa-table"></i>
                         Complete Installation History
                     </h2>
@@ -433,6 +475,7 @@
     <script src="js/config.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/sidebar.js"></script>
     <script>
         let roomId = null;
         let roomData = null;
@@ -457,8 +500,14 @@
 
         async function loadRoomHistory() {
             try {
-                // Load comprehensive room history using the optimized endpoint
-                const result = await Utils.apiRequest(`${CONFIG.ENDPOINTS.ROOM_HISTORY}?room_id=${roomId}`, {
+                // Build API URL — append date_from / date_to only when set
+                const dateFrom = document.getElementById('dateFrom')?.value || '';
+                const dateTo   = document.getElementById('dateTo')?.value   || '';
+                let apiUrl = `${CONFIG.ENDPOINTS.ROOM_HISTORY}?room_id=${roomId}`;
+                if (dateFrom) apiUrl += `&date_from=${encodeURIComponent(dateFrom)}`;
+                if (dateTo)   apiUrl += `&date_to=${encodeURIComponent(dateTo)}`;
+
+                const result = await Utils.apiRequest(apiUrl, {
                     method: 'GET'
                 });
                 
@@ -661,41 +710,90 @@
             history.sort((a, b) => new Date(b.installed_date) - new Date(a.installed_date));
             
             container.innerHTML = `
+                <div class="table-container">
                 <table>
                     <thead>
-                        <tr>
-                            <th>Device ID</th>
-                            <th>Type</th>
-                            <th>Brand</th>
-                            <th>Installed Date</th>
-                            <th>Withdrawn Date</th>
-                            <th>Days in Room</th>
-                            <th>Status</th>
-                            <th>Installed By</th>
-                            <th>Withdrawn By</th>
+                        <tr style="color: black !important;">
+                            <th style="color: black !important;">Device ID</th>
+                            <th style="color: black !important;">Type</th>
+                            <th style="color: black !important;">Brand</th>
+                            <th style="color: black !important;">Installed Date</th>
+                            <th style="color: black !important;">Withdrawn Date</th>
+                            <th style="color: black !important;">Days in Room</th>
+                            <th style="color: black !important;">Status</th>
+                            <th style="color: black !important;">Installed By</th>
+                            <th style="color: black !important;">Withdrawn By</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${history.map(record => `
                             <tr>
-                                <td><strong>${record.device_unique_id}</strong></td>
-                                <td>${record.type_name || 'N/A'}</td>
-                                <td>${record.brand_name || 'N/A'}</td>
-                                <td>${formatDate(record.installed_date)}</td>
-                                <td>${record.withdrawn_date ? formatDate(record.withdrawn_date) : '<span style="color: #4CAF50;">Active</span>'}</td>
-                                <td>${record.days_in_room} days</td>
+                                <td style="color: black !important;"><strong>${record.device_unique_id}</strong></td>
+                                <td style="color: black !important;">${record.type_name || 'N/A'}</td>
+                                <td style="color: black !important;">${record.brand_name || 'N/A'}</td>
+                                <td style="color: black !important;">${formatDate(record.installed_date)}</td>
+                                <td style="color: black !important;">${record.withdrawn_date ? formatDate(record.withdrawn_date) : '<span style="color: #4CAF50;">Active</span>'}</td>
+                                <td style="color: black !important;">${record.days_in_room} days</td>
                                 <td>
                                     <span class="status-badge ${record.status}">
                                         ${record.status}
                                     </span>
                                 </td>
-                                <td>${record.installed_by || 'N/A'}</td>
-                                <td>${record.withdrawn_by || '-'}</td>
+                                <td style="color: black !important;">${record.installed_by || 'N/A'}</td>
+                                <td style="color: black !important;">${record.withdrawn_by || '-'}</td>
                             </tr>
                         `).join('')}
                     </tbody>
                 </table>
+                </div>
             `;
+        }
+
+        function applyDateFilter() {
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo   = document.getElementById('dateTo').value;
+            const clearBtn     = document.getElementById('clearFilterBtn');
+            const filterInfo   = document.getElementById('filterInfo');
+            const printDateNote = document.getElementById('printDateNote');
+            const today = new Date().toISOString().split('T')[0];
+
+            const hasFilter = dateFrom || dateTo;
+
+            if (hasFilter) {
+                clearBtn.style.display = 'inline-flex';
+
+                let infoText  = '';
+                let noteText  = '';
+
+                if (dateFrom && dateTo) {
+                    infoText = `Showing history from ${formatDate(dateFrom)} to ${formatDate(dateTo)}`;
+                    noteText = `History filtered: ${formatDate(dateFrom)} → ${formatDate(dateTo)}`;
+                } else if (dateFrom) {
+                    infoText = `Showing history from ${formatDate(dateFrom)} to today`;
+                    noteText = `History filtered: ${formatDate(dateFrom)} → ${formatDate(today)}`;
+                } else {
+                    infoText = `Showing history up to ${formatDate(dateTo)}`;
+                    noteText = `History filtered: Beginning → ${formatDate(dateTo)}`;
+                }
+
+                filterInfo.textContent   = infoText;
+                printDateNote.textContent = noteText;
+            } else {
+                clearBtn.style.display    = 'none';
+                filterInfo.textContent    = '';
+                printDateNote.textContent = '';
+            }
+
+            loadRoomHistory();
+        }
+
+        function clearDateFilter() {
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value   = '';
+            document.getElementById('clearFilterBtn').style.display = 'none';
+            document.getElementById('filterInfo').textContent       = '';
+            document.getElementById('printDateNote').textContent    = '';
+            loadRoomHistory();
         }
 
         function formatDate(dateString) {

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Code Test - Direct</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h2 { color: #333; }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover { background: #218838; }
+        .btn-simple { background: #667eea; }
+        .btn-simple:hover { background: #5568d3; }
+        img {
+            max-width: 100%;
+            margin-top: 20px;
+            border: 2px solid #ddd;
+            padding: 10px;
+            background: white;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="test-box">
+        <h2>QR Code Generation Test</h2>
+        <p>This page tests QR code generation with and without authentication.</p>
+        
+        <button class="btn-simple" onclick="testSimpleQR()">Test Simple QR (No Auth)</button>
+        <button onclick="testQRWithAuth()">Test QR with Auth (Device ID 1)</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function testSimpleQR() {
+            const url = '/nsuit-classroom-records/backend/api/test-qr-simple.php?t=' + Date.now();
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Loading simple QR code...</p>';
+            
+            fetch(url)
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error('Failed: ' + response.status);
+                })
+                .then(blob => {
+                    const imgUrl = URL.createObjectURL(blob);
+                    result.innerHTML = `
+                        <p class="success">✓ Simple QR Code Generated Successfully!</p>
+                        <img src="${imgUrl}" alt="QR Code">
+                        <p>Size: ${blob.size} bytes</p>
+                    `;
+                })
+                .catch(error => {
+                    result.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+                });
+        }
+
+        function testQRWithAuth() {
+            const token = localStorage.getItem('jwt_token');
+            if (!token) {
+                alert('Please login first!');
+                window.location.href = '/nsuit-classroom-records/frontend/login.html';
+                return;
+            }
+
+            const url = '/nsuit-classroom-records/backend/api/generate-qr.php?device_id=1&t=' + Date.now();
+            const result = document.getElementById('result');
+            result.innerHTML = '<p>Loading device QR code...</p>';
+            
+            fetch(url, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers.get('content-type'));
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    return response.text().then(text => {
+                        throw new Error(`Failed: ${response.status} - ${text}`);
+                    });
+                })
+                .then(blob => {
+                    const imgUrl = URL.createObjectURL(blob);
+                    result.innerHTML = `
+                        <p class="success">✓ Device QR Code Generated Successfully!</p>
+                        <img src="${imgUrl}" alt="Device QR Code">
+                        <p>Size: ${blob.size} bytes</p>
+                    `;
+                })
+                .catch(error => {
+                    result.innerHTML = `<p class="error">✗ Error: ${error.message}</p>`;
+                    console.error('Full error:', error);
+                });
+        }
+    </script>
+</body>
+</html>

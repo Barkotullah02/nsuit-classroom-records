@@ -14,64 +14,66 @@ class Auth {
     public function __construct() {
         $this->db = new Database();
         $this->conn = $this->db->getConnection();
+
+        if (!$this->conn) {
+            http_response_code(500);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Database connection failed'
+            ]);
+            exit();
+        }
     }
 
     /**
      * Login user
-     * @param string $username
-     * @param string $password
-     * @return array
      */
     public function login($username, $password) {
         try {
-            $query = "SELECT user_id, username, password_hash, full_name, email, role, is_active 
-                     FROM users 
-                     WHERE username = :username AND is_active = TRUE";
-            
+            $query = "SELECT user_id, username, password_hash, full_name, email, role, is_active
+                      FROM users
+                      WHERE username = :username AND is_active = TRUE";
+
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':username', $username);
             $stmt->execute();
 
-            if ($stmt->rowCount() > 0) {
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                if (password_verify($password, $user['password_hash'])) {
-                    // Create JWT token
-                    $payload = [
-                        'user_id' => $user['user_id'],
-                        'username' => $user['username'],
-                        'full_name' => $user['full_name'],
-                        'email' => $user['email'],
-                        'role' => $user['role']
-                    ];
-                    
-                    $token = JWT::encode($payload);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-                    // Log login
-                    $this->logAction($user['user_id'], 'LOGIN', 'users', $user['user_id']);
+            if ($user && password_verify($password, $user['password_hash'])) {
+                // JWT payload
+                $payload = [
+                    'user_id' => $user['user_id'],
+                    'username' => $user['username'],
+                    'full_name' => $user['full_name'],
+                    'email' => $user['email'],
+                    'role' => $user['role']
+                ];
 
-                    return [
-                        'success' => true,
-                        'token' => $token,
-                        'user' => $payload
-                    ];
-                }
+                $token = JWT::encode($payload);
+
+                $this->logAction($user['user_id'], 'LOGIN', 'users', $user['user_id']);
+
+                return [
+                    'success' => true,
+                    'token' => $token,
+                    'user' => $payload
+                ];
             }
 
             return ['success' => false, 'message' => 'Invalid username or password'];
+
         } catch (Exception $e) {
             return ['success' => false, 'message' => 'Login failed: ' . $e->getMessage()];
         }
     }
 
     /**
-     * Logout user (with JWT, just log the action)
+     * Logout user
      */
     public function logout() {
         $user = $this->getCurrentUser();
-        
         if ($user) {
-            // Log logout
             $this->logAction($user['user_id'], 'LOGOUT', 'users', $user['user_id']);
         }
 
@@ -79,30 +81,15 @@ class Auth {
     }
 
     /**
-     * Check if user is logged in (validate JWT)
-     * @return bool
-     */
-    public function isLoggedIn() {
-        return $this->getCurrentUser() !== null;
-    }
-
-    /**
      * Get current user from JWT token
-     * @return array|null
      */
     public function getCurrentUser() {
         $token = JWT::getBearerToken();
-        
-        if (!$token) {
-            return null;
-        }
-        
+        if (!$token) return null;
+
         $payload = JWT::decode($token);
-        
-        if (!$payload) {
-            return null;
-        }
-        
+        if (!$payload) return null;
+
         return [
             'user_id' => $payload['user_id'],
             'username' => $payload['username'],
@@ -113,48 +100,33 @@ class Auth {
     }
 
     /**
-     * Check if current user is admin
-     * @return bool
+     * Permission checks
      */
-    public function isAdmin() {
-        $user = $this->getCurrentUser();
-        return $user && $user['role'] === 'admin';
-    }
-
-    /**
-     * Check if current user is staff (can add/edit data)
-     * @return bool
-     */
-    public function isStaff() {
-        $user = $this->getCurrentUser();
-        return $user && $user['role'] === 'staff';
-    }
-
-    /**
-     * Check if current user is viewer (read-only)
-     * @return bool
-     */
-    public function isViewer() {
-        $user = $this->getCurrentUser();
-        return $user && $user['role'] === 'viewer';
-    }
-
-    /**
-     * Check if user can create (admin or staff)
-     * @return bool
-     */
-    public function canCreate() {
-        $user = $this->getCurrentUser();
-        return $user && ($user['role'] === 'admin' || $user['role'] === 'staff');
-    }
+    public function isAdmin() { $user = $this->getCurrentUser(); return $user && in_array($user['role'], ['super_admin', 'admin']); }
+    public function isSuperAdmin() { $user = $this->getCurrentUser(); return $user && $user['role'] === 'super_admin'; }
+    public function isStaff() { $user = $this->getCurrentUser(); return $user && $user['role'] === 'staff'; }
+    public function isViewer() { $user = $this->getCurrentUser(); return $user && $user['role'] === 'viewer'; }
+    public function canCreate() { $user = $this->getCurrentUser(); return $user && in_array($user['role'], ['super_admin', 'admin','staff']); }
 
     /**
      * Require authentication
      */
     public function requireAuth() {
-        if (!$this->isLoggedIn()) {
+        if (!$this->getCurrentUser()) {
             http_response_code(401);
             echo json_encode(['success' => false, 'message' => 'Authentication required']);
+            exit();
+        }
+    }
+
+    /**
+     * Require create permission (staff, admin, super_admin)
+     */
+    public function requireCreate() {
+        $this->requireAuth();
+        if (!$this->canCreate()) {
+            http_response_code(403);
+            echo json_encode(['success' => false, 'message' => 'Insufficient permissions to create records']);
             exit();
         }
     }
@@ -164,7 +136,6 @@ class Auth {
      */
     public function requireAdmin() {
         $this->requireAuth();
-        
         if (!$this->isAdmin()) {
             http_response_code(403);
             echo json_encode(['success' => false, 'message' => 'Admin access required']);
@@ -173,56 +144,28 @@ class Auth {
     }
 
     /**
-     * Require create permission (admin or staff - can only add, not edit)
+     * Require super admin role
      */
-    public function requireCreate() {
+    public function requireSuperAdmin() {
         $this->requireAuth();
-        
-        if (!$this->canCreate()) {
+        if (!$this->isSuperAdmin()) {
             http_response_code(403);
-            echo json_encode(['success' => false, 'message' => 'You do not have permission to add data. Contact administrator.']);
+            echo json_encode(['success' => false, 'message' => 'Super admin access required']);
             exit();
         }
     }
 
     /**
-     * Check permission for specific action
-     * @param string $action 'read', 'create', 'edit', 'admin'
-     * @return bool
-     */
-    public function hasPermission($action) {
-        $user = $this->getCurrentUser();
-        
-        if (!$user) {
-            return false;
-        }
-
-        switch ($action) {
-            case 'read':
-                return true; // All authenticated users can read
-            case 'create':
-                return $user['role'] === 'admin' || $user['role'] === 'staff';
-            case 'edit':
-            case 'delete':
-                return $user['role'] === 'admin'; // Only admin can edit/delete
-            case 'admin':
-                return $user['role'] === 'admin';
-            default:
-                return false;
-        }
-    }
-
-    /**
-     * Log user action
+     * Log user actions
      */
     private function logAction($user_id, $action, $table_name, $record_id) {
         try {
             $ip_address = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
             $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'unknown';
 
-            $query = "INSERT INTO audit_log (user_id, action, table_name, record_id, ip_address, user_agent) 
-                     VALUES (:user_id, :action, :table_name, :record_id, :ip_address, :user_agent)";
-            
+            $query = "INSERT INTO audit_log (user_id, action, table_name, record_id, ip_address, user_agent)
+                      VALUES (:user_id, :action, :table_name, :record_id, :ip_address, :user_agent)";
+
             $stmt = $this->conn->prepare($query);
             $stmt->bindParam(':user_id', $user_id);
             $stmt->bindParam(':action', $action);

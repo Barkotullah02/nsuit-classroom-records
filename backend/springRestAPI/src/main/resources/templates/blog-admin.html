@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Manage Posts')}"></head>
+<style>
+    .admin-container { max-width:1200px; margin:0 auto; padding:20px; }
+    .posts-list { background:var(--card-bg); border-radius:12px; padding:25px; }
+    .post-item { display:flex; justify-content:space-between; align-items:center; padding:20px; border:1px solid rgba(255,255,255,0.1); border-radius:8px; margin-bottom:15px; transition:all 0.3s; }
+    .post-item:hover { box-shadow:0 2px 8px rgba(0,0,0,0.3); }
+    .post-info { flex:1; }
+    .post-info-title { font-size:18px; font-weight:600; margin-bottom:5px; }
+    .post-info-meta { font-size:13px; opacity:0.7; display:flex; gap:15px; flex-wrap:wrap; }
+    .post-actions { display:flex; gap:10px; }
+    .status-badge { padding:4px 10px; border-radius:12px; font-size:11px; font-weight:600; }
+    .status-published { background:#10b981; color:white; }
+    .status-draft { background:#6b7280; color:white; }
+    .editor-toolbar { display:flex; gap:5px; flex-wrap:wrap; padding:10px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-bottom:none; border-radius:8px 8px 0 0; }
+    .editor-btn { padding:6px 12px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1); border-radius:4px; cursor:pointer; font-size:14px; transition:all 0.2s; color:white; }
+    .editor-btn:hover { background:rgba(255,255,255,0.2); }
+    .editor-textarea { border-radius:0 0 8px 8px !important; }
+    .image-preview { margin-top:10px; max-width:100%; max-height:200px; border-radius:8px; display:none; }
+    .image-preview.show { display:block; }
+    .checkbox-group { display:flex; align-items:center; gap:10px; }
+    .checkbox-group input { width:auto; }
+</style>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+    <main class="main-content">
+        <div class="admin-container">
+            <div class="page-header">
+                <div>
+                    <h1><i class="fas fa-cog"></i> Manage Posts</h1>
+                    <p>Create, edit, and manage blog posts</p>
+                </div>
+                <button class="btn btn-primary" id="createPostBtn">
+                    <i class="fas fa-plus"></i> Create New Post
+                </button>
+            </div>
+            <div class="posts-list">
+                <div id="postsContainer">
+                    <div style="text-align:center;padding:40px;"><div class="spinner"></div></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Post Editor Modal -->
+<div class="modal-overlay" id="postModal">
+    <div class="modal" style="max-width:800px;width:90%;max-height:90vh;overflow-y:auto;">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modalTitle">Create New Post</h2>
+            <span class="btn-close" onclick="closePostModal()">&times;</span>
+        </div>
+        <div style="padding:0 1.5rem 1.5rem;">
+            <form id="postForm">
+                <input type="hidden" id="postId">
+                <div class="form-group">
+                    <label for="postTitle">Title *</label>
+                    <input type="text" id="postTitle" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="postCategory">Category *</label>
+                        <select id="postCategory" required><option value="">Select category...</option></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="postStatus">Status *</label>
+                        <select id="postStatus" required>
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="postExcerpt">Excerpt (Brief summary)</label>
+                    <div class="editor-toolbar">
+                        <button type="button" class="editor-btn" onclick="formatText('postExcerpt','bold')" title="Bold"><i class="fas fa-bold"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postExcerpt','italic')" title="Italic"><i class="fas fa-italic"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postExcerpt','underline')" title="Underline"><i class="fas fa-underline"></i></button>
+                    </div>
+                    <textarea id="postExcerpt" class="editor-textarea" rows="3" placeholder="Enter a brief summary..."></textarea>
+                    <small style="opacity:0.6;font-size:12px;">Tip: Select text and click buttons to format</small>
+                </div>
+                <div class="form-group">
+                    <label for="postContent">Content *</label>
+                    <div class="editor-toolbar">
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','bold')"><i class="fas fa-bold"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','italic')"><i class="fas fa-italic"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','underline')"><i class="fas fa-underline"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','h1')"><i class="fas fa-heading"></i> 1</button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','h2')"><i class="fas fa-heading"></i> 2</button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','h3')"><i class="fas fa-heading"></i> 3</button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','ul')"><i class="fas fa-list-ul"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','ol')"><i class="fas fa-list-ol"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','link')"><i class="fas fa-link"></i></button>
+                        <button type="button" class="editor-btn" onclick="formatText('postContent','quote')"><i class="fas fa-quote-right"></i></button>
+                    </div>
+                    <textarea id="postContent" class="editor-textarea" required placeholder="Write your post content here..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="postImage">Featured Image (Optional)</label>
+                    <input type="file" id="postImage" accept="image/*" onchange="previewImage(this)">
+                    <img id="imagePreview" class="image-preview" alt="Image preview">
+                    <input type="hidden" id="postImageData">
+                </div>
+                <div class="form-group checkbox-group">
+                    <input type="checkbox" id="postPinned">
+                    <label for="postPinned">Pin this post to the top</label>
+                </div>
+                <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:1rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closePostModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> <span id="submitBtnText">Create Post</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script src="/js/blog-admin.js"></script>
+</body>
+</html>

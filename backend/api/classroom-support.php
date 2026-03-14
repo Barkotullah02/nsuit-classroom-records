@@ -161,7 +161,7 @@ switch ($method) {
             }
 
             $user = $auth->getCurrentUser();
-            $isAdmin = $user['role'] === 'admin';
+            $isAdmin = in_array($user['role'], ['super_admin', 'admin']);
 
             // Check if user owns this record or is admin
             $check_query = "SELECT created_by FROM classroom_support_records WHERE support_id = :support_id";
@@ -228,7 +228,7 @@ switch ($method) {
             }
 
             $user = $auth->getCurrentUser();
-            $isAdmin = $user['role'] === 'admin';
+            $isAdmin = in_array($user['role'], ['super_admin', 'admin']);
 
             // Check ownership
             $check_query = "SELECT created_by FROM classroom_support_records WHERE support_id = :support_id";

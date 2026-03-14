@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Installations')}"></head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+
+    <main class="main-content">
+        <div class="content-header">
+            <h1><i class="fas fa-plug" style="color:var(--color-mid);margin-right:8px;"></i>Device Installations</h1>
+            <button class="btn btn-primary" id="addInstallationBtn">
+                <i class="fas fa-plus"></i> Install Device
+            </button>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Filters</h3>
+                <button class="btn btn-secondary btn-sm" id="clearFiltersBtn">Clear Filters</button>
+            </div>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filterRoom">Room</label>
+                    <select id="filterRoom">
+                        <option value="">All Rooms</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterStatus">Status</label>
+                    <select id="filterStatus">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="withdrawn">Withdrawn</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filterInstallationType">Installation Type</label>
+                    <select id="filterInstallationType">
+                        <option value="">All Types</option>
+                        <option value="NEW_INSTALLATION">New Installation</option>
+                        <option value="REPAIRED">Repaired</option>
+                        <option value="OLD_REINSTALL">Old Reinstall</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Installations Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Installation Records</h3>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Device ID (NSU ID)</th>
+                            <th>Type</th>
+                            <th>Brand/Model</th>
+                            <th>Room</th>
+                            <th>Installed Date</th>
+                            <th>Installation Type</th>
+                            <th>Team</th>
+                            <th>Days in Room</th>
+                            <th>Status</th>
+                            <th>Issue</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="installationsTableBody">
+                        <tr><td colspan="11" class="text-center"><div class="loading"><div class="spinner"></div></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Install Device Modal -->
+<div id="installModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-plug"></i> Install Device</h3>
+            <button class="modal-close" id="closeInstallModalBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="installForm">
+            <div class="form-group">
+                <label for="deviceSearch">Select Device *</label>
+                <input type="text" id="deviceSearch" class="form-control"
+                       placeholder="Type to search by NSU ID, type, or brand…"
+                       autocomplete="off" required>
+                <input type="hidden" id="deviceSelect" required>
+                <div id="deviceDropdown" style="position:relative;"></div>
+                <small class="text-muted">Start typing to search for available devices</small>
+            </div>
+            <div class="form-group">
+                <label for="roomSelect">Select Room *</label>
+                <div style="display:flex;gap:8px;">
+                    <select id="roomSelect" class="form-control" required style="flex:1;">
+                        <option value="">Choose a room…</option>
+                    </select>
+                    <button type="button" class="btn btn-secondary btn-sm" id="addRoomBtn" style="display:none;" title="Add new room">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="installedDate">Installation Date *</label>
+                <input type="date" id="installedDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="installationType">Installation Type</label>
+                <select id="installationType" class="form-control">
+                    <option value="NEW_INSTALLATION">New Installation</option>
+                    <option value="REPAIRED">Repaired Device</option>
+                    <option value="OLD_REINSTALL">Old Device Reinstall</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="installerName">Installer Name</label>
+                <input type="text" id="installerName" class="form-control" placeholder="Name of person who installed">
+            </div>
+            <div class="form-group">
+                <label for="installerId">Installer ID</label>
+                <input type="text" id="installerId" class="form-control" placeholder="Employee/Staff ID">
+            </div>
+            <div class="form-group">
+                <label for="teamMembers">Team Members</label>
+                <input type="text" id="teamMembers" class="form-control" placeholder="e.g., Arafat/Sabbir/Kayfan">
+                <small class="text-muted">Separate multiple names with / (slash)</small>
+            </div>
+            <div class="form-group">
+                <label for="gatePassNumber">Gate Pass Number</label>
+                <input type="text" id="gatePassNumber" class="form-control" placeholder="e.g., GP-2024-001">
+            </div>
+            <div class="form-group">
+                <label for="gatePassDate">Gate Pass Date</label>
+                <input type="date" id="gatePassDate" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="installationNotes">Installation Notes</label>
+                <textarea id="installationNotes" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelInstallBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-plug"></i> Install Device</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Withdraw Modal -->
+<div id="withdrawModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-arrow-down"></i> Withdraw Device</h3>
+            <button class="modal-close" id="closeWithdrawModalBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="withdrawForm">
+            <input type="hidden" id="withdrawInstallationId">
+            <div id="withdrawDeviceInfo" class="mb-3"></div>
+            <div class="form-group">
+                <label for="withdrawnDate">Withdrawal Date *</label>
+                <input type="date" id="withdrawnDate" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="withdrawerName">Withdrawer Name</label>
+                <input type="text" id="withdrawerName" class="form-control" placeholder="Name of person who withdrew">
+            </div>
+            <div class="form-group">
+                <label for="withdrawerId">Withdrawer ID</label>
+                <input type="text" id="withdrawerId" class="form-control" placeholder="Employee/Staff ID">
+            </div>
+            <div class="form-group">
+                <label for="issueAtWithdrawal">Issue Found</label>
+                <select id="issueAtWithdrawal" class="form-control">
+                    <option value="">No Issue</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="withdrawalStorage">Storage Location</label>
+                <select id="withdrawalStorage" class="form-control">
+                    <option value="">Not Stored</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="withdrawalNotes">Withdrawal Notes</label>
+                <textarea id="withdrawalNotes" class="form-control" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelWithdrawBtn">Cancel</button>
+                <button type="submit" class="btn btn-danger"><i class="fas fa-arrow-down"></i> Withdraw Device</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Update Dates Modal -->
+<div id="updateDatesModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-calendar-alt"></i> Update Installation Dates</h3>
+            <button class="modal-close" id="closeUpdateDatesModalBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="updateDatesForm">
+            <input type="hidden" id="updateDatesInstallationId">
+            <div id="updateDatesDeviceInfo" class="mb-3"></div>
+            <div class="form-group">
+                <label for="updateInstalledDate">Installation Date</label>
+                <input type="date" id="updateInstalledDate" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="updateWithdrawnDate">Withdrawal Date</label>
+                <input type="date" id="updateWithdrawnDate" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="updateGatePassDate">Gate Pass Date</label>
+                <input type="date" id="updateGatePassDate" class="form-control">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelUpdateDatesBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Dates</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Add Room Modal -->
+<div id="addRoomModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-door-open"></i> Add New Room</h3>
+            <button class="modal-close" id="closeAddRoomModalBtn"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="addRoomForm">
+            <div class="form-group">
+                <label for="newRoomNumber">Room Number *</label>
+                <input type="text" id="newRoomNumber" class="form-control" placeholder="e.g., 101, 202, A-305" required>
+            </div>
+            <div class="form-group">
+                <label for="newRoomName">Room Type *</label>
+                <select id="newRoomName" class="form-control" required>
+                    <option value="">Select Room Type</option>
+                    <option value="CLASSROOM">CLASSROOM</option>
+                    <option value="LAB">LAB</option>
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancelAddRoomBtn">Cancel</button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add Room</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="alert-container" style="position:fixed;bottom:24px;right:24px;z-index:999;min-width:280px;"></div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script th:src="@{/js/installations.js}"></script>
+</body>
+</html>

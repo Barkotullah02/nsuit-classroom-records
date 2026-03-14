@@ -80,10 +80,10 @@ if ($method === 'GET') {
         }
         
         // Validate role
-        $valid_roles = ['admin', 'staff', 'viewer'];
+        $valid_roles = ['super_admin', 'admin', 'staff', 'viewer'];
         $role = $data['role'] ?? 'viewer';
         if (!in_array($role, $valid_roles)) {
-            Response::error('Invalid role. Must be: admin, staff, or viewer');
+            Response::error('Invalid role. Must be: super_admin, admin, staff, or viewer');
         }
         
         // Check if username already exists
@@ -196,9 +196,9 @@ if ($method === 'GET') {
         }
         
         if (isset($data['role'])) {
-            $valid_roles = ['admin', 'staff', 'viewer'];
+            $valid_roles = ['super_admin', 'admin', 'staff', 'viewer'];
             if (!in_array($data['role'], $valid_roles)) {
-                Response::error('Invalid role. Must be: admin, staff, or viewer');
+                Response::error('Invalid role. Must be: super_admin, admin, staff, or viewer');
             }
             $updates[] = "role = :role";
             $params['role'] = $data['role'];

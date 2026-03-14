@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Import Data')}"></head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+    <main class="main-content">
+        <div class="page-header">
+            <h1><i class="fas fa-file-import"></i> Import Data from CSV</h1>
+            <p>Upload CSV files to bulk import devices, rooms, or other data</p>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <div class="card" style="margin-bottom:30px;">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-info-circle"></i> Instructions</h3>
+            </div>
+            <div style="padding:20px;">
+                <h4>CSV Format Requirements:</h4>
+                <ul style="line-height:2;">
+                    <li><strong>Devices CSV:</strong> Columns: <code>device_unique_id, type_name, brand_name, model, serial_number, purchase_date, warranty_period, notes</code></li>
+                    <li><strong>Rooms CSV:</strong> Columns: <code>room_number, room_name, building, floor, capacity</code></li>
+                    <li><strong>Installation History CSV:</strong> Columns: <code>device_unique_id, room_number, installation_date, installation_time, installer_name, installer_id, withdrawal_date, withdrawal_time, withdrawer_name, withdrawer_id, data_entry_by, status, notes</code></li>
+                    <li><strong>Gate Passes CSV:</strong> Columns: <code>gate_pass_number, device_unique_ids, pass_direction, gate_pass_date, gate_pass_time, department, gate_name, vendor_destination, bearer_name, bearer_company, bearer_contact_no, security_officer_name, security_officer_designation, security_officer_ext, processing_name, processing_designation, processing_ext, authorized_name, authorized_designation, authorized_ext</code></li>
+                    <li><strong>First row must be header row</strong> with column names</li>
+                    <li>Date format: YYYY-MM-DD (e.g., 2025-01-15)</li>
+                    <li>Time format: HH:MM (e.g., 14:30) - Leave empty if not applicable</li>
+                    <li>For Gate Passes: <code>device_unique_ids</code> can be comma-separated for multiple devices. <code>pass_direction</code> must be 'incoming' or 'outgoing'</li>
+                    <li>For Installation History: <code>status</code> should be 'active' or 'withdrawn'. Leave withdrawal fields empty for active installations</li>
+                    <li>File must be in CSV format (.csv extension)</li>
+                </ul>
+                <h4 style="margin-top:20px;">Download Sample Templates:</h4>
+                <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+                    <button class="btn btn-secondary" onclick="downloadDeviceTemplate()">
+                        <i class="fas fa-download"></i> Devices Template
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadRoomTemplate()">
+                        <i class="fas fa-download"></i> Rooms Template
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadInstallationTemplate()">
+                        <i class="fas fa-download"></i> Installation History Template
+                    </button>
+                    <button class="btn btn-secondary" onclick="downloadGatePassTemplate()">
+                        <i class="fas fa-download"></i> Gate Passes Template
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-upload"></i> Upload CSV File</h3>
+            </div>
+            <div style="padding:30px;">
+                <form id="importForm">
+                    <div class="form-group">
+                        <label for="importType">Import Type *</label>
+                        <select id="importType" required>
+                            <option value="">Select what you want to import...</option>
+                            <option value="devices">Devices (Basic Info)</option>
+                            <option value="rooms">Rooms</option>
+                            <option value="installations">Installation History</option>
+                            <option value="gate-passes">Gate Passes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="csvFile">CSV File *</label>
+                        <input type="file" id="csvFile" accept=".csv" required>
+                        <small>Select a CSV file to upload</small>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="skipDuplicates" checked>
+                            Skip duplicate entries (recommended)
+                        </label>
+                    </div>
+                    <div style="display:flex;gap:10px;margin-top:20px;">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-upload"></i> Upload and Import
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="window.location.reload()">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                </form>
+
+                <div id="importProgress" style="display:none;margin-top:30px;">
+                    <h4>Import Progress</h4>
+                    <div style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;">
+                        <div id="progressText">Processing...</div>
+                        <div style="margin-top:10px;background:rgba(255,255,255,0.1);height:30px;border-radius:5px;overflow:hidden;">
+                            <div id="progressBar" style="background:#28a745;height:100%;width:0%;transition:width 0.3s;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="importResults" style="display:none;margin-top:30px;">
+                    <h4>Import Results</h4>
+                    <div id="resultsContent" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script src="/js/import-data.js"></script>
+</body>
+</html>

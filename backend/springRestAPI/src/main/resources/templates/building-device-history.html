@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Building Device History')}"></head>
+<style>
+    .history-container { max-width:1400px; margin:0 auto; }
+    .filter-card { background:var(--card-bg); border-radius:10px; padding:1.5rem; margin-bottom:1.5rem; }
+    .filter-card h3 { margin:0 0 1rem; font-size:1.1rem; }
+    .filter-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(180px,1fr)); gap:1rem; align-items:end; }
+    .filter-group { display:flex; flex-direction:column; gap:0.4rem; }
+    .filter-group label { font-size:0.9rem; font-weight:500; }
+    .filter-group select, .filter-group input[type="date"] {
+        padding:0.5rem 0.75rem; border:1px solid rgba(255,255,255,0.2);
+        border-radius:6px; background:var(--input-bg,#1e3a5f); color:white; font-size:0.95rem;
+    }
+    .filter-actions { display:flex; gap:0.5rem; align-items:flex-end; }
+    .filter-info-bar { margin-top:0.75rem; font-size:0.9rem; color:var(--color-mid); min-height:1rem; }
+    .stats-strip { display:flex; gap:1rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+    .stat-chip { background:var(--card-bg); border-radius:8px; padding:0.75rem 1.25rem; flex:1; min-width:130px; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+    .stat-chip .stat-val { font-size:1.5rem; font-weight:700; color:var(--color-mid); }
+    .stat-chip .stat-lbl { font-size:0.8rem; opacity:0.75; }
+    .action-buttons { display:flex; gap:1rem; margin-bottom:1.5rem; }
+    .print-report-header { display:none; }
+    .no-data { text-align:center; padding:3rem; color:rgba(255,255,255,0.5); font-size:1.1rem; }
+    @media print {
+        .sidebar, .action-buttons, .filter-card, .btn { display:none !important; }
+        .print-report-header { display:block !important; text-align:center; margin-bottom:0.75rem; }
+        .main-content { margin:0 !important; padding:0.5rem !important; }
+    }
+</style>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+    <main class="main-content">
+        <div class="history-container">
+
+            <div class="page-header">
+                <h1><i class="fas fa-building"></i> Building Device History</h1>
+                <p>View and print device installation history for any building or floor.</p>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="window.location.href='/rooms'">
+                    <i class="fas fa-arrow-left"></i> Back to Rooms
+                </button>
+                <button class="btn btn-primary" onclick="printHistory()">
+                    <i class="fas fa-print"></i> Print History
+                </button>
+            </div>
+
+            <div class="filter-card">
+                <h3><i class="fas fa-filter"></i> Filters</h3>
+                <div class="filter-grid">
+                    <div class="filter-group">
+                        <label for="buildingFilter"><i class="fas fa-building"></i> Building <span style="color:red;">*</span></label>
+                        <select id="buildingFilter">
+                            <option value="">— Select Building —</option>
+                            <option value="NAC">NAC - North Academic</option>
+                            <option value="SAC">SAC - South Academic</option>
+                            <option value="NTR">NTR - North Tower</option>
+                            <option value="LIB">LIB - Library</option>
+                            <option value="LAB">LAB - Laboratory</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="floorFilter"><i class="fas fa-layer-group"></i> Floor <small style="opacity:0.6;">(optional)</small></label>
+                        <select id="floorFilter">
+                            <option value="">All Floors</option>
+                            <option value="0">Ground Floor (0)</option>
+                            <option value="2">2nd Floor</option>
+                            <option value="3">3rd Floor</option>
+                            <option value="4">4th Floor</option>
+                            <option value="5">5th Floor</option>
+                            <option value="6">6th Floor</option>
+                            <option value="7">7th Floor</option>
+                            <option value="8">8th Floor</option>
+                            <option value="9">9th Floor</option>
+                            <option value="1">10th Floor</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="statusFilter"><i class="fas fa-toggle-on"></i> Status</label>
+                        <select id="statusFilter">
+                            <option value="all">All (Active + Withdrawn)</option>
+                            <option value="active">Active Only</option>
+                            <option value="withdrawn">Withdrawn Only</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="dateFrom"><i class="fas fa-calendar"></i> From Date</label>
+                        <input type="date" id="dateFrom" />
+                    </div>
+                    <div class="filter-group">
+                        <label for="dateTo"><i class="fas fa-calendar-check"></i> To Date</label>
+                        <input type="date" id="dateTo" />
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-primary btn-sm" onclick="applyFilters()">
+                            <i class="fas fa-search"></i> Apply
+                        </button>
+                        <button class="btn btn-secondary btn-sm" id="clearBtn" onclick="clearFilters()" style="display:none;">
+                            <i class="fas fa-times"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                <div class="filter-info-bar" id="filterInfoBar"></div>
+            </div>
+
+            <div class="print-report-header" id="printReportHeader">
+                <h2>Building Device History Report</h2>
+                <div class="print-filter-note" id="printFilterNote"></div>
+            </div>
+
+            <div class="stats-strip" id="statsStrip" style="display:none;"></div>
+
+            <div id="resultsContainer">
+                <div class="no-data">
+                    <i class="fas fa-building" style="font-size:3rem;opacity:0.3;display:block;margin-bottom:1rem;"></i>
+                    <p>Select a building and click <strong>Apply</strong> to load history.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script src="/js/building-device-history.js"></script>
+</body>
+</html>

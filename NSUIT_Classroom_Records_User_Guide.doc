@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NSUIT Classroom Records - User Guide</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.35; color: #111; }
+    h1, h2, h3 { margin: 16px 0 8px; }
+    h1 { font-size: 22px; }
+    h2 { font-size: 18px; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    h3 { font-size: 15px; }
+    p { margin: 6px 0; }
+    ul { margin: 6px 0 10px 20px; }
+    li { margin: 3px 0; }
+    .muted { color: #555; }
+    .box { border: 1px solid #ddd; padding: 10px; margin: 10px 0; }
+    .role { font-weight: bold; }
+    table { width: 100%; border-collapse: collapse; margin: 8px 0 14px; }
+    th, td { border: 1px solid #ddd; padding: 6px 8px; vertical-align: top; }
+    th { background: #f5f5f5; }
+    .mono { font-family: Consolas, "Courier New", monospace; }
+    .req { font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<h1>NSUIT Classroom Records – User Guide</h1>
+<p class="muted">Scope: This guide documents how to use the system from login through all pages in the sidebar, including buttons and forms (based on the current frontend behavior).</p>
+
+<div class="box">
+  <h2>1) Getting Started</h2>
+  <h3>1.1 Open the system</h3>
+  <ul>
+    <li>Open the site root: it redirects to <span class="mono">frontend/login.html</span>.</li>
+  </ul>
+
+  <h3>1.2 Login</h3>
+  <ul>
+    <li>Go to <span class="mono">Login</span> page.</li>
+    <li>Fill the required fields: <span class="req">Username</span> and <span class="req">Password</span>.</li>
+    <li>Click <b>Login</b>.</li>
+    <li>On success, you are redirected to <b>Dashboard</b>.</li>
+  </ul>
+
+  <h3>1.3 Logout</h3>
+  <ul>
+    <li>Click <b>Logout</b> in the sidebar footer on any page.</li>
+    <li>You will be signed out and sent back to the login page.</li>
+  </ul>
+</div>
+
+<div class="box">
+  <h2>2) Roles & Permissions (What you can do)</h2>
+  <p>Roles control which buttons are visible and which actions are allowed.</p>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 18%">Role</th>
+        <th>Typical permissions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="role">Admin</td>
+        <td>
+          Full access (add/edit/delete), can restore deleted items, manage users, and manage blog posts.
+        </td>
+      </tr>
+      <tr>
+        <td class="role">Staff</td>
+        <td>
+          Can create/add many records, but may be restricted from editing/deleting in some modules.
+        </td>
+      </tr>
+      <tr>
+        <td class="role">Viewer</td>
+        <td>
+          Read-only access (view data and reports); cannot modify records.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p class="muted">Note: Some pages enforce role access by redirecting away if you are not allowed (for example, User Management and Deleted Items).</p>
+</div>
+
+<div class="box">
+  <h2>3) Sidebar Navigation (What each menu opens)</h2>
+  <ul>
+    <li><b>Dashboard</b>: summary statistics, quick links to other modules.</li>
+    <li><b>Devices</b>: device inventory, search/filter, add/edit (admin), QR code and history actions.</li>
+    <li><b>Installations</b>: install devices into rooms, withdraw devices, view installation history.</li>
+    <li><b>Gate Passes</b>: list, filter, print gate passes; create new gate pass.</li>
+    <li><b>Rooms</b>: room grid with filters; add/edit/delete room; view devices in a room; open room history report.</li>
+    <li><b>Blog & News</b>: read posts; reactions/comments; admins can create/manage posts.</li>
+    <li><b>Import Data</b>: upload CSV and import rooms/devices/installations/gate passes.</li>
+    <li><b>Deleted Items</b>: restore or permanently delete soft-deleted rooms/devices (admin-only).</li>
+    <li><b>User Management</b>: manage users (admin-only; only visible to admin).</li>
+  </ul>
+</div>
+
+<h2>4) Dashboard</h2>
+<ul>
+  <li>Shows overall counts/stat cards and recent activities.</li>
+  <li>Some cards act as shortcuts to filtered views (for example, opening Devices with a pre-selected filter via stored page state).</li>
+  <li>Use Dashboard to quickly confirm system status and navigate to common actions.</li>
+</ul>
+
+<h2>5) Devices</h2>
+<h3>5.1 Purpose</h3>
+<p>Manage the full device inventory (projectors, PCs, etc.) and perform device-level actions like history, QR, and gate pass creation.</p>
+
+<h3>5.2 Filters and search</h3>
+<ul>
+  <li>Use the top filters (device ID, type, brand, status, room, search) to narrow down the list.</li>
+  <li>Use <b>Clear Filters</b> to reset to the full list.</li>
+</ul>
+
+<h3>5.3 Add Device (Admin)</h3>
+<ul>
+  <li>Click <b>Add Device</b> to open the device form modal.</li>
+  <li>Fill required fields (marked with * in the UI), typically including:
+    <ul>
+      <li><span class="req">Device Unique ID</span></li>
+      <li><span class="req">Type</span> and <span class="req">Brand</span></li>
+      <li>Optional: Model, Serial Number, Purchase Date, Warranty Period, Notes</li>
+    </ul>
+  </li>
+  <li>Click <b>Save</b> to create the device.</li>
+</ul>
+
+<h3>5.4 Edit / Delete Device (Admin)</h3>
+<ul>
+  <li>Use the action buttons on each row/card:</li>
+  <li><b>Edit</b>: opens the device modal populated with existing values; click <b>Save</b>.</li>
+  <li><b>Delete</b>: moves the device to Deleted Items (soft delete) where it can be restored later (admin).</li>
+</ul>
+
+<h3>5.5 QR Code (Device action)</h3>
+<ul>
+  <li>Click <b>QR</b> (or QR icon) for a device to generate/show a QR code.</li>
+  <li>The QR typically encodes a device payload; scanning it can open the QR view page (see section 12).</li>
+</ul>
+
+<h3>5.6 Device History (Device action)</h3>
+<ul>
+  <li>Click <b>History</b> to open the detailed device history report page.</li>
+  <li>On the history page you can print the report.</li>
+</ul>
+
+<h3>5.7 Create Gate Pass (Device action)</h3>
+<ul>
+  <li>Click the gate pass action for a device to open <b>Create Gate Pass</b> with the device pre-selected (when supported).</li>
+</ul>
+
+<h2>6) Installations</h2>
+<h3>6.1 Purpose</h3>
+<p>Track which devices are installed in which rooms and manage withdrawal when devices are removed.</p>
+
+<h3>6.2 Filters</h3>
+<ul>
+  <li>Filter by room, status (Active/Withdrawn), and device type.</li>
+  <li>Use search to quickly find a device/room/record.</li>
+</ul>
+
+<h3>6.3 Install a Device</h3>
+<ul>
+  <li>Click <b>Install Device</b> to open the installation modal.</li>
+  <li>Required fields usually include:
+    <ul>
+      <li><span class="req">Device</span> (selected via autocomplete / dropdown)</li>
+      <li><span class="req">Room</span></li>
+      <li><span class="req">Installed Date</span></li>
+    </ul>
+  </li>
+  <li>Click <b>Install</b> to save.</li>
+  <li>After successful install, the device will appear as installed in the selected room.</li>
+</ul>
+
+<h3>6.4 Withdraw a Device</h3>
+<ul>
+  <li>Find an active installation record.</li>
+  <li>Click <b>Withdraw</b> to open the withdrawal modal.</li>
+  <li>Required fields usually include:
+    <ul>
+      <li><span class="req">Withdrawn Date</span></li>
+      <li>Optional notes/reason depending on the UI</li>
+    </ul>
+  </li>
+  <li>Click <b>Confirm Withdraw</b> to complete withdrawal.</li>
+</ul>
+
+<h3>6.5 View Gate Pass (Installation action)</h3>
+<ul>
+  <li>Some installation rows provide a <b>View Gate Pass</b> action that opens a printable gate pass window for that record.</li>
+  <li>If the popup is blocked, allow popups for the site.</li>
+  <li class="muted">Note: There are two different gate-pass print pages in the project. Most gate-pass printing is via <span class="mono">gate-pass-standalone.html</span>.</li>
+</ul>
+
+<h2>7) Gate Passes</h2>
+<h3>7.1 Purpose</h3>
+<p>Create, list, and print “Material Gate Pass” documents for one or multiple devices.</p>
+
+<h3>7.2 Gate Pass list</h3>
+<ul>
+  <li>Use the date filters (From / To) and search to find gate passes.</li>
+  <li>Each row typically provides actions like <b>View</b> and <b>Print</b> (opens a new window).</li>
+  <li>Admin may also see <b>Delete</b> on gate passes.</li>
+</ul>
+
+<h3>7.3 Create Gate Pass</h3>
+<ul>
+  <li>Click <b>Create Gate Pass</b> to open the creation page.</li>
+  <li>Steps:
+    <ul>
+      <li>Select devices and click <b>Add</b> to include them in the pass list (must add at least one device).</li>
+      <li>Select exactly one direction: <span class="req">Incoming</span> or <span class="req">Outgoing</span>.</li>
+      <li>Fill required fields (commonly): Department, Gate, Vendor/Destination, bearer details, security/processing/authorized fields.</li>
+      <li>A 6-digit gate pass number is auto-generated.</li>
+      <li>Click <b>Create</b> to save.</li>
+    </ul>
+  </li>
+  <li>After creation, the system offers to open/print the gate pass in a new window.</li>
+</ul>
+
+<h3>7.4 Printing a gate pass</h3>
+<ul>
+  <li>Gate pass print view opens in a new window.</li>
+  <li>Use the <b>Print</b> button, then choose your printer.</li>
+  <li>The layout is optimized for A4.</li>
+</ul>
+
+<h2>8) Rooms</h2>
+<h3>8.1 Purpose</h3>
+<p>Manage rooms, view installed devices per room, and open full room history reports.</p>
+
+<h3>8.2 Filters</h3>
+<ul>
+  <li><b>Building</b> dropdown: NAC, SAC, NTR, LIB, LAB (or All).</li>
+  <li><b>Floor</b> dropdown: Ground (0) to 9.</li>
+  <li><b>Search</b>: room number or room name.</li>
+  <li><b>Clear Filters</b> resets all filters.</li>
+</ul>
+
+<h3>8.3 Room cards and actions</h3>
+<ul>
+  <li>Each room card shows room number/name, building, floor, capacity, device count.</li>
+  <li>Buttons on each room card:</li>
+  <ul>
+    <li><b>History</b>: opens the room history report page (<span class="mono">room-history.html</span>) for that room.</li>
+    <li><b>Devices</b>: opens a modal listing active devices and recently withdrawn devices for that room.</li>
+    <li><b>Edit</b>: opens the edit modal to update room fields.</li>
+    <li><b>Delete</b>: soft-deletes the room (moves it to Deleted Items).</li>
+  </ul>
+</ul>
+
+<h3>8.4 Add Room</h3>
+<ul>
+  <li>Click <b>Add Room</b>.</li>
+  <li>Required: <span class="req">Room Number</span>, <span class="req">Room Name</span>.</li>
+  <li>Optional: Building, Floor, Capacity.</li>
+  <li>Click <b>Save</b>.</li>
+</ul>
+
+<h3>8.5 Room Devices modal</h3>
+<ul>
+  <li>Shows <b>Active Devices</b> table and <b>Recently Withdrawn Devices</b> table.</li>
+  <li>Each device row provides a <b>History</b> button to open the device history modal (quick history list).</li>
+</ul>
+
+<h2>9) Room History Report</h2>
+<ul>
+  <li>Opened from Rooms → <b>History</b>.</li>
+  <li>Contains:
+    <ul>
+      <li>Room header details (room number/name, building, floor, capacity)</li>
+      <li>Currently installed devices section</li>
+      <li>Previously withdrawn devices section</li>
+      <li>Complete history table (sortable by most recent install)</li>
+    </ul>
+  </li>
+  <li>Buttons:
+    <ul>
+      <li><b>Back to Rooms</b></li>
+      <li><b>Print History</b></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>10) Device History Report</h2>
+<ul>
+  <li>Opened from Devices → <b>History</b>.</li>
+  <li>Shows device details (ID, type, brand, model, serial, purchase date, warranty, active/inactive status, current room, lifetime).</li>
+  <li>Shows installation history table (room, installed date, withdrawn date, days, status, installed/withdrawn by).</li>
+  <li>Shows summary statistics (total installations, total days used, rooms used, average days per room).</li>
+  <li>Buttons:
+    <ul>
+      <li><b>Back to Devices</b></li>
+      <li><b>Print History</b></li>
+    </ul>
+  </li>
+</ul>
+
+<h2>11) Classroom Support</h2>
+<h3>11.1 Purpose</h3>
+<p>Log and track classroom support incidents and manage support team members (admin-only).</p>
+
+<h3>11.2 Filters</h3>
+<ul>
+  <li><b>Member</b>: filter by assigned support team member.</li>
+  <li><b>Date From / Date To</b>: filter by support datetime range.</li>
+  <li><b>Status</b>: Pending / In Progress / Completed / Cancelled.</li>
+  <li><b>Issue Type</b>: Technical / Maintenance / Setup / Other (based on dropdown values).</li>
+</ul>
+
+<h3>11.3 Support Records table actions</h3>
+<ul>
+  <li><b>View</b> (eye icon): opens a details modal with full record information.</li>
+  <li><b>Edit</b> (pencil icon): available for admins, and for the user who created the record.</li>
+  <li><b>Delete</b> (trash icon): available for admins, and for the user who created the record.</li>
+</ul>
+
+<h3>11.4 New Support Record</h3>
+<ul>
+  <li>Click <b>New Support Record</b> (button on the page).</li>
+  <li>Required fields typically include:
+    <ul>
+      <li><span class="req">Team Member</span></li>
+      <li><span class="req">Date</span> and <span class="req">Time</span></li>
+      <li><span class="req">Location</span></li>
+      <li><span class="req">Description</span></li>
+      <li><span class="req">Issue Type</span>, <span class="req">Priority</span>, <span class="req">Status</span></li>
+    </ul>
+  </li>
+  <li>Optional fields: Room, Duration (minutes), Faculty name, Devices involved, Notes.</li>
+  <li>Click <b>Save</b> to create the record.</li>
+</ul>
+
+<h3>11.5 Support Team Members (Admin only)</h3>
+<ul>
+  <li>Admins see the Team Members section.</li>
+  <li>Add/edit team members using the Team Member form.</li>
+  <li>Team member list actions:
+    <ul>
+      <li><b>Edit</b>: populates the form and scrolls to it.</li>
+      <li><b>Delete</b>: removes a member (may fail if support records exist for that member).</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>12) QR View (Device info via QR)</h2>
+<ul>
+  <li>Opening <span class="mono">qr-view.html</span> with a valid <span class="mono">data=</span> parameter shows device details and history.</li>
+  <li>This is typically used by scanning a QR code generated from the Devices module.</li>
+</ul>
+
+<h2>13) Blog & News</h2>
+<h3>13.1 Blog list</h3>
+<ul>
+  <li>Use search and category list to find posts.</li>
+  <li>Click a post title/card to open the full post page.</li>
+</ul>
+
+<h3>13.2 Post page</h3>
+<ul>
+  <li>Read the post content.</li>
+  <li>Use reaction buttons (like/celebrate/etc.) and comments area (when enabled) to interact.</li>
+  <li>Admins may see extra actions like edit/delete (depending on the page implementation).</li>
+</ul>
+
+<h3>13.3 Blog Admin (Admin only)</h3>
+<ul>
+  <li>Admins can open Blog Admin to create/edit posts.</li>
+  <li>The post editor includes a formatting toolbar and image upload (stored in the post payload).</li>
+</ul>
+
+<h2>14) Import Data</h2>
+<h3>14.1 Purpose</h3>
+<p>Bulk import data from CSV templates.</p>
+
+<h3>14.2 Download templates</h3>
+<ul>
+  <li>Choose a data type (Devices, Rooms, Installations, Gate Passes).</li>
+  <li>Click the related <b>Download Template</b> button to get the CSV format.</li>
+</ul>
+
+<h3>14.3 Import CSV</h3>
+<ul>
+  <li>Select the import type.</li>
+  <li>Choose a CSV file.</li>
+  <li>Optional: enable <b>Skip duplicates</b> when supported.</li>
+  <li>Click <b>Import</b> and wait for the results summary.</li>
+  <li class="muted">Note: During device import, the system can auto-create missing brand/type metadata.</li>
+</ul>
+
+<h2>15) Deleted Items (Admin only)</h2>
+<ul>
+  <li>Contains separate views for deleted devices and deleted rooms.</li>
+  <li>Actions:
+    <ul>
+      <li><b>Restore</b>: brings the item back to active lists.</li>
+      <li><b>Delete Permanently</b>: removes the item permanently (cannot be undone).</li>
+    </ul>
+  </li>
+</ul>
+
+<h2>16) User Management (Admin only)</h2>
+<h3>16.1 Purpose</h3>
+<p>Create, edit, and deactivate user accounts and assign roles.</p>
+
+<h3>16.2 View Users</h3>
+<ul>
+  <li>The users list shows full name, username, email, role badge, and created date.</li>
+  <li>Inactive users are visually dimmed.</li>
+</ul>
+
+<h3>16.3 Add User</h3>
+<ul>
+  <li>Click <b>Add User</b>.</li>
+  <li>Required fields: <span class="req">Username</span>, <span class="req">Full Name</span>, <span class="req">Email</span>, <span class="req">Role</span>, <span class="req">Password</span>, <span class="req">Confirm Password</span>.</li>
+  <li>Password must be at least 6 characters and must match confirmation.</li>
+  <li>Click <b>Save User</b>.</li>
+</ul>
+
+<h3>16.4 Edit User</h3>
+<ul>
+  <li>Click <b>Edit</b> on a user card.</li>
+  <li>You can change username/full name/email/role/active status.</li>
+  <li>Password is optional on edit: fill it only if you want to change the user’s password.</li>
+  <li>Click <b>Save User</b>.</li>
+</ul>
+
+<h3>16.5 Deactivate User</h3>
+<ul>
+  <li>Click <b>Deactivate</b> to disable a user account.</li>
+  <li>Confirm the modal; the user will no longer be able to login.</li>
+</ul>
+
+<div class="box">
+  <h2>17) Troubleshooting</h2>
+  <ul>
+    <li><b>“Authentication required”</b>: you are logged out or your token expired. Login again.</li>
+    <li><b>Page not loading / stuck spinner</b>: check backend API availability and database connection.</li>
+    <li><b>Popups blocked (gate pass print)</b>: allow popups for the site.</li>
+    <li><b>Cannot see admin menus</b>: verify your account role is Admin.</li>
+  </ul>
+</div>
+
+<p class="muted">Document generated for this codebase’s current UI behavior.</p>
+
+</body>
+</html>

@@ -46,37 +46,7 @@
 <body>
     <div class="container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><img src="images/bot.png" alt="Logo" style="height: 50px; vertical-align: middle; margin-right: 8px;"> Classroom</h2>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="dashboard.html">
-                    <i class="fas fa-dashboard"></i> Dashboard
-                </a>
-                <a href="devices.html" class="active">
-                    <i class="fas fa-laptop"></i> Devices
-                </a>
-                <a href="installations.html">
-                    <i class="fas fa-exchange-alt"></i> Installations
-                </a>
-                <a href="rooms.html">
-                    <i class="fas fa-door-open"></i> Rooms
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <i class="fas fa-user-circle"></i>
-                    <div>
-                        <div id="userName" class="user-name">Loading...</div>
-                        <div id="userRole" class="user-role"></div>
-                    </div>
-                </div>
-                <button class="btn btn-secondary btn-sm" onclick="Utils.logout()">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </aside>
+        <aside class="sidebar" id="mainSidebar"></aside>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -164,6 +134,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/sidebar.js"></script>
     <script src="js/device-history.js"></script>
 </body>
 </html>

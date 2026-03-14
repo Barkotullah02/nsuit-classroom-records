@@ -53,7 +53,7 @@ if ($method === 'GET') {
 } elseif ($method === 'POST') {
     // Admin only
     $user = $auth->getCurrentUser();
-    if ($user['role'] !== 'admin') {
+    if (!in_array($user['role'], ['super_admin', 'admin'])) {
         Response::error('Unauthorized. Admin access required.', 403);
     }
 

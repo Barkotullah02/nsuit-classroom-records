@@ -4,6 +4,10 @@
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
+    if (!Utils.checkAuth()) {
+        return;
+    }
+
     await loadDashboardData();
 
     // Auto-refresh every 60 seconds
@@ -58,10 +62,10 @@ async function loadGatePassesCount() {
  */
 function updateStats(data) {
     document.getElementById('totalDevices').textContent = data.total_devices || 0;
-    document.getElementById('activeInstallations').textContent = data.active_installations || 0;
+    document.getElementById('labRooms').textContent = data.lab_rooms || 0;
     document.getElementById('withdrawnDevices').textContent = data.withdrawn_devices || 0;
     document.getElementById('availableDevices').textContent = data.available_devices || 0;
-    document.getElementById('totalRooms').textContent = data.total_rooms || 0;
+    document.getElementById('totalRooms').textContent = data.classroom_rooms || 0;
 }
 
 /**

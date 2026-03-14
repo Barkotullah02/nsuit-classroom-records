@@ -810,6 +810,12 @@ body::after {
     overflow-x: auto;
     border-radius: 16px;
     border: 1px solid var(--card-border);
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+}
+.table-container.is-dragging {
+    cursor: grabbing;
 }
 
 table {

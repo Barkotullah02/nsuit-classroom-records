@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Login')}"></head>
+<body>
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <h1>
+                <img th:src="@{/images/bot.png}" alt="Logo"
+                     onerror="this.style.display='none'"
+                     style="height:40px;width:40px;border-radius:8px;vertical-align:middle;">
+                NSUIT AssetBeacon
+            </h1>
+            <p>Sign in to manage classroom equipment</p>
+        </div>
+
+        <div id="alert-container"></div>
+
+        <form id="loginForm" autocomplete="off">
+            <div class="form-group">
+                <label for="username"><i class="fas fa-user"></i> Username</label>
+                <input type="text" id="username" class="form-control"
+                       placeholder="Enter username" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password"><i class="fas fa-lock"></i> Password</label>
+                <input type="password" id="password" class="form-control"
+                       placeholder="Enter password" required autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px;">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+        </form>
+
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--glass-border);text-align:center;">
+            <p class="text-muted text-small">
+                <strong style="color:var(--text-secondary);">Demo Credentials</strong><br>
+                Admin: <code>admin</code> / <code>admin123</code><br>
+                Viewer: <code>viewer</code> / <code>admin123</code>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/scripts :: login-scripts}"></div>
+</body>
+</html>

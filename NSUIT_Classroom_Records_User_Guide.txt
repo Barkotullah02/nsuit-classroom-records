@@ -1,0 +1,103 @@
+NSUIT Classroom Records – User Guide
+
+How to open:
+- Open the project root. It redirects to frontend/login.html.
+
+Login:
+- Required: Username, Password
+- Click Login → goes to Dashboard
+
+Logout:
+- Use the Logout button in the sidebar footer.
+
+Roles:
+- Admin: full access, can delete/restore, manage users, manage blog posts
+- Staff: can add records; editing/deleting may be restricted
+- Viewer: read-only
+
+Sidebar pages:
+- Dashboard: system summary + quick navigation
+- Devices: inventory + QR + history + (admin) add/edit/delete
+- Installations: install/withdraw devices into rooms
+- Gate Passes: list/filter/print gate passes; create gate pass
+- Rooms: room grid + filters; view devices/history; add/edit/delete room
+- Blog & News: posts + reactions/comments; (admin) manage posts
+- Import Data: CSV templates + import
+- Deleted Items: restore/permanent delete (admin only)
+- User Management: manage accounts/roles (admin only)
+
+Dashboard:
+- View total counts/stats and recent activity.
+
+Devices:
+- Use filters to search devices.
+- Actions per device (varies by role):
+  - QR Code: generate/view QR
+  - History: open device-history.html?id=...
+  - Gate Pass: open create-gate-pass.html (device may be preselected)
+  - (Admin) Add/Edit/Delete device
+
+Device History report (device-history.html):
+- Shows device details + installation history + usage statistics.
+- Buttons: Back to Devices, Print History.
+
+Installations:
+- Install Device:
+  - Required: Device, Room, Installed Date
+- Withdraw:
+  - Required: Withdrawn Date
+- View Gate Pass:
+  - Opens a print window (popup may be blocked by browser settings).
+
+Gate Passes:
+- Filter by date range and search.
+- Create Gate Pass:
+  - Add 1+ devices
+  - Select exactly one direction: incoming OR outgoing
+  - Fill required fields like Department, Gate, Vendor/Destination, bearer/security/processing/authorized details
+  - Create → you can open/print
+- Print opens gate-pass-standalone.html?id=...
+
+Rooms:
+- Filters:
+  - Building: NAC/SAC/NTR/LIB/LAB
+  - Floor: 0-9
+  - Search: room number/name
+- Room card actions:
+  - History: room-history.html?room_id=...
+  - Devices: shows active devices and recently withdrawn devices
+  - Edit / Delete (delete is soft-delete to Deleted Items)
+
+Room History report (room-history.html):
+- Shows active devices, withdrawn devices, and full installation history table.
+- Buttons: Back to Rooms, Print History.
+
+Classroom Support:
+- Filters by member/date/status/issue type.
+- Records table actions:
+  - View: details popup
+  - Edit/Delete: admin or record creator
+- New Support Record:
+  - Required: team member, date/time, location, description, issue type, priority, status
+  - Optional: room, duration, faculty, devices, notes
+- Team Members (admin only): add/edit/delete members.
+
+Import Data:
+- Download templates, then upload CSV.
+- Skip duplicates option may be available.
+
+Deleted Items (admin only):
+- Restore or permanently delete deleted rooms/devices.
+
+User Management (admin only):
+- Add User:
+  - Required: username, full name, email, role, password+confirm (min 6 chars)
+- Edit User:
+  - Password optional; fill only to change password
+- Deactivate:
+  - Disables login for that account
+
+Troubleshooting:
+- “Authentication required”: login again.
+- Gate pass won’t open: allow popups.
+- Stuck spinners: check backend/api and database.

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     currentUser = Utils.getCurrentUser();
     
     // Check if user is admin
-    if (!currentUser || currentUser.role !== 'admin') {
+        if (!currentUser || !['super_admin', 'admin'].includes(currentUser.role)) {
         showNotification('Access denied. Admin only.', 'error');
         setTimeout(() => window.location.href = 'blog.html', 2000);
         return;

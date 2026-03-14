@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Deleted Items')}"></head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <h1><i class="fas fa-trash-restore"></i> Deleted Items</h1>
+                <p class="page-subtitle">Restore or permanently delete items</p>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'devices')">
+                <i class="fas fa-desktop"></i> Deleted Devices
+            </button>
+            <button class="tab-btn" onclick="switchTab(event, 'rooms')">
+                <i class="fas fa-door-open"></i> Deleted Rooms
+            </button>
+        </div>
+
+        <div id="devicesTab" class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-desktop"></i> Deleted Devices</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Type</th>
+                                <th>Brand</th>
+                                <th>Model</th>
+                                <th>Serial Number</th>
+                                <th>Deleted By</th>
+                                <th>Deleted At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deletedDevicesTableBody">
+                            <tr><td colspan="8" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="roomsTab" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-door-open"></i> Deleted Rooms</h2>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Room Number</th>
+                                <th>Room Name</th>
+                                <th>Building</th>
+                                <th>Floor</th>
+                                <th>Capacity</th>
+                                <th>Deleted At</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deletedRoomsTableBody">
+                            <tr><td colspan="7" class="text-center">Loading...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Restore Modal -->
+<div id="restoreModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-trash-restore"></i> Restore Item</h3>
+            <button class="btn-close" onclick="closeRestoreModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to restore this <span id="restoreType"></span>?</p>
+            <p><strong id="restoreItemName"></strong></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeRestoreModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmRestore()">
+                <i class="fas fa-trash-restore"></i> Restore
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Permanent Delete Modal -->
+<div id="permanentDeleteModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle"></i> Permanent Delete</h3>
+            <button class="btn-close" onclick="closePermanentDeleteModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p style="color:#ef4444;"><strong>Warning:</strong> This action cannot be undone!</p>
+            <p>Are you sure you want to permanently delete this <span id="deleteType"></span>?</p>
+            <p><strong id="deleteItemName"></strong></p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closePermanentDeleteModal()">Cancel</button>
+            <button class="btn btn-danger" onclick="confirmPermanentDelete()">
+                <i class="fas fa-trash"></i> Delete Permanently
+            </button>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script src="/js/deleted-items.js"></script>
+</body>
+</html>

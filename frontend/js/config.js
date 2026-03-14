@@ -4,7 +4,7 @@
  */
 
 const CONFIG = {
-    API_BASE_URL: 'http://localhost/nsuit-classroom-records/backend/api',
+    API_BASE_URL: 'http://10.100.6.191/nsuit-classroom-records/backend/api',
     
     // API Endpoints
     ENDPOINTS: {
@@ -14,6 +14,7 @@ const CONFIG = {
         DEVICE_HISTORY: '/device-history.php',
         ROOMS: '/rooms.php',
         ROOM_HISTORY: '/room-history.php',
+        BUILDING_DEVICE_HISTORY: '/building-device-history.php',
         METADATA: '/metadata.php',
         DASHBOARD: '/dashboard.php',
         GATE_PASSES: '/gate-passes.php',
@@ -24,11 +25,13 @@ const CONFIG = {
         BLOG_CATEGORIES: '/blog-categories.php',
         SUPPORT_TEAM: '/support-team.php',
         CLASSROOM_SUPPORT: '/classroom-support.php',
-        USERS: '/users.php'
+        USERS: '/users.php',
+        INVALID_INSTALLATION_DATES: '/invalid-installation-dates.php'
     },
 
     // User roles
     ROLES: {
+        SUPER_ADMIN: 'super_admin',
         ADMIN: 'admin',
         STAFF: 'staff',
         VIEWER: 'viewer'

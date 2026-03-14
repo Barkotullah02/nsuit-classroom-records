@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 function setupEventListeners() {
     // Logout
-    document.getElementById('logoutBtn').addEventListener('click', Utils.logout);
+    document.getElementById('logoutBtn').addEventListener('click', () => Utils.logout());
 
     // Filters
     document.getElementById('filterDateFrom').addEventListener('change', applyFilters);

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Building Device History - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .history-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .page-header h1 {
+            margin: 0 0 0.4rem 0;
+            font-size: 1.9rem;
+        }
+
+        .page-header p {
+            margin: 0;
+            opacity: 0.85;
+            font-size: 0.95rem;
+        }
+
+        /* ── Filter card ── */
+        .filter-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .filter-card h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            color: #555;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 0.3rem;
+        }
+
+        .filter-group select,
+        .filter-group input[type="date"] {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 0.95rem;
+            color: #333;
+            background: white;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .filter-info-bar {
+            margin-top: 0.85rem;
+            padding: 0.5rem 0.75rem;
+            background: #f0f4ff;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            font-size: 0.9rem;
+            color: #444;
+            display: none;
+        }
+
+        /* ── Stats strip ── */
+        .stats-strip {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-chip {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.95rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .stat-chip .stat-val {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .stat-chip .stat-label {
+            color: #777;
+            font-size: 0.85rem;
+        }
+
+        /* ── Table ── */
+        .history-table {
+            background: white;
+            border-radius: 8px;
+            overflow-x: auto;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .history-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .history-table thead {
+            background: #f9faff;
+            color: rgb(0, 0, 0);
+        }
+
+        .history-table th {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .history-table td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #f0f0f0;
+            color: #333;
+            vertical-align: middle;
+        }
+
+        .history-table tbody tr:hover {
+            background: #f8f8ff;
+        }
+
+        .history-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.2rem 0.65rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .status-badge.active {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-badge.withdrawn {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 3rem;
+            color: #999;
+        }
+
+        .no-data i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.4;
+        }
+
+        /* ── Print-only note ── */
+        .print-filter-note {
+            display: none;
+            text-align: center;
+            color: #555;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            font-style: italic;
+            padding: 0.5rem;
+            border-bottom: 1px solid #ccc;
+        }
+
+        /* ── Print-only full header (replaces body::before) ── */
+        .print-report-header {
+            display: none;
+        }
+
+        /* ── Spinner ── */
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+
+        @keyframes spin {
+            0%   { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* ── Print styles ── */
+        @media print {
+            .sidebar,
+            .action-buttons,
+            .filter-card,
+            .btn {
+                display: none !important;
+            }
+
+            .main-content {
+                margin: 0 !important;
+                padding: 0.5rem !important;
+            }
+
+            /* Show print-only elements */
+            .print-report-header {
+                display: block !important;
+                text-align: center;
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 2px solid #333;
+            }
+
+            .print-report-header h2 {
+                font-size: 20px;
+                font-weight: bold;
+                margin: 0 0 0.25rem 0;
+            }
+
+            .print-report-header .print-filter-note {
+                display: block !important;
+                border-bottom: none;
+                margin-bottom: 0;
+                padding: 0;
+            }
+
+            /* Stats strip — shown in print as a compact row */
+            .stats-strip {
+                flex-wrap: nowrap !important;
+                gap: 0.5rem !important;
+                margin-bottom: 0.75rem !important;
+            }
+
+            .stat-chip {
+                box-shadow: none !important;
+                border: 1px solid #ccc !important;
+                padding: 0.4rem 0.75rem !important;
+                flex: 1;
+            }
+
+            .stat-chip .stat-val {
+                font-size: 1.1rem !important;
+            }
+
+            /* Table */
+            .history-table {
+                border: none;
+                box-shadow: none;
+            }
+
+            .history-table thead {
+                background: #667eea !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .history-table tbody tr {
+                page-break-inside: avoid;
+            }
+
+            /* Status badge colours in print */
+            .status-badge {
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            @page {
+                margin: 1cm;
+                @bottom-right {
+                    content: "Page " counter(page) " of " counter(pages);
+                }
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="mainSidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="history-container">
+
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1><i class="fas fa-building"></i> Building Device History</h1>
+                    <p>View and print device installation history for any building or floor.</p>
+                </div>
+
+                <!-- Action Bar -->
+                <div class="action-buttons">
+                    <button class="btn btn-secondary" onclick="window.location.href='rooms.html'">
+                        <i class="fas fa-arrow-left"></i> Back to Rooms
+                    </button>
+                    <button class="btn btn-primary" onclick="printHistory()">
+                        <i class="fas fa-print"></i> Print History
+                    </button>
+                </div>
+
+                <!-- Filter Card -->
+                <div class="filter-card">
+                    <h3><i class="fas fa-filter"></i> Filters</h3>
+                    <div class="filter-grid">
+
+                        <div class="filter-group">
+                            <label for="buildingFilter"><i class="fas fa-building"></i> Building <span style="color:red;">*</span></label>
+                            <select id="buildingFilter">
+                                <option value="">— Select Building —</option>
+                                <option value="NAC">NAC - North Academic</option>
+                                <option value="SAC">SAC - South Academic</option>
+                                <option value="NTR">NTR - North Tower</option>
+                                <option value="LIB">LIB - Library</option>
+                                <option value="LAB">LAB - Laboratory</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="floorFilter"><i class="fas fa-layer-group"></i> Floor <span style="color:#aaa; font-size:0.8rem;">(optional)</span></label>
+                            <select id="floorFilter">
+                                <option value="">All Floors</option>
+                                <option value="0">Ground Floor (0)</option>
+                                <option value="2">2nd Floor</option>
+                                <option value="3">3rd Floor</option>
+                                <option value="4">4th Floor</option>
+                                <option value="5">5th Floor</option>
+                                <option value="6">6th Floor</option>
+                                <option value="7">7th Floor</option>
+                                <option value="8">8th Floor</option>
+                                <option value="9">9th Floor</option>
+                                <option value="1">10th Floor</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="statusFilter"><i class="fas fa-toggle-on"></i> Status</label>
+                            <select id="statusFilter">
+                                <option value="all">All (Active + Withdrawn)</option>
+                                <option value="active">Active Only</option>
+                                <option value="withdrawn">Withdrawn Only</option>
+                            </select>
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="dateFrom"><i class="fas fa-calendar"></i> From Date</label>
+                            <input type="date" id="dateFrom" />
+                        </div>
+
+                        <div class="filter-group">
+                            <label for="dateTo"><i class="fas fa-calendar-check"></i> To Date</label>
+                            <input type="date" id="dateTo" />
+                        </div>
+
+                        <div class="filter-actions">
+                            <button class="btn btn-primary btn-sm" onclick="applyFilters()">
+                                <i class="fas fa-search"></i> Apply
+                            </button>
+                            <button class="btn btn-secondary btn-sm" id="clearBtn" onclick="clearFilters()" style="display:none;">
+                                <i class="fas fa-times"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Active filter summary -->
+                    <div class="filter-info-bar" id="filterInfoBar"></div>
+                </div>
+
+                <!-- Print-only report header (dynamically populated, visible only when printing) -->
+                <div class="print-report-header" id="printReportHeader">
+                    <h2>Building Device History Report</h2>
+                    <div class="print-filter-note" id="printFilterNote"></div>
+                </div>
+
+                <!-- Stats Strip (hidden until results loaded) -->
+                <div class="stats-strip" id="statsStrip" style="display:none;"></div>
+
+                <!-- Results Table -->
+                <div id="resultsContainer">
+                    <div class="no-data">
+                        <i class="fas fa-building"></i>
+                        <p>Select a building and click <strong>Apply</strong> to load history.</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script>
+        // ── Mirrors rooms.html fallback extraction helpers ──────────────────────
+        function extractBuildingFromRoomName(roomNumber) {
+            const match = roomNumber.match(/^([A-Z]+)/);
+            return match ? match[1] : '';
+        }
+
+        function extractFloorFromRoomName(roomNumber) {
+            const match = roomNumber.match(/\s+(\d)(\d{2})/);
+            return match ? match[1] : '';
+        }
+
+        // ── Init ────────────────────────────────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function () {
+            Utils.checkAuth();
+
+            // Pre-fill from URL params (e.g. from rooms.html deeplink)
+            const p = new URLSearchParams(window.location.search);
+            if (p.get('building')) document.getElementById('buildingFilter').value = p.get('building');
+            if (p.get('floor'))    document.getElementById('floorFilter').value    = p.get('floor');
+
+            // Auto-load if building is pre-filled
+            if (document.getElementById('buildingFilter').value) {
+                applyFilters();
+            }
+        });
+
+        // ── Main fetch ──────────────────────────────────────────────────────────
+        async function loadHistory() {
+            const building = document.getElementById('buildingFilter').value.trim();
+            const floor    = document.getElementById('floorFilter').value.trim();
+            const status   = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo   = document.getElementById('dateTo').value;
+
+            if (!building) {
+                alert('Please select a building first.');
+                return;
+            }
+
+            document.getElementById('resultsContainer').innerHTML =
+                '<div class="no-data"><div class="spinner"></div><p>Loading…</p></div>';
+            document.getElementById('statsStrip').style.display = 'none';
+
+            let url = `${CONFIG.ENDPOINTS.BUILDING_DEVICE_HISTORY}?building=${encodeURIComponent(building)}`;
+            if (floor)    url += `&floor=${encodeURIComponent(floor)}`;
+            if (status !== 'all') url += `&status=${encodeURIComponent(status)}`;
+            if (dateFrom) url += `&date_from=${encodeURIComponent(dateFrom)}`;
+            if (dateTo)   url += `&date_to=${encodeURIComponent(dateTo)}`;
+
+            try {
+                const result = await Utils.apiRequest(url, { method: 'GET' });
+
+                if (result.success) {
+                    renderStats(result.data.statistics);
+                    renderTable(result.data.records);
+                } else {
+                    showError(result.message || 'Failed to load history');
+                }
+            } catch (e) {
+                console.error(e);
+                showError('An error occurred while loading history.');
+            }
+        }
+
+        // ── Filter apply / clear ────────────────────────────────────────────────
+        function applyFilters() {
+            const building = document.getElementById('buildingFilter').value;
+            const floor    = document.getElementById('floorFilter').value;
+            const status   = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo   = document.getElementById('dateTo').value;
+            const today    = new Date().toISOString().split('T')[0];
+
+            if (!building) {
+                alert('Please select a building first.');
+                return;
+            }
+
+            // Build human-readable filter summary
+            const buildingNames = {
+                NAC: 'NAC - North Academic', SAC: 'SAC - South Academic',
+                NTR: 'NTR - North Tower',    LIB: 'LIB - Library', LAB: 'LAB - Laboratory'
+            };
+            const floorNames = {
+                '0':'Ground Floor','2':'2nd','3':'3rd','4':'4th','5':'5th',
+                '6':'6th','7':'7th','8':'8th','9':'9th','1':'10th'
+            };
+
+            let parts = [`Building: ${buildingNames[building] || building}`];
+            if (floor)  parts.push(`Floor: ${floorNames[floor] || floor}`);
+            if (status !== 'all') parts.push(`Status: ${status}`);
+
+            let datePart = '';
+            if (dateFrom && dateTo)  datePart = `${formatDate(dateFrom)} → ${formatDate(dateTo)}`;
+            else if (dateFrom)        datePart = `${formatDate(dateFrom)} → today`;
+            else if (dateTo)          datePart = `Beginning → ${formatDate(dateTo)}`;
+            if (datePart) parts.push(`Period: ${datePart}`);
+
+            const summary = parts.join('   |   ');
+
+            document.getElementById('filterInfoBar').textContent = summary;
+            document.getElementById('filterInfoBar').style.display = 'block';
+            document.getElementById('printFilterNote').textContent = summary;  // inside print header
+            document.getElementById('clearBtn').style.display = 'inline-flex';
+
+            loadHistory();
+        }
+
+        function clearFilters() {
+            document.getElementById('buildingFilter').value = '';
+            document.getElementById('floorFilter').value    = '';
+            document.getElementById('statusFilter').value   = 'all';
+            document.getElementById('dateFrom').value       = '';
+            document.getElementById('dateTo').value         = '';
+            document.getElementById('filterInfoBar').style.display = 'none';
+            document.getElementById('filterInfoBar').textContent   = '';
+            document.getElementById('printFilterNote').textContent = '';
+            document.getElementById('clearBtn').style.display      = 'none';
+            document.getElementById('statsStrip').style.display    = 'none';
+            document.getElementById('resultsContainer').innerHTML  = `
+                <div class="no-data">
+                    <i class="fas fa-building"></i>
+                    <p>Select a building and click <strong>Apply</strong> to load history.</p>
+                </div>`;
+        }
+
+        // ── Print ────────────────────────────────────────────────────────────────
+        function printHistory() {
+            const building = document.getElementById('buildingFilter').value;
+            if (!building) {
+                alert('Please apply a filter first before printing.');
+                return;
+            }
+
+            const floor  = document.getElementById('floorFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            const buildingNames = {
+                NAC: 'NAC - North Academic', SAC: 'SAC - South Academic',
+                NTR: 'NTR - North Tower',    LIB: 'LIB - Library', LAB: 'LAB - Laboratory'
+            };
+            const floorNames = {
+                '0':'Ground Floor','2':'2nd Floor','3':'3rd Floor','4':'4th Floor',
+                '5':'5th Floor','6':'6th Floor','7':'7th Floor','8':'8th Floor',
+                '9':'9th Floor','1':'10th Floor'
+            };
+
+            let title = buildingNames[building] || building;
+            if (floor)  title += ` — ${floorNames[floor] || 'Floor ' + floor}`;
+            if (status !== 'all') title += ` (${status} only)`;
+
+            // Stamp the dynamic title into the print-only header
+            const h2 = document.querySelector('#printReportHeader h2');
+            if (h2) h2.textContent = `Device History Report: ${title}`;
+
+            window.print();
+        }
+
+        // ── Renderers ────────────────────────────────────────────────────────────
+        function renderStats(stats) {
+            const strip = document.getElementById('statsStrip');
+            strip.style.display = 'flex';
+            strip.innerHTML = `
+                <div class="stat-chip">
+                    <div>
+                        <div class="stat-val">${stats.total_records}</div>
+                        <div class="stat-label">Total Records</div>
+                    </div>
+                </div>
+                <div class="stat-chip">
+                    <div>
+                        <div class="stat-val" style="color:#2e7d32;">${stats.active_count}</div>
+                        <div class="stat-label">Active Devices</div>
+                    </div>
+                </div>
+                <div class="stat-chip">
+                    <div>
+                        <div class="stat-val" style="color:#e65100;">${stats.withdrawn_count}</div>
+                        <div class="stat-label">Withdrawn</div>
+                    </div>
+                </div>
+                <div class="stat-chip">
+                    <div>
+                        <div class="stat-val" style="color:#7b1fa2;">${stats.room_count}</div>
+                        <div class="stat-label">Rooms</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTable(records) {
+            const container = document.getElementById('resultsContainer');
+
+            if (!records || records.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <i class="fas fa-inbox"></i>
+                        <p>No records found for the selected filters.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="history-table table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Room</th>
+                                <th>Floor</th>
+                                <th>Device ID</th>
+                                <th>Type</th>
+                                <th>Brand / Model</th>
+                                <th>Installed Date</th>
+                                <th>Withdrawn Date</th>
+                                <th>Days in Room</th>
+                                <th>Status</th>
+                                <th>Installed By</th>
+                                <th>Withdrawn By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${records.map(r => {
+                                // Derive floor for display (mirrors rooms.html fallback)
+                                const displayFloor = (r.floor && r.floor.trim() !== '')
+                                    ? r.floor
+                                    : extractFloorFromRoomName(r.room_number);
+                                const floorLabel = displayFloor === '0' ? 'Ground'
+                                    : displayFloor ? displayFloor : 'N/A';
+                                return `
+                                <tr>
+                                    <td><strong>${r.room_number}</strong><br><small style="color:#888;">${r.room_name}</small></td>
+                                    <td>${floorLabel}</td>
+                                    <td><code>${r.device_unique_id}</code></td>
+                                    <td>${r.type_name || 'N/A'}</td>
+                                    <td>${r.brand_name || 'N/A'}${r.model ? '<br><small style="color:#888;">' + r.model + '</small>' : ''}</td>
+                                    <td>${formatDate(r.installed_date)}</td>
+                                    <td>${r.withdrawn_date ? formatDate(r.withdrawn_date) : '<span style="color:#2e7d32;">—</span>'}</td>
+                                    <td>${r.days_in_room !== null ? r.days_in_room + ' days' : 'N/A'}</td>
+                                    <td><span class="status-badge ${r.status}">${r.status}</span></td>
+                                    <td>${r.installed_by || 'N/A'}</td>
+                                    <td>${r.withdrawn_by || '—'}</td>
+                                </tr>`;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>`;
+        }
+
+        function showError(msg) {
+            document.getElementById('resultsContainer').innerHTML = `
+                <div style="background:#ffebee;color:#c62828;padding:1rem;border-radius:5px;border-left:4px solid #c62828;margin:1rem 0;">
+                    <i class="fas fa-exclamation-triangle"></i> ${msg}
+                </div>`;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString || dateString === '0000-00-00') return 'N/A';
+            const d = new Date(dateString);
+            return d.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // Logout
+        document.addEventListener('DOMContentLoaded', function () {
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) logoutBtn.addEventListener('click', () => Utils.logout());
+        });
+    </script>
+</body>
+</html>

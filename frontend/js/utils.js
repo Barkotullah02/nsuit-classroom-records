@@ -91,7 +91,15 @@ const Utils = {
      */
     getCurrentUser() {
         const userStr = localStorage.getItem(CONFIG.STORAGE_KEYS.USER);
-        return userStr ? JSON.parse(userStr) : null;
+        if (!userStr) return null;
+
+        try {
+            return JSON.parse(userStr);
+        } catch (error) {
+            console.error('Invalid current_user in localStorage:', error);
+            localStorage.removeItem(CONFIG.STORAGE_KEYS.USER);
+            return null;
+        }
     },
 
     /**
@@ -120,7 +128,15 @@ const Utils = {
      */
     isAdmin() {
         const user = this.getCurrentUser();
-        return user && user.role === CONFIG.ROLES.ADMIN;
+        return user && (user.role === CONFIG.ROLES.SUPER_ADMIN || user.role === CONFIG.ROLES.ADMIN);
+    },
+
+    /**
+     * Check if user is super admin
+     */
+    isSuperAdmin() {
+        const user = this.getCurrentUser();
+        return user && user.role === CONFIG.ROLES.SUPER_ADMIN;
     },
 
     /**
@@ -138,12 +154,12 @@ const Utils = {
      * Logout user
      */
     async logout() {
-        await this.apiRequest(CONFIG.ENDPOINTS.AUTH, {
+        await Utils.apiRequest(CONFIG.ENDPOINTS.AUTH, {
             method: 'DELETE'
         });
 
-        this.clearToken();
-        this.clearCurrentUser();
+        Utils.clearToken();
+        Utils.clearCurrentUser();
         window.location.href = 'login.html';
     },
 
@@ -200,8 +216,10 @@ const Utils = {
 
         if (userNameEl) userNameEl.textContent = user.full_name || user.username;
         if (userRoleEl) {
-            // Display role with proper capitalization
-            const roleDisplay = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+            const roleDisplay = user.role
+                .split('_')
+                .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+                .join(' ');
             userRoleEl.textContent = roleDisplay;
         }
         if (userAvatarEl) {
@@ -210,8 +228,13 @@ const Utils = {
 
         // Show User Management menu for admins only
         const userManagementNav = document.getElementById('userManagementNav');
-        if (userManagementNav && user.role === CONFIG.ROLES.ADMIN) {
+        if (userManagementNav && (user.role === CONFIG.ROLES.SUPER_ADMIN || user.role === CONFIG.ROLES.ADMIN)) {
             userManagementNav.style.display = 'block';
+        }
+
+        const invalidInstallationDatesNav = document.getElementById('invalidInstallationDatesNav');
+        if (invalidInstallationDatesNav && user.role === CONFIG.ROLES.SUPER_ADMIN) {
+            invalidInstallationDatesNav.style.display = 'block';
         }
     },
 
@@ -376,6 +399,52 @@ const Utils = {
         if (!text) return '';
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + '...';
+    },
+
+    /**
+     * Enable click-and-drag horizontal scrolling on .table-container elements.
+     * Safe to call multiple times — already-wired elements are skipped.
+     * A MutationObserver picks up containers injected dynamically after load.
+     */
+    initDragScroll() {
+        const wire = (el) => {
+            if (el._dragScroll) return;
+            el._dragScroll = true;
+            let active = false, startX = 0, startLeft = 0;
+            el.addEventListener('mousedown', (e) => {
+                // Ignore clicks on buttons / links / inputs inside the table
+                if (e.target.closest('a, button, input, select, textarea')) return;
+                active    = true;
+                startX    = e.pageX;
+                startLeft = el.scrollLeft;
+                el.classList.add('is-dragging');
+                e.preventDefault();
+            });
+            const stop = () => { active = false; el.classList.remove('is-dragging'); };
+            el.addEventListener('mouseleave', stop);
+            el.addEventListener('mouseup',    stop);
+            el.addEventListener('mousemove',  (e) => {
+                if (!active) return;
+                el.scrollLeft = startLeft - (e.pageX - startX);
+            });
+        };
+
+        // Wire any containers already in the DOM
+        document.querySelectorAll('.table-container').forEach(wire);
+
+        // Wire containers injected later (dynamic table renders)
+        if (!this._dragScrollObserver) {
+            this._dragScrollObserver = new MutationObserver((mutations) => {
+                mutations.forEach((m) => {
+                    m.addedNodes.forEach((node) => {
+                        if (node.nodeType !== 1) return;
+                        if (node.classList && node.classList.contains('table-container')) wire(node);
+                        if (node.querySelectorAll) node.querySelectorAll('.table-container').forEach(wire);
+                    });
+                });
+            });
+            this._dragScrollObserver.observe(document.body, { childList: true, subtree: true });
+        }
     }
 };
 
@@ -388,4 +457,5 @@ document.addEventListener('DOMContentLoaded', () => {
         Utils.initLogoutButton();
         Utils.initMobileMenu();
     }
+    Utils.initDragScroll();
 });

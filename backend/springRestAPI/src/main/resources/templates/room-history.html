@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Room History')}"></head>
+<style>
+    .room-header {
+        background: linear-gradient(135deg, var(--color-dark) 0%, var(--color-mid) 100%);
+        color: white;
+        padding: 2rem;
+        border-radius: 10px;
+        margin-bottom: 2rem;
+    }
+    .room-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+    .room-info-item {
+        background: rgba(255,255,255,0.15);
+        padding: 0.75rem;
+        border-radius: 5px;
+    }
+    .room-info-item label { display: block; font-size:0.85rem; opacity:0.9; margin-bottom:0.25rem; }
+    .devices-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px,1fr)); gap:1.5rem; margin-bottom:2rem; }
+    .device-card { background: var(--card-bg); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:1.5rem; transition:all 0.3s; }
+    .device-card:hover { box-shadow: 0 6px 12px rgba(0,0,0,0.3); transform:translateY(-2px); }
+    .device-card.active { border-left:4px solid #4CAF50; }
+    .device-card.withdrawn { border-left:4px solid #FF9800; }
+    .device-header { display:flex; justify-content:space-between; align-items:start; margin-bottom:1rem; }
+    .device-title h3 { margin:0 0 0.25rem 0; font-size:1.1rem; }
+    .device-id { font-size:0.9rem; font-weight:500; opacity:0.8; }
+    .status-badge { padding:0.35rem 0.75rem; border-radius:20px; font-size:0.85rem; font-weight:600; text-transform:uppercase; }
+    .status-badge.active { background:#e8f5e9; color:#2e7d32; }
+    .status-badge.withdrawn { background:#fff3e0; color:#e65100; }
+    .device-info { display:grid; gap:0.5rem; margin:1rem 0; font-size:0.9rem; }
+    .device-info-row { display:flex; padding:0.5rem; background:rgba(255,255,255,0.05); border-radius:5px; }
+    .device-info-row label { font-weight:600; min-width:120px; opacity:0.8; }
+    .device-notes { margin-top:1rem; padding:0.75rem; background:rgba(var(--color-mid-rgb,119,141,169),0.2); border-left:3px solid var(--color-mid); border-radius:5px; font-size:0.9rem; }
+    .section-header { display:flex; justify-content:space-between; align-items:center; margin:2rem 0 1rem; padding-bottom:0.75rem; border-bottom:2px solid rgba(255,255,255,0.15); }
+    .section-header h2 { margin:0; display:flex; align-items:center; gap:0.5rem; }
+    .section-count { background:var(--color-dark); color:white; padding:0.25rem 0.75rem; border-radius:20px; font-size:0.9rem; font-weight:bold; }
+    .action-buttons { display:flex; gap:1rem; margin-bottom:1.5rem; }
+    .date-filter-bar { display:flex; align-items:center; gap:1rem; flex-wrap:wrap; background:var(--card-bg); padding:0.85rem 1.25rem; border-radius:8px; border:1px solid rgba(255,255,255,0.1); margin-bottom:1.5rem; }
+    .date-filter-bar label { font-weight:500; white-space:nowrap; margin:0; }
+    .date-filter-bar input[type="date"] { padding:0.45rem 0.75rem; border:1px solid rgba(255,255,255,0.2); border-radius:5px; font-size:0.95rem; background:var(--input-bg,#1e3a5f); color:white; }
+    .date-filter-info { color:var(--color-mid); font-weight:500; font-size:0.9rem; }
+    .print-date-note { display:none; text-align:center; font-size:0.9rem; margin-bottom:0.75rem; font-style:italic; }
+    .history-table { width:100%; background:var(--card-bg); border-radius:10px; overflow:visible; margin-bottom:2rem; }
+    .history-table th { background:var(--color-dark); color:white; padding:1rem; text-align:left; font-weight:600; }
+    .history-table td { padding:1rem; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .no-data { text-align:center; padding:3rem; color:rgba(255,255,255,0.5); font-size:1.1rem; }
+    @media print {
+        .sidebar, .action-buttons, .btn, .date-filter-bar { display:none !important; }
+        .print-date-note { display:block !important; }
+        .main-content { margin:0 !important; padding:1rem !important; }
+    }
+</style>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+    <main class="main-content">
+        <div class="history-container">
+
+            <div class="room-header" id="roomHeader">
+                <div class="spinner"></div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="window.location.href='/rooms'">
+                    <i class="fas fa-arrow-left"></i> Back to Rooms
+                </button>
+                <button class="btn btn-primary" onclick="window.print()">
+                    <i class="fas fa-print"></i> Print History
+                </button>
+            </div>
+
+            <div class="date-filter-bar">
+                <label><i class="fas fa-calendar-alt"></i> Filter by date range:</label>
+                <label for="dateFrom" style="font-weight:400;font-size:0.9rem;">From:</label>
+                <input type="date" id="dateFrom" />
+                <label for="dateTo" style="font-weight:400;font-size:0.9rem;">To:</label>
+                <input type="date" id="dateTo" />
+                <button class="btn btn-primary btn-sm" onclick="applyDateFilter()">
+                    <i class="fas fa-filter"></i> Apply Filter
+                </button>
+                <button class="btn btn-secondary btn-sm" id="clearFilterBtn" onclick="clearDateFilter()" style="display:none;">
+                    <i class="fas fa-times"></i> Clear
+                </button>
+                <span class="date-filter-info" id="filterInfo"></span>
+            </div>
+
+            <div class="print-date-note" id="printDateNote"></div>
+
+            <div class="section-header">
+                <h2><i class="fas fa-desktop"></i> Currently Installed Devices <span id="activeDeviceCount" class="section-count">0</span></h2>
+            </div>
+            <div class="devices-grid" id="activeDevicesGrid">
+                <div class="no-data"><div class="spinner"></div></div>
+            </div>
+
+            <div class="section-header">
+                <h2><i class="fas fa-history"></i> Installation History <span id="historyCount" class="section-count">0</span></h2>
+            </div>
+            <div class="history-table" id="historyTableContainer">
+                <div class="no-data"><div class="spinner"></div></div>
+            </div>
+
+            <div class="section-header">
+                <h2><i class="fas fa-chart-bar"></i> Past Device Record <span id="pastDeviceCount" class="section-count">0</span></h2>
+            </div>
+            <div class="devices-grid" id="pastDevicesGrid">
+                <div class="no-data"><div class="spinner"></div></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script src="/js/room-history.js"></script>
+</body>
+</html>

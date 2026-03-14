@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<body>
+<!-- Common scripts loaded on every page (except login) -->
+<div th:fragment="common-scripts">
+    <script th:src="@{/js/config.js}"></script>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/sidebar.js}"></script>
+</div>
+
+<!-- Login page scripts -->
+<div th:fragment="login-scripts">
+    <script th:src="@{/js/config.js}"></script>
+    <script th:src="@{/js/utils.js}"></script>
+    <script th:src="@{/js/auth.js}"></script>
+</div>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Create Gate Pass')}"></head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+
+    <main class="main-content">
+        <div class="content-header">
+            <div>
+                <button class="btn btn-secondary" onclick="window.location.href='/gate-passes'">
+                    <i class="fas fa-arrow-left"></i> Back to Gate Passes
+                </button>
+                <h1 style="margin-top:8px;"><i class="fas fa-plus-circle" style="color:var(--color-mid);margin-right:8px;"></i>Create Gate Pass</h1>
+                <p class="text-muted">Generate gate pass for device movement</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Gate Pass Information</h3>
+            </div>
+            <div style="padding:24px;">
+                <div id="alert-container"></div>
+                <form id="gatePassForm">
+                    <!-- Pass Type -->
+                    <div class="form-group">
+                        <label>Pass Type *</label>
+                        <div style="display:flex;gap:24px;align-items:center;padding:8px 0;">
+                            <label style="display:flex;gap:8px;align-items:center;margin:0;color:var(--text-primary);cursor:pointer;">
+                                <input type="checkbox" id="passIncoming"> Incoming
+                            </label>
+                            <label style="display:flex;gap:8px;align-items:center;margin:0;color:var(--text-primary);cursor:pointer;">
+                                <input type="checkbox" id="passOutgoing" checked> Outgoing
+                            </label>
+                        </div>
+                        <small class="text-muted">Select exactly one</small>
+                    </div>
+
+                    <!-- Device Selection -->
+                    <div class="form-group">
+                        <label for="deviceSelect">Select Device *</label>
+                        <select id="deviceSelect" class="form-control" required>
+                            <option value="">Choose a device…</option>
+                        </select>
+                        <small class="text-muted">Select any device from your inventory</small>
+                    </div>
+                    <div style="margin:12px 0 20px;">
+                        <button type="button" class="btn btn-success btn-sm" onclick="addDeviceToList()">
+                            <i class="fas fa-plus"></i> Add This Device to Gate Pass
+                        </button>
+                    </div>
+
+                    <!-- Selected Devices List -->
+                    <div id="selectedDevicesList" style="margin-bottom:20px;">
+                        <h4 style="color:var(--color-mid);margin-bottom:12px;">
+                            <i class="fas fa-list"></i> Devices in This Gate Pass (<span id="deviceCount">0</span>)
+                        </h4>
+                        <div id="devicesListContainer"
+                             style="background:rgba(13,27,42,.5);border:1px solid var(--glass-border);padding:16px;border-radius:8px;min-height:80px;">
+                            <p style="text-align:center;color:var(--text-secondary);margin:12px 0;">
+                                No devices added yet. Select a device and click "Add This Device to Gate Pass".
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Gate Pass Details -->
+                    <div class="form-group">
+                        <label for="gatePassNumber">Gate Pass Number *</label>
+                        <input type="text" id="gatePassNumber" class="form-control" readonly required
+                               style="font-weight:700;color:var(--color-mid);">
+                        <small class="text-muted">Auto-generated 6-digit unique number</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="gatePassDate">Gate Pass Date *</label>
+                        <input type="date" id="gatePassDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gatePassTime">Gate Pass Time</label>
+                        <input type="time" id="gatePassTime" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="department">Department *</label>
+                        <input type="text" id="department" class="form-control" placeholder="Enter department" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gateName">Departure/Incoming Gate *</label>
+                        <input type="text" id="gateName" class="form-control" placeholder="Enter gate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="vendorDestination">Vendor/Destination *</label>
+                        <input type="text" id="vendorDestination" class="form-control" placeholder="Enter vendor or destination" required>
+                    </div>
+
+                    <!-- Bearer Details -->
+                    <div style="margin:20px 0 10px;padding:16px;border:1px solid var(--glass-border);border-radius:10px;background:rgba(65,90,119,.1);">
+                        <h4 style="margin-bottom:12px;color:var(--color-mid);"><i class="fas fa-user"></i> Bearer Details</h4>
+                        <div class="form-group">
+                            <label for="bearerName">Name *</label>
+                            <input type="text" id="bearerName" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bearerCompany">Company *</label>
+                            <input type="text" id="bearerCompany" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bearerContactNo">Contact No *</label>
+                            <input type="tel" id="bearerContactNo" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="bearerSignature">Signature</label>
+                            <input type="text" id="bearerSignature" class="form-control" placeholder="(Optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="bearerSignatureDate">Signature Date</label>
+                            <input type="date" id="bearerSignatureDate" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Security Office -->
+                    <div style="margin:12px 0 10px;padding:16px;border:1px solid var(--glass-border);border-radius:10px;background:rgba(65,90,119,.1);">
+                        <h4 style="margin-bottom:12px;color:var(--color-mid);"><i class="fas fa-shield-alt"></i> Security Office</h4>
+                        <div class="form-group">
+                            <label for="securityOfficerName">Duty Officer Name</label>
+                            <input type="text" id="securityOfficerName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="securityOfficerDesignation">Designation</label>
+                            <input type="text" id="securityOfficerDesignation" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="securityOfficerExt">Ext</label>
+                            <input type="text" id="securityOfficerExt" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="securityOfficerSignature">Signature</label>
+                            <input type="text" id="securityOfficerSignature" class="form-control" placeholder="(Optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="securityOfficerSignatureDate">Signature Date</label>
+                            <input type="date" id="securityOfficerSignatureDate" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Processing Person -->
+                    <div style="margin:12px 0 10px;padding:16px;border:1px solid var(--glass-border);border-radius:10px;background:rgba(65,90,119,.1);">
+                        <h4 style="margin-bottom:12px;color:var(--color-mid);"><i class="fas fa-user-edit"></i> Processing Person</h4>
+                        <div class="form-group">
+                            <label for="processingName">Name</label>
+                            <input type="text" id="processingName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="processingDesignation">Designation</label>
+                            <input type="text" id="processingDesignation" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="processingExt">Ext</label>
+                            <input type="text" id="processingExt" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="processingSignature">Signature</label>
+                            <input type="text" id="processingSignature" class="form-control" placeholder="(Optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="processingSignatureDate">Signature Date</label>
+                            <input type="date" id="processingSignatureDate" class="form-control">
+                        </div>
+                    </div>
+
+                    <!-- Authorized By -->
+                    <div style="margin:12px 0 20px;padding:16px;border:1px solid var(--glass-border);border-radius:10px;background:rgba(65,90,119,.1);">
+                        <h4 style="margin-bottom:12px;color:var(--color-mid);"><i class="fas fa-signature"></i> Authorized By</h4>
+                        <div class="form-group">
+                            <label for="authorizedName">Name</label>
+                            <input type="text" id="authorizedName" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="authorizedDesignation">Designation</label>
+                            <input type="text" id="authorizedDesignation" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="authorizedExt">Ext</label>
+                            <input type="text" id="authorizedExt" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="authorizedSignature">Signature</label>
+                            <input type="text" id="authorizedSignature" class="form-control" placeholder="(Optional)">
+                        </div>
+                        <div class="form-group">
+                            <label for="authorizedSignatureDate">Signature Date</label>
+                            <input type="date" id="authorizedSignatureDate" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer" style="padding:0;border:none;margin-top:24px;">
+                        <button type="button" class="btn btn-secondary" onclick="window.location.href='/gate-passes'">
+                            <i class="fas fa-times"></i> Cancel
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-check"></i> Create Gate Pass
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script>
+    // Generate 6-digit number on load
+    document.addEventListener('DOMContentLoaded', function () {
+        const field = document.getElementById('gatePassNumber');
+        if (field) field.value = Math.floor(100000 + Math.random() * 900000);
+    });
+</script>
+<script th:src="@{/js/create-gate-pass.js}"></script>
+</body>
+</html>

@@ -43,6 +43,11 @@ function initializeEventListeners() {
         document.getElementById('addRoomBtn').addEventListener('click', () => openAddRoomModal());
     }
 
+    // Update dates modal
+    document.getElementById('closeUpdateDatesModalBtn').addEventListener('click', closeUpdateDatesModal);
+    document.getElementById('cancelUpdateDatesBtn').addEventListener('click', closeUpdateDatesModal);
+    document.getElementById('updateDatesForm').addEventListener('submit', handleUpdateDatesSubmit);
+
     // Filter listeners
     document.getElementById('filterRoom').addEventListener('change', () => loadInstallations());
     document.getElementById('filterStatus').addEventListener('change', () => loadInstallations());
@@ -211,6 +216,11 @@ function displayInstallations(installationsList) {
                     ` : `
                         <span class="text-muted">Withdrawn on ${Utils.formatDate(inst.withdrawn_date)}</span>
                     `}
+                    ${Utils.isAdmin() ? `
+                        <button class="btn btn-sm btn-warning" onclick="openUpdateDatesModal(${inst.installation_id}, '${inst.device_unique_id}', '${inst.installed_date || ''}', '${inst.withdrawn_date || ''}', '${inst.gate_pass_date || ''}')" title="Update installation dates">
+                            <i class="fas fa-calendar-alt"></i> Dates
+                        </button>
+                    ` : ''}
                     ${Utils.isAdmin() && inst.status === 'withdrawn' ? `
                         <button class="btn btn-sm btn-danger" onclick="deleteInstallation(${inst.installation_id})">
                             <i class="fas fa-trash"></i> Delete
@@ -222,6 +232,63 @@ function displayInstallations(installationsList) {
     });
 
     tbody.innerHTML = html;
+}
+
+/**
+ * Open update dates modal
+ */
+function openUpdateDatesModal(installationId, deviceId, installedDate, withdrawnDate, gatePassDate) {
+    document.getElementById('updateDatesInstallationId').value = installationId;
+    document.getElementById('updateInstalledDate').value = (installedDate && installedDate !== '0000-00-00') ? installedDate : '';
+    document.getElementById('updateWithdrawnDate').value = withdrawnDate || '';
+    document.getElementById('updateGatePassDate').value = gatePassDate || '';
+
+    document.getElementById('updateDatesDeviceInfo').innerHTML = `
+        <div style="background-color: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 8px;">
+            <p><strong>Device:</strong> ${deviceId}</p>
+            <p><strong>Installation ID:</strong> #${installationId}</p>
+        </div>
+    `;
+
+    document.getElementById('updateDatesModal').classList.add('active');
+}
+
+/**
+ * Close update dates modal
+ */
+function closeUpdateDatesModal() {
+    document.getElementById('updateDatesModal').classList.remove('active');
+}
+
+/**
+ * Handle update dates form submit
+ */
+async function handleUpdateDatesSubmit(e) {
+    e.preventDefault();
+
+    const installationId = parseInt(document.getElementById('updateDatesInstallationId').value);
+    const installedDate  = document.getElementById('updateInstalledDate').value  || null;
+    const withdrawnDate  = document.getElementById('updateWithdrawnDate').value  || null;
+    const gatePassDate   = document.getElementById('updateGatePassDate').value   || null;
+
+    const result = await Utils.apiRequest(CONFIG.ENDPOINTS.INVALID_INSTALLATION_DATES, {
+        method: 'PUT',
+        body: JSON.stringify({
+            installation_id: installationId,
+            installed_date:  installedDate,
+            withdrawn_date:  withdrawnDate,
+            gate_pass_date:  gatePassDate
+        })
+    });
+
+    if (result.success) {
+        closeUpdateDatesModal();
+        await loadInstallations();
+        Utils.showAlert('Dates updated successfully!', 'success');
+    } else {
+        const errors = result.errors ? Object.values(result.errors).join(', ') : result.message;
+        Utils.showAlert('Error: ' + errors, 'error');
+    }
 }
 
 /**
@@ -239,7 +306,7 @@ function populateRoomDropdowns() {
     const roomSelect = document.getElementById('roomSelect');
 
     rooms.forEach(room => {
-        const option = `<option value="${room.room_id}">${room.room_number} - ${room.room_name}</option>`;
+        const option = `<option  style="color: black;" value="${room.room_id}">${room.room_number} - ${room.room_name}</option>`;
         filterRoom.innerHTML += option;
         roomSelect.innerHTML += option;
     });

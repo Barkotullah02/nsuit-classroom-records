@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', async () => {
  */
 function setupEventListeners() {
     // Logout
-    document.getElementById('logoutBtn').addEventListener('click', Utils.logout);
+    document.getElementById('logoutBtn').addEventListener('click', () => Utils.logout());
 
     // Pass type (Incoming/Outgoing) - behave like a single-choice checkbox group
     const incoming = document.getElementById('passIncoming');

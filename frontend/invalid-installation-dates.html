@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invalid Installation Dates - Classroom Device Management</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar" id="mainSidebar"></aside>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1><i class="fas fa-calendar-times"></i> Invalid Installation Dates</h1>
+            </div>
+
+            <div id="alert-container"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Records with Invalid Dates</h3>
+                    <button class="btn btn-secondary btn-sm" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Installation ID</th>
+                                <th>Device</th>
+                                <th>Room</th>
+                                <th>Installed Date</th>
+                                <th>Withdrawn Date</th>
+                                <th>Gate Pass Date</th>
+                                <th>Status</th>
+                                <th>Invalid Reason</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invalidInstallationsTableBody">
+                            <tr>
+                                <td colspan="9" class="text-center"><div class="spinner"></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="editDatesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Update Installation Dates</h2>
+                <button class="close-btn" id="closeEditDatesModalBtn">&times;</button>
+            </div>
+            <form id="editDatesForm">
+                <input type="hidden" id="editInstallationId">
+
+                <div id="editDeviceInfo" class="mb-3"></div>
+
+                <div class="form-group">
+                    <label for="editInstalledDate">Installed Date</label>
+                    <input type="date" id="editInstalledDate" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="editWithdrawnDate">Withdrawn Date</label>
+                    <input type="date" id="editWithdrawnDate" class="form-control">
+                </div>
+
+                <div class="form-group">
+                    <label for="editGatePassDate">Gate Pass Date</label>
+                    <input type="date" id="editGatePassDate" class="form-control">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelEditDatesBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Dates</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/invalid-installation-dates.js"></script>
+</body>
+</html>

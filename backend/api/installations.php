@@ -123,25 +123,37 @@ switch ($method) {
                 Response::validationError($errors);
             }
 
-            // Check if device already has an active installation
-            $check_query = "SELECT installation_id FROM device_installations 
-                           WHERE device_id = :device_id AND status = 'active' AND is_deleted = FALSE";
-            $check_stmt = $db->prepare($check_query);
-            $check_stmt->bindParam(':device_id', $data['device_id']);
-            $check_stmt->execute();
-            
-            if ($check_stmt->rowCount() > 0) {
-                Response::error('Device already has an active installation. Please withdraw it first.', 409);
+            // Check if device already has an active installation (skip for withdrawn status)
+            if ((!isset($data['status']) || $data['status'] === 'active')) {
+                $check_query = "SELECT installation_id FROM device_installations 
+                               WHERE device_id = :device_id AND status = 'active' AND is_deleted = FALSE";
+                $check_stmt = $db->prepare($check_query);
+                $check_stmt->bindParam(':device_id', $data['device_id']);
+                $check_stmt->execute();
+                
+                if ($check_stmt->rowCount() > 0) {
+                    Response::error('Device already has an active installation. Please withdraw it first.', 409);
+                }
             }
 
             $user = $auth->getCurrentUser();
 
+            // Determine status - default to 'active' unless withdrawn_date is provided
+            $status = isset($data['status']) ? $data['status'] : 'active';
+            if (!empty($data['withdrawn_date']) && $status !== 'withdrawn') {
+                $status = 'withdrawn';
+            }
+
             $query = "INSERT INTO device_installations 
                      (device_id, room_id, installed_date, installed_by, installer_name, installer_id, 
-                      installation_notes, team_members, installation_type, gate_pass_number, gate_pass_date, data_entry_by, status) 
+                      installation_notes, team_members, installation_type, gate_pass_number, gate_pass_date, 
+                      withdrawn_date, withdrawn_by, withdrawer_name, withdrawer_id, withdrawal_notes, 
+                      issue_at_withdrawal, storage_location, data_entry_by, status) 
                      VALUES 
                      (:device_id, :room_id, :installed_date, :installed_by, :installer_name, :installer_id,
-                      :installation_notes, :team_members, :installation_type, :gate_pass_number, :gate_pass_date, :data_entry_by, 'active')";
+                      :installation_notes, :team_members, :installation_type, :gate_pass_number, :gate_pass_date,
+                      :withdrawn_date, :withdrawn_by, :withdrawer_name, :withdrawer_id, :withdrawal_notes,
+                      :issue_at_withdrawal, :storage_location, :data_entry_by, :status)";
 
             $stmt = $db->prepare($query);
             $stmt->bindParam(':device_id', $data['device_id']);
@@ -155,7 +167,15 @@ switch ($method) {
             $stmt->bindParam(':installation_type', $data['installation_type']);
             $stmt->bindParam(':gate_pass_number', $data['gate_pass_number']);
             $stmt->bindParam(':gate_pass_date', $data['gate_pass_date']);
+            $stmt->bindParam(':withdrawn_date', $data['withdrawn_date']);
+            $stmt->bindParam(':withdrawn_by', $user['user_id']); // Use current user if withdrawn
+            $stmt->bindParam(':withdrawer_name', $data['withdrawer_name']);
+            $stmt->bindParam(':withdrawer_id', $data['withdrawer_id']);
+            $stmt->bindParam(':withdrawal_notes', $data['withdrawal_notes']);
+            $stmt->bindParam(':issue_at_withdrawal', $data['issue_at_withdrawal']);
+            $stmt->bindParam(':storage_location', $data['storage_location']);
             $stmt->bindParam(':data_entry_by', $user['user_id']);
+            $stmt->bindParam(':status', $status);
 
             if ($stmt->execute()) {
                 $installation_id = $db->lastInsertId();

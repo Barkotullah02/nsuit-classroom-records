@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('User Management')}"></head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+
+    <main class="main-content">
+        <div class="content-header">
+            <h1><i class="fas fa-users-cog" style="color:var(--color-mid);margin-right:8px;"></i>User Management</h1>
+            <button class="btn btn-primary" onclick="showAddUserModal()">
+                <i class="fas fa-user-plus"></i> Add User
+            </button>
+        </div>
+
+        <!-- Role Permissions Info Card -->
+        <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+                <h3 class="card-title"><i class="fas fa-info-circle" style="color:var(--color-mid);margin-right:6px;"></i>User Role Permissions</h3>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;">
+                <div style="background:rgba(212,134,10,.08);border:1px solid rgba(212,134,10,.3);border-radius:8px;padding:12px;">
+                    <h5 style="color:#f0bc5e;margin-bottom:8px;font-size:0.9rem;"><i class="fas fa-shield-alt"></i> Super Admin</h5>
+                    <ul style="padding-left:16px;font-size:0.82rem;color:var(--text-secondary);line-height:1.8;">
+                        <li>Highest access level</li>
+                        <li>Fix invalid dates</li>
+                        <li>Manage all users &amp; data</li>
+                    </ul>
+                </div>
+                <div style="background:rgba(36,113,163,.08);border:1px solid rgba(36,113,163,.3);border-radius:8px;padding:12px;">
+                    <h5 style="color:#66b0e2;margin-bottom:8px;font-size:0.9rem;"><i class="fas fa-crown"></i> Admin</h5>
+                    <ul style="padding-left:16px;font-size:0.82rem;color:var(--text-secondary);line-height:1.8;">
+                        <li>Full system access</li>
+                        <li>Add/Edit/Delete data</li>
+                        <li>View all reports</li>
+                    </ul>
+                </div>
+                <div style="background:rgba(65,90,119,.15);border:1px solid var(--glass-border);border-radius:8px;padding:12px;">
+                    <h5 style="color:var(--color-light);margin-bottom:8px;font-size:0.9rem;"><i class="fas fa-user-edit"></i> Staff</h5>
+                    <ul style="padding-left:16px;font-size:0.82rem;color:var(--text-secondary);line-height:1.8;">
+                        <li>Add new data only</li>
+                        <li>Cannot edit/delete</li>
+                        <li>View all reports</li>
+                    </ul>
+                </div>
+                <div style="background:rgba(45,158,107,.08);border:1px solid rgba(45,158,107,.3);border-radius:8px;padding:12px;">
+                    <h5 style="color:#4dd896;margin-bottom:8px;font-size:0.9rem;"><i class="fas fa-eye"></i> Viewer</h5>
+                    <ul style="padding-left:16px;font-size:0.82rem;color:var(--text-secondary);line-height:1.8;">
+                        <li>Read-only access</li>
+                        <li>View all data</li>
+                        <li>Cannot modify anything</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Users List -->
+        <div id="usersContainer">
+            <div class="loading"><div class="spinner"></div> Loading users…</div>
+        </div>
+    </main>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div id="userModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3 id="userModalTitle"><i class="fas fa-user-plus"></i> Add User</h3>
+            <button class="modal-close" onclick="closeUserModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <form id="userForm">
+            <input type="hidden" id="userId">
+            <div class="form-group">
+                <label for="username">Username *</label>
+                <input type="text" id="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="fullName">Full Name *</label>
+                <input type="text" id="fullName" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="role">Role *</label>
+                <select id="role" class="form-control" required>
+                    <option value="">Select Role</option>
+                    <option value="super_admin">Super Admin – Highest Access</option>
+                    <option value="admin">Admin – Full Access</option>
+                    <option value="staff">Staff – Add Data Only</option>
+                    <option value="viewer">Viewer – Read Only</option>
+                </select>
+            </div>
+            <div class="form-group" id="passwordGroup">
+                <label for="password">Password *</label>
+                <input type="password" id="password" class="form-control" minlength="6">
+                <small class="text-muted">Minimum 6 characters</small>
+            </div>
+            <div class="form-group" id="confirmPasswordGroup">
+                <label for="confirmPassword">Confirm Password *</label>
+                <input type="password" id="confirmPassword" class="form-control" minlength="6">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="isActive" checked> Active User
+                </label>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeUserModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="saveUser()"><i class="fas fa-save"></i> Save User</button>
+        </div>
+    </div>
+</div>
+
+<!-- Deactivate Confirmation Modal -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-exclamation-triangle" style="color:var(--warning-color);"></i> Deactivate User</h3>
+            <button class="modal-close" onclick="closeDeleteModal()"><i class="fas fa-times"></i></button>
+        </div>
+        <p>Are you sure you want to deactivate <strong id="deleteUserName"></strong>?</p>
+        <p class="mt-2" style="color:var(--danger-color);font-size:0.88rem;">This user will no longer be able to access the system.</p>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn btn-danger" onclick="confirmDelete()"><i class="fas fa-user-slash"></i> Deactivate</button>
+        </div>
+    </div>
+</div>
+
+<div id="alert-container" style="position:fixed;bottom:24px;right:24px;z-index:999;min-width:280px;"></div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script th:src="@{/js/users.js}"></script>
+</body>
+</html>

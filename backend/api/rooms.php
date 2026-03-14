@@ -224,7 +224,7 @@ if ($method === 'GET') {
 } elseif ($method === 'DELETE') {
     // Admin only - Soft delete room
     $user = $auth->getCurrentUser();
-    if ($user['role'] !== 'admin') {
+    if (!in_array($user['role'], ['super_admin', 'admin'])) {
         Response::error('Unauthorized. Admin access required.', 403);
     }
 

@@ -45,36 +45,7 @@
 </head>
 <body>
     <div class="dashboard-container">
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><img src="images/bot.png" alt="Logo" style="height: 50px;  vertical-align: middle; margin-right: 8px;"> Device Manager</h2>
-            </div>
-            <nav>
-                <ul class="sidebar-nav">
-                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
-                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
-                    <li><a href="installations.html"><i class="fas fa-plug"></i> Installations</a></li>
-                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
-                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
-                    <li><a href="classroom-support.html"><i class="fas fa-headset"></i> Classroom Support</a></li>
-                    <li><a href="blog.html" class="active"><i class="fas fa-newspaper"></i> Blog & News</a></li>
-                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
-                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
-                </ul>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar"></div>
-                    <div class="user-details">
-                        <h4 id="userName">Loading...</h4>
-                        <p id="userRole">Role</p>
-                    </div>
-                </div>
-                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </aside>
+        <aside class="sidebar" id="mainSidebar"></aside>
 
         <main class="main-content">
             <div class="content-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -130,6 +101,7 @@
 
     <script src="js/config.js?v=4"></script>
     <script src="js/utils.js"></script>
+    <script src="js/sidebar.js"></script>
     <script src="js/blog.js?v=6"></script>
 </body>
 </html>

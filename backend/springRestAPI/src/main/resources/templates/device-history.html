@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Device History')}"></head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+    <main class="main-content">
+        <div class="page-header">
+            <div>
+                <button class="btn btn-secondary" onclick="window.location.href='/devices'">
+                    <i class="fas fa-arrow-left"></i> Back to Devices
+                </button>
+                <h1 id="pageTitle"><i class="fas fa-history"></i> Device History</h1>
+                <p id="deviceInfo">Loading device information...</p>
+            </div>
+            <button class="btn btn-primary" onclick="window.print()">
+                <i class="fas fa-print"></i> Print History
+            </button>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Device Information</h3>
+            </div>
+            <div id="deviceDetails" style="padding:20px;">
+                <div class="spinner"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Installation History</h3>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Room</th>
+                            <th>Building</th>
+                            <th>Installed Date</th>
+                            <th>Withdrawn Date</th>
+                            <th>Days in Room</th>
+                            <th>Status</th>
+                            <th>Installed By</th>
+                            <th>Withdrawn By</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableBody">
+                        <tr><td colspan="8" class="text-center"><div class="spinner"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Usage Statistics</h3>
+            </div>
+            <div style="padding:20px;">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalInstallations">0</div>
+                        <div class="stat-label">Total Installations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalDays">0</div>
+                        <div class="stat-label">Total Days Used</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="roomsUsed">0</div>
+                        <div class="stat-label">Rooms Used</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgDaysPerRoom">0</div>
+                        <div class="stat-label">Avg Days per Room</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script src="/js/device-history.js"></script>
+</body>
+</html>

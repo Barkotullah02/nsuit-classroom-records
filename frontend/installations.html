@@ -10,39 +10,7 @@
 <body>
     <div class="dashboard-container">
         <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h2><img src="images/bot.png" alt="Logo" style="height: 50px; vertical-align: middle; margin-right: 8px;"> Device Manager</h2>
-            </div>
-
-            <nav>
-                <ul class="sidebar-nav">
-                    <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
-                    <li><a href="devices.html"><i class="fas fa-desktop"></i> Devices</a></li>
-                    <li><a href="installations.html" class="active"><i class="fas fa-plug"></i> Installations</a></li>
-                    <li><a href="gate-passes.html"><i class="fas fa-file-alt"></i> Gate Passes</a></li>
-                    <li><a href="rooms.html"><i class="fas fa-door-open"></i> Rooms</a></li>
-                    <li><a href="classroom-support.html"><i class="fas fa-headset"></i> Classroom Support</a></li>
-                    <li><a href="blog.html"><i class="fas fa-newspaper"></i> Blog & News</a></li>
-                    <li><a href="import-data.html"><i class="fas fa-file-import"></i> Import Data</a></li>
-                    <li><a href="deleted-items.html"><i class="fas fa-trash-restore"></i> Deleted Items</a></li>
-                    <li id="userManagementNav" style="display: none;"><a href="users.html"><i class="fas fa-users-cog"></i> User Management</a></li>
-                </ul>
-            </nav>
-
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar" id="userAvatar"></div>
-                    <div class="user-details">
-                        <h4 id="userName">Loading...</h4>
-                        <p id="userRole">Role</p>
-                    </div>
-                </div>
-                <button class="btn btn-secondary btn-sm" id="logoutBtn" style="width: 100%;">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </aside>
+        <aside class="sidebar" id="mainSidebar"></aside>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -142,7 +110,7 @@
                 <div class="form-group">
                     <label for="roomSelect">Select Room *</label>
                     <div style="display: flex; gap: 8px;">
-                        <select id="roomSelect" class="form-control" required style="flex: 1;">
+                        <select id="roomSelect"  style="color: black; background-color: white;" class="form-control" required style="flex: 1;">
                             <option value="">Choose a room...</option>
                         </select>
                         <button type="button" class="btn btn-secondary" id="addRoomBtn" style="display: none;" title="Add new room">
@@ -157,13 +125,13 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="installationType">Installation Type *</label>
-                    <select id="installationType" class="form-control" required>
+                    <label for="installationType">Installation Type</label>
+                    <select id="installationType" style="color: black; background-color: white;" class="form-control">
                         <option value="NEW_INSTALLATION">New Installation</option>
                         <option value="REPAIRED">Repaired Device</option>
                         <option value="OLD_REINSTALL">Old Device Reinstall</option>
                     </select>
-                    <small class="form-text">Select whether this is a new installation, repaired device, or old device being reinstalled</small>
+                    <small class="form-text">Select installation type (defaults to New Installation)</small>
                 </div>
 
                 <div class="form-group">
@@ -244,7 +212,7 @@
 
                 <div class="form-group">
                     <label for="withdrawalStorage">Storage Location (Excel Store field)</label>
-                    <select id="withdrawalStorage" class="form-control">
+                    <select id="withdrawalStorage" style="color: black; background-color: white;" class="form-control">
                         <option value="">Not Stored</option>
                     </select>
                     <small class="form-text">Where the device will be stored</small>
@@ -258,6 +226,45 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" id="cancelWithdrawBtn">Cancel</button>
                     <button type="submit" class="btn btn-danger">Withdraw Device</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Update Dates Modal -->
+    <div id="updateDatesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-calendar-alt"></i> Update Installation Dates</h2>
+                <button class="close-btn" id="closeUpdateDatesModalBtn">&times;</button>
+            </div>
+            <form id="updateDatesForm">
+                <input type="hidden" id="updateDatesInstallationId">
+
+                <div id="updateDatesDeviceInfo" class="mb-3"></div>
+
+                <div class="form-group">
+                    <label for="updateInstalledDate">Installation Date</label>
+                    <input type="date" id="updateInstalledDate" class="form-control">
+                    <small class="form-text">Leave blank to clear the date</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="updateWithdrawnDate">Withdrawal Date</label>
+                    <input type="date" id="updateWithdrawnDate" class="form-control">
+                    <small class="form-text">Only applies to withdrawn devices</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="updateGatePassDate">Gate Pass Date</label>
+                    <input type="date" id="updateGatePassDate" class="form-control">
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelUpdateDatesBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Dates
+                    </button>
                 </div>
             </form>
         </div>
@@ -278,7 +285,7 @@
 
                 <div class="form-group">
                     <label for="newRoomName">Room Type *</label>
-                    <select id="newRoomName" class="form-control" required>
+                    <select id="newRoomName" style="color: black; background-color: white;" class="form-control" required>
                         <option value="">Select Room Type</option>
                         <option value="CLASSROOM">CLASSROOM</option>
                         <option value="LAB">LAB</option>
@@ -297,6 +304,7 @@
 
     <script src="js/config.js"></script>
     <script src="js/utils.js"></script>
+    <script src="js/sidebar.js"></script>
     <script src="js/installations.js"></script>
 </body>
 </html>

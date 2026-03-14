@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('User role:', user.role);
     
     // Check if user is admin
-    if (user.role !== 'admin') {
+    if (!['super_admin', 'admin'].includes(user.role)) {
         console.log('User is not admin, redirecting to dashboard');
         alert('Access denied. Admin privileges required.');
         window.location.href = 'dashboard.html';

@@ -118,7 +118,7 @@ if ($method === 'GET') {
             Response::error('Comment not found', 404);
         }
         
-        if ($comment['user_id'] != $user['user_id'] && $user['role'] !== 'admin') {
+        if ($comment['user_id'] != $user['user_id'] && !in_array($user['role'], ['super_admin', 'admin'])) {
             Response::error('Unauthorized', 403);
         }
         
@@ -159,7 +159,7 @@ if ($method === 'GET') {
             Response::error('Comment not found', 404);
         }
         
-        if ($comment['user_id'] != $user['user_id'] && $user['role'] !== 'admin') {
+        if ($comment['user_id'] != $user['user_id'] && !in_array($user['role'], ['super_admin', 'admin'])) {
             Response::error('Unauthorized', 403);
         }
         

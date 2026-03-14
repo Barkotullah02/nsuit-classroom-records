@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head th:replace="~{fragments/head :: head('Gate Passes')}"></head>
+<body>
+<div class="dashboard-container">
+    <aside class="sidebar" id="mainSidebar"></aside>
+
+    <main class="main-content">
+        <div class="content-header">
+            <h1><i class="fas fa-file-alt" style="color:var(--color-mid);margin-right:8px;"></i>Gate Passes</h1>
+            <button class="btn btn-primary" onclick="window.location.href='/create-gate-pass'"
+                    title="Create a new gate pass">
+                <i class="fas fa-plus"></i> Create New Gate Pass
+            </button>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="totalGatePasses">—</div>
+                        <div class="stat-label">Total Gate Passes</div>
+                    </div>
+                    <div class="stat-icon primary"><i class="fas fa-file-alt"></i></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="thisMonthGatePasses">—</div>
+                        <div class="stat-label">This Month</div>
+                    </div>
+                    <div class="stat-icon warning"><i class="fas fa-calendar-day"></i></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="thisWeekGatePasses">—</div>
+                        <div class="stat-label">This Week</div>
+                    </div>
+                    <div class="stat-icon info"><i class="fas fa-calendar-week"></i></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-card-header">
+                    <div>
+                        <div class="stat-value" id="todayGatePasses">—</div>
+                        <div class="stat-label">Today</div>
+                    </div>
+                    <div class="stat-icon success"><i class="fas fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Filters</h3>
+                <button class="btn btn-secondary btn-sm" id="clearFiltersBtn">Clear Filters</button>
+            </div>
+            <div class="filters">
+                <div class="filter-group">
+                    <label for="filterDateFrom">From Date</label>
+                    <input type="date" id="filterDateFrom" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="filterDateTo">To Date</label>
+                    <input type="date" id="filterDateTo" class="form-control">
+                </div>
+                <div class="filter-group">
+                    <label for="filterSearch">Search</label>
+                    <input type="text" id="filterSearch" class="form-control"
+                           placeholder="Gate Pass #, Device ID, Room…">
+                </div>
+            </div>
+        </div>
+
+        <!-- Gate Passes Table -->
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Gate Pass Records</h3>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gate Pass #</th>
+                            <th>Date</th>
+                            <th>Devices</th>
+                            <th>Department</th>
+                            <th>Direction</th>
+                            <th>Vendor/Destination</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gatePassesTableBody">
+                        <tr><td colspan="8" class="text-center"><div class="loading"><div class="spinner"></div></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+</div>
+
+<div id="alert-container" style="position:fixed;bottom:24px;right:24px;z-index:999;min-width:280px;"></div>
+
+<div th:replace="~{fragments/scripts :: common-scripts}"></div>
+<script th:src="@{/js/gate-passes.js}"></script>
+</body>
+</html>
